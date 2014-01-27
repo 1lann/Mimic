@@ -5,23 +5,29 @@ A Soon(tm) to be a full featured implementation of ComputerCraft that works stra
 This project may be ditched at anytime so feel free to fork and finish it!
 
 File Descriptions
-====
-bios.lua - A temporary bios.lua that I will use to intially test WebCC (Not implemented into main code)
-rom - The 
+----
+lua5.1.5.min.js - Lua implementation in JS. - I do not own this code
+rom - Taken from ComputerCraft. All of the rom files from ComputerCraft (Not implemented into main code). - I do not own this code
+minecraftia* - Generated Webfonts of the Minecraftia font (http://www.dafont.com/minecraftia.font). - I do not own this code
+computercraft.js - Core ComputerCraft functions re-implemented in JS. - I own this code
+render.js - Rendering management for drawing text and stuff. - I own this code
+index.html - HTML document for displaying the canvas and loading screen. - I own this code
+package.json - JSON package data for use with Node-Webkit. - I own this code
+bios.lua - A temporary bios.lua that I will use to intially test WebCC (Not implemented into main code). - I own this code
+
 
 License
-=====
-You may redistribute, copy, modify and publish any/all the code I wrote
-(Everything except lua5.1.5.min.js and the files in the rom folder).
+----
+You may redistribute, copy, modify and publish any/all the code I wrote (See file descriptions above).
 If you use all of my code and re-publish it, it would be nice if you were to credit me.
-If you use only a portion of my code, or if you made significant modifications to it
-(Like fixing bugs or adding features) then I'm happy for you to publish it without crediting me.
+If you use only a portion of my code, or if you made significant modifications to it (Like fixing bugs or adding features) then I'm happy for you to publish it without crediting me.
 
 All of the other code are to be used by their respective licenses.
 
 COPYRIGHT and Credits
-=====
+----
 Dan200 for making ComputerCraft (Twitter: @DanTwoHundred)
+Andrew Tyler for the Minecraftia font used (http://www.dafont.com/andrew-tyler.d2526)
 
 Alexander Gladysh for making the Lua engine I'm using from https://github.com/logiceditor-com/lua5.1.js/:
 
