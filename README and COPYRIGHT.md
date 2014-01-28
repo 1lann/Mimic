@@ -30,7 +30,7 @@ Dan200 for making ComputerCraft (Twitter: @DanTwoHundred)
 
 Andrew Tyler for the Minecraftia font used (http://www.dafont.com/andrew-tyler.d2526)
 
-Alexander Gladysh for making the Lua engine I'm using from https://github.com/logiceditor-com/lua5.1.js/:
+Alexander Gladysh for making the Lua engine I'm using from https://github.com/logiceditor-com/lua5.1.js/
 
 lua5.1.js License
 -----------------
