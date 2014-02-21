@@ -2,7 +2,7 @@ var textWidth = 12;
 var textHeight = 18;
 
 var canvas = document.getElementById("canvas");
-var overlayCanvas = document.getElementById("overlayCanvas");
+var overlayCanvas = document.getElementById("overlay-canvas");
 var ctxt = canvas.getContext("2d");
 var oCtxt = overlayCanvas.getContext("2d")
 
