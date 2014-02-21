@@ -1,3 +1,10 @@
+
+//  
+//  WebCC
+//  Made by 1lann and GravityScore
+//  
+
+
 var textWidth = 12;
 var textHeight = 18;
 
@@ -70,14 +77,14 @@ var loaded = false;
 
 // Trick from http://stackoverflow.com/questions/2635814/
 var image = new Image;
-image.src = "minecraftia-webfont.ttf";
+image.src = "res/minecraftia-webfont.ttf";
 image.onerror = function() {
 	setTimeout(function() {
 		loaded = true;
 		document.getElementById("loading").style.display = "none";
 		renderMain();
-		if (typeof(computercraft) != "undefined") {
-			computercraft();
+		if (typeof(main) != "undefined") {
+			main();
 		} else {
 			drawText(1,1,"An error occured while loading ComputerCraft!","#CC4C4C","#000");
 			drawText(1,2,"Check the JavaScript console for more details","#CC4C4C","#000");
