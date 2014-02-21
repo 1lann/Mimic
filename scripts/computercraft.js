@@ -304,6 +304,11 @@ term.write(os.startTimer(3)..'')\
 ";
 
 
+callLua = function(data) {
+	C.luaL_dostring(L, data);
+}
+
+
 resumeThread = function() {
 	if (threadAlive) {
 		console.log("Resuming thread");
@@ -412,7 +417,3 @@ var main = function() {
 	eventStack.push(["test event"]);
 	resumeThread();
 };
-
-callLua = function(data) {
-	C.luaL_dostring(L,data);
-}
