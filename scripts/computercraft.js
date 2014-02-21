@@ -10,38 +10,50 @@ String.prototype.repeat = function(num) {
 }
 
 
-var cursorPos;
-var textColor;
-var cursorBlink;
+// Version
+var version = "CraftOS 1.5 (Web Alpha)";
 
+
+// Lua State
 var C = Lua5_1.C;
 var L = C.lua_open();
-C.luaL_openlibs(L);
-
-var resumeThread;
-
-// Term variables
-cursorPos = [1,1];
-textColor = "#FFF";
-cursorBlink = false;
-var bgColor = "#000";
-var width = 51;
-var height = 19;
 
 var mainThread;
 var threadAlive;
 var threadLoop;
 
 
-// OS variables
-var osVersion = "CraftOS 1.5 (Web Alpha)";
-var tempID = 1;
-var label = null;
-var startClock = null;
+// Term variables
+var cursorPos = [1, 1];
+var textColor = "#FFF";
+var cursorBlink = false;
+var bgColor = "#000000";
 
-// Coroutines and events!
+
+// OS
+var tempID = 1;
+var label;
+var startClock;
+
+
+// Events
 var eventStack = [];
 var latestID = 0;
+
+
+
+//  ----------------  Properties  ----------------  //
+
+
+var config = {
+
+	"width": 51,
+	"height": 19,
+
+	"cellWidth": 12,
+	"cellHeight": 18,
+
+};
 
 
 
@@ -52,55 +64,61 @@ var termAPI = {
 
 	"write": function(L) {
 		var str = C.luaL_checkstring(L, 1);
-		drawText(cursorPos[0],cursorPos[1],str,textColor,bgColor);
+
+		drawText(cursorPos[0], cursorPos[1], str, textColor, bgColor);
 		cursorPos[0] += str.length;
+
 		if (!blinkState) {
-			oCtxt.clearRect(0,0,canvas.width,canvas.height);
+			oCtxt.clearRect(0, 0, canvas.width, canvas.height);
 			oCtxt.fillStyle = textColor;
-			oCtxt.fillText("_",((cursorPos[0]-1)*textWidth)+5,((cursorPos[1]-1)*textHeight)+18);
+			oCtxt.fillText("_", ((cursorPos[0] - 1) * textWidth) + 5, ((cursorPos[1] - 1) * textHeight) + 18);
 		}
+
 		return 0;
 	},
 
 	"clear": function(L) {
-		for (i = 1; i <= height; i++) {
-			drawText(1,i," ".repeat(width),"#000",bgColor);
+		for (var i = 1; i <= height; i++ ) {
+			drawText(1, i, " ".repeat(width), "#000000", bgColor);
 		}
+		return 0;
 	},
 
 	"clearLine": function(L) {
-		drawText(1,cursorPos[1]," ".repeat(width),"#000",bgColor);
+		drawText(1, cursorPos[1], " ".repeat(width), "#000000", bgColor);
+		return 0;
 	},
 
 	"setCursorPos": function(L) {
 		var x = C.luaL_checkint(L, 1);
 		var y = C.luaL_checkint(L, 2);
-		cursorPos = [x,y];
+		cursorPos = [x, y];
 		if (!blinkState) {
-			oCtxt.clearRect(0,0,canvas.width,canvas.height);
+			oCtxt.clearRect(0, 0, canvas.width, canvas.height);
 			oCtxt.fillStyle = textColor;
-			oCtxt.fillText("_",((x-1)*textWidth)+5,((y-1)*textHeight)+18);
+			oCtxt.fillText("_", ((x - 1) * textWidth) + 5, ((y - 1) * textHeight) + 18);
 		}
+		return 0;
 	},
 
 	"getCursorPos": function(L) {
 		C.lua_pushnumber(cursorPos[0]);
 		C.lua_pushnumber(cursorPos[1]);
-		return 1, 2;
+		return 2;
 	},
 
 	"setCursorBlink": function(L) {
-		if(C.lua_isboolean(L, 1)){
+		if (C.lua_isboolean(L, 1)){
 			cursorBlink = C.lua_toboolean(L, 1);
 			if (!cursorBlink) {
-				oCtxt.clearRect(0,0,620,350);
+				oCtxt.clearRect(0, 0, 620, 350);
 				blinkState = false;
 			}
-			return 0;
 		} else {
 			C.lua_pushstring(L, "Expected boolean");
 			C.lua_error(L);
 		}
+		return 0;
 	},
 
 	"setTextColor": function(L) {
@@ -126,27 +144,30 @@ var termAPI = {
 	"getSize": function(L) {
 		C.lua_pushnumber(L, width);
 		C.lua_pushnumber(L, height);
-		return 1, 2;
+		return 2;
 	},
 
 	"scroll": function(L) {
 		var amount = C.luaL_checkint(L, 1);
 		// Extra rendering crap is handled here!
-		var imgd = ctxt.getImageData(4, 4, canvas.width-8, canvas.height-8);
-		ctxt.clearRect(0,0,canvas.width,canvas.height);
-		ctxt.putImageData(imgd, 4, textHeight*amount*(-1)+4);
+		var imgd = ctxt.getImageData(4, 4, canvas.width - 8, canvas.height - 8);
+		ctxt.clearRect(0, 0, canvas.width, canvas.height);
+		ctxt.putImageData(imgd, 4, textHeight * amount * ( - 1) + 4);
+		return 0;
 	},
 
 	"redirect": function(L) {
 		// Function not supported
 		C.lua_pushstring(L, "redirect is not supported at this time!");
 		C.lua_error(L);
+		return 0;
 	},
 
 	"restore": function(L) {
 		// Function not supported
 		C.lua_pushstring(L, "restore is not supported at this time!");
 		C.lua_error(L);
+		return 0;
 	},
 };
 
@@ -182,7 +203,7 @@ var osAPI = {
 
 	"clock": function(L) {
 		var diff = Date.now() - startClock;
-		var retDiff = Math.round(diff*0.1)/100;
+		var retDiff = Math.round(diff * 0.1)/100;
 		C.lua_pushnumber(L, retDiff);
 		return 1;
 	},
@@ -190,13 +211,17 @@ var osAPI = {
 	"time": function(L) {
 		C.lua_pushstring(L, "Time not supported!");
 		C.lua_error(L);
+		return 0;
 	},
 
 	"startTimer": function(L) {
 		var time = C.luaL_checknumber(L, 1);
 		latestID++;
 		var timerID = latestID;
-		setTimeout(function() { eventStack.push(["timer",timerID]); resumeThread(); }, time*1000);
+		setTimeout(function() {
+			eventStack.push(["timer", timerID]);
+			resumeThread();
+		}, time * 1000);
 		C.lua_pushnumber(L, timerID);
 		return 1;
 	},
@@ -206,22 +231,23 @@ var osAPI = {
 		queueObject.push(C.luaL_checkstring(L, 1));
 		var top = lua_gettop(L);
 		for (i = 1; i <= top; i++) {
-			var t = lua_type(L,i);
+			var t = lua_type(L, i);
 			if (t == C.LUA_TSTRING) {
-				queueObject.push(C.lua_tostring(L,i));
+				queueObject.push(C.lua_tostring(L, i));
 			} else if (t == C.LUA_TBOOLEAN) {
-				if (C.lua_toboolean(L,i)) {
+				if (C.lua_toboolean(L, i)) {
 					queueObject.push(true);
 				} else {
 					queueObject.push(false);
 				}
 			} else if (t == C.LUA_TNUMBER) {
-				queueObject.push(C.lua_tonumber(L,i));
+				queueObject.push(C.lua_tonumber(L, i));
 			} else {
 				queueObject.push(null);
 			}
 		}
 		eventStack.push(queueObject);
+		return 0;
 	},
 
 	"shutdown": function(L) {
@@ -286,11 +312,11 @@ resumeThread = function() {
 				var argumentsNumber = eventStack[0].length;
 
 				for (var index in eventStack[0]) {
-					C.lua_pushstring(mainThread,""+eventStack[0][index]);
+					C.lua_pushstring(mainThread, "" + eventStack[0][index]);
 				}
-				eventStack.splice(0,1)
+				eventStack.splice(0, 1)
 
-				var resp = C.lua_resume(mainThread,argumentsNumber);
+				var resp = C.lua_resume(mainThread, argumentsNumber);
 				if (resp == C.LUA_YIELD) {
 
 				} else if (resp == 0) {
@@ -299,7 +325,7 @@ resumeThread = function() {
 					console.log("Program complete")
 					console.log("Thread closed")
 				} else {
-					console.log("Error: "+C.lua_tostring(mainThread,-1));
+					console.log("Error: " + C.lua_tostring(mainThread, -1));
 					clearInterval(threadLoop);
 					threadAlive = false;
 					console.log("Thread closed")
@@ -315,27 +341,27 @@ resumeThread = function() {
 
 var initialization = function() {
 	for (i = 1; i <= height; i++) {
-		drawText(1,i," ".repeat(width),"#000",bgColor);
+		drawText(1, i, " ".repeat(width), "#000000", bgColor);
 	}
 
-	var resp = C.lua_resume(mainThread,0);
+	var resp = C.lua_resume(mainThread, 0);
 	if ((resp != C.LUA_YIELD) && (resp != 0)) {
-		var errorCode = C.lua_tostring(mainThread,-1);
-		var trace = C.lua_tostring(mainThread,-3);
-		console.log("Intialization Error: "+errorCode);
+		var errorCode = C.lua_tostring(mainThread,  - 1);
+		var trace = C.lua_tostring(mainThread,  - 3);
+		console.log("Intialization Error: " + errorCode);
 		threadAlive = false;
 		console.log("Thread closed")
 		for (i = 1; i <= height; i++) {
-			drawText(1,i," ".repeat(width),"#000","#0000AA");
+			drawText(1, i, " ".repeat(width), "#000000", "#0000AA");
 		}
-		drawText(13,7,"WEBCC : FATAL : BIOS ERROR","#0000AA","#FFF");
-		var startPos = Math.round(width/2 - ((7+errorCode.length)/2));
-		drawText(startPos,9,"ERROR: "+errorCode,"#FFF","#0000AA");
+		drawText(13, 7, "WEBCC : FATAL : BIOS ERROR", "#0000AA", "#FFF");
+		var startPos = Math.round(width/2 - ((7 + errorCode.length)/2));
+		drawText(startPos, 9, "ERROR: " + errorCode, "#FFF", "#0000AA");
 		if (trace) {
 			function wordWrap(str, maxWidth) {
 				var white = new RegExp(/^\s$/);
 				var newLineStr = "\n"; done = false; res = [];
-				do {                    
+				do {
 					found = false;
 				// Inserts new line at first whitespace of the line
 				for (i = maxWidth - 1; i >= 0; i--) {
@@ -358,13 +384,13 @@ var initialization = function() {
 
 				return res;
 			}
-			var words = wordWrap(trace,40)
-			drawText(17,11,"-- MORE DETAILS --","#FFF","#0000AA");
+			var words = wordWrap(trace, 40)
+			drawText(17, 11, "-- MORE DETAILS --", "#FFF", "#0000AA");
 			var yIndex = 11;
 			for (var index in words) {
 				yIndex++;
 				var startPos = Math.round(width/2 - ((words[index].length)/2));
-				drawText(startPos,yIndex,words[index],"#FFF","#0000AA");
+				drawText(startPos, yIndex, words[index], "#FFF", "#0000AA");
 			}
 		}
 	}
@@ -372,6 +398,7 @@ var initialization = function() {
 
 
 var main = function() {
+	C.luaL_openlibs(L);
 	loadAPIs();
 
 	startClock = Date.now();
