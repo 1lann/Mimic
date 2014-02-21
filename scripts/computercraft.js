@@ -278,20 +278,21 @@ var loadAPIs = function() {
 
 var code = "\
 term.write('Self test...') \
-local startClock = os.clock() \
-os.startTimer(100000)\
+term.setCursorPos(1,2) \
 while true do \
 	local e, but, x, y = coroutine.yield() \
 	if e == 'timer' then break \
 	elseif e == 'mouse_click' then term.write(e .. ' ' .. but .. ' ' .. x .. ' ' .. y .. '\\n') \
 	elseif e == 'key' or e == 'char' then term.write(e .. ' ' .. but) end \
+	local x, y = term.getCursorPos() \
+	local h, w = term.getSize() \
+	if y >= h then \
+		term.scroll(1) \
+		term.setCursorPos(1,h) \
+	else \
+		term.setCursorPos(1,y+1) \
+	end \
 end \
-local diff = (os.clock()-startClock) \
-term.scroll(1) \
-term.setCursorPos(1,1) \
-term.write('Completed!') \
-term.setCursorPos(1,2) \
-term.write('Accurate to: '..2-diff) \
 ";
 
 
@@ -354,7 +355,7 @@ var initialization = function() {
 		}
 
 		var startPos = Math.round(config.width / 2 - ((7 + errorCode.length) / 2));
-		drawText(13, 7, "FATAL : BIOS ERROR", "#0000aa", "#ffffff");
+		drawText(16, 7, "FATAL : BIOS ERROR", "#0000aa", "#ffffff");
 		drawText(startPos, 9, "ERROR: " + errorCode, "#ffffff", "#0000aa");
 
 		if (trace) {
