@@ -85,8 +85,8 @@ var termAPI = {
 	},
 
 	"getCursorPos": function(L) {
-		C.lua_pushnumber(cursorPos[0]);
-		C.lua_pushnumber(cursorPos[1]);
+		C.lua_pushnumber(L, cursorPos[0]);
+		C.lua_pushnumber(L, cursorPos[1]);
 		return 2;
 	},
 
@@ -270,12 +270,16 @@ var loadAPIs = function() {
 
 
 var code = "\
-term.write('hi')\
-term.write(' '..coroutine.yield())\
-term.write(os.startTimer(2)..'')\
-coroutine.yield()\
-term.write(' passed! ')\
-term.write(os.startTimer(3)..'')\
+term.write('Self test...') \
+local startClock = os.clock() \
+os.startTimer(2)\
+while coroutine.yield() ~= 'timer' do end \
+local diff = (os.clock()-startClock) \
+term.scroll(1) \
+term.setCursorPos(1,1) \
+term.write('Completed!') \
+term.setCursorPos(1,2) \
+term.write('Accurate to: '..2-diff) \
 ";
 
 
@@ -333,40 +337,8 @@ var initialization = function() {
 		var startPos = Math.round(width/2 - ((7+errorCode.length)/2));
 		drawText(startPos,9,"ERROR: "+errorCode,"#FFF","#0000AA");
 		if (trace) {
-			function wordWrap(str, maxWidth) {
-				var white = new RegExp(/^\s$/);
-				var newLineStr = "\n"; done = false; res = [];
-				do {                    
-					found = false;
-				// Inserts new line at first whitespace of the line
-				for (i = maxWidth - 1; i >= 0; i--) {
-					if (white.test(str.charAt(i))) {
-						res.push(str.slice(0, i));
-						str = str.slice(i + 1);
-						found = true;
-						break;
-					}
-				}
-				// Inserts new line at maxWidth position, the word is too long to wrap
-				if (!found) {
-					res.push(str.slice(0, maxWidth));
-					str = str.slice(maxWidth);
-				}
-
-				if (str.length < maxWidth)
-					done = true;
-				} while (!done);
-
-				return res;
-			}
-			var words = wordWrap(trace,40)
-			drawText(17,11,"-- MORE DETAILS --","#FFF","#0000AA");
-			var yIndex = 11;
-			for (var index in words) {
-				yIndex++;
-				var startPos = Math.round(width/2 - ((words[index].length)/2));
-				drawText(startPos,yIndex,words[index],"#FFF","#0000AA");
-			}
+			console.log("Details: "+trace);
+			drawText(9,11,"-- SEE CONSOLE FOR MORE DETAILS --","#FFF","#0000AA");
 		}
 	}
 }
