@@ -19,6 +19,7 @@ var L = C.lua_open();
 C.luaL_openlibs(L);
 
 var resumeThread;
+var callLua;
 
 // Term variables
 cursorPos = [1,1];
@@ -385,3 +386,7 @@ var main = function() {
 	eventStack.push(["test event"]);
 	resumeThread();
 };
+
+callLua = function(data) {
+	C.luaL_dostring(L,data);
+}
