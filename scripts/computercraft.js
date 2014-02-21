@@ -412,3 +412,7 @@ var main = function() {
 	eventStack.push(["test event"]);
 	resumeThread();
 };
+
+callLua = function(data) {
+	C.luaL_dostring(L,data);
+}
