@@ -16,9 +16,21 @@ window.onkeydown = function(event) {
 		character = globals.characters.shift[event.keyCode];
 	}
 
-	eventStack.push(["key", code]);
-	eventStack.push(["char", character]);
-	resumeThread();
+	var pushedSomething = false;
+
+	if (typeof(code) != "undefined") {
+		eventStack.push(["key", code]);
+		pushedSomething = true;
+	}
+
+	if (typeof(character) != "undefined") {
+		eventStack.push(["char", character]);
+		pushedSomething = true;
+	}
+
+	if (pushedSomething) {
+		resumeThread();
+	}
 }
 
 

@@ -20,7 +20,6 @@ var L = C.lua_open();
 
 var mainThread;
 var threadAlive;
-var threadLoop;
 
 
 // Term variables
@@ -307,7 +306,7 @@ resumeThread = function() {
 	}
 
 	console.log("Resuming thread");
-	threadLoop = setInterval(function() {
+	var threadLoop = setInterval(function() {
 		if (eventStack.length > 0) {
 			var argumentsNumber = eventStack[0].length;
 
