@@ -147,6 +147,7 @@ var termAPI = {
 
 };
 
+termAPI["isColour"] = termAPI["isColor"];
 termAPI["setTextColour"] = termAPI["setTextColor"];
 termAPI["setBackgroundColour"] = termAPI["setBackgroundColor"];
 
@@ -156,6 +157,10 @@ termAPI["setBackgroundColour"] = termAPI["setBackgroundColor"];
 
 
 var osAPI = {
+
+	"setAlarm": function(L) {
+
+	},
 
 	"getComputerID": function(L) {
 		C.lua_pushnumber(L, tempID);
@@ -188,6 +193,10 @@ var osAPI = {
 		C.lua_pushstring(L, "Time not supported!");
 		C.lua_error(L);
 		return 0;
+	},
+
+	"day": function(L) {
+
 	},
 
 	"startTimer": function(L) {
@@ -241,6 +250,147 @@ var osAPI = {
 };
 
 osAPI["computerLabel"] = osAPI["getComputerLabel"];
+osAPI["computerID"] = osAPI["getComputerID"];
+
+
+
+//  ----------------  HTTP API  ----------------  //
+
+
+var httpAPI = {
+
+	"request": function(L) {
+
+	},
+
+};
+
+
+
+//  ----------------  FS API  ----------------  //
+
+
+var fsAPI = {
+
+	"list": function(L) {
+
+	},
+
+	"combine": function(L) {
+
+	},
+
+	"getName": function(L) {
+
+	},
+
+	"getSize": function(L) {
+
+	},
+
+	"exists": function(L) {
+
+	},
+
+	"isDir": function(L) {
+
+	},
+
+	"isReadOnly": function(L) {
+
+	},
+
+	"makeDir": function(L) {
+
+	},
+
+	"move": function(L) {
+
+	},
+
+	"copy": function(L) {
+
+	},
+
+	"delete": function(L) {
+
+	},
+
+	"open": function(L) {
+
+	},
+
+	"getDrive": function(L) {
+
+	},
+
+	"getFreeSpace": function(L) {
+
+	},
+
+};
+
+
+
+//  ----------------  Bit API  ----------------  //
+
+
+var bitAPI = {
+
+	"bnot": function(L) {
+
+	},
+
+	"band": function(L) {
+
+	},
+
+	"bor": function(L) {
+
+	},
+
+	"bxor": function(L) {
+
+	},
+
+	"brshift": function(L) {
+
+	},
+
+	"blshift": function(L) {
+
+	},
+
+	"blogic_rshift": function(L) {
+
+	},
+
+};
+
+
+
+//  ----------------  Peripheral API  ----------------  //
+
+
+var peripheralAPI = {
+
+	"isPresent": function(L) {
+
+	},
+
+	"getType": function(L) {
+
+	},
+
+	"getMethods": function(L) {
+
+	},
+
+	"call": function(L) {
+
+	},
+
+};
 
 
 
@@ -248,8 +398,12 @@ osAPI["computerLabel"] = osAPI["getComputerLabel"];
 
 
 var apis = {
-	"term": termAPI,
+	"bit": bitAPI,
+	"fs": fsAPI,
+	"http": httpAPI,
 	"os": osAPI,
+	"peripheral": peripheralAPI,
+	"term": termAPI,
 };
 
 
