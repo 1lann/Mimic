@@ -285,7 +285,7 @@ while true do \
 	elseif e == 'mouse_click' then term.write(e .. ' ' .. but .. ' ' .. x .. ' ' .. y .. '\\n') \
 	elseif e == 'key' or e == 'char' then term.write(e .. ' ' .. but) end \
 	local x, y = term.getCursorPos() \
-	local h, w = term.getSize() \
+	local w, h = term.getSize() \
 	if y >= h then \
 		term.scroll(1) \
 		term.setCursorPos(1,h) \
