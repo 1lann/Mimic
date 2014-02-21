@@ -77,12 +77,14 @@ var termAPI = {
 	"setCursorPos": function(L) {
 		var x = C.luaL_checkint(L, 1);
 		var y = C.luaL_checkint(L, 2);
+
 		cursorPos = [x, y];
 		if (!blinkState) {
 			overlayContext.clearRect(0, 0, canvas.width, canvas.height);
 			overlayContext.fillStyle = textColor;
 			overlayContext.fillText("_", ((x - 1) * config.cellWidth) + 5, ((y - 1) * config.cellHeight) + 18);
 		}
+
 		return 0;
 	},
 
@@ -136,10 +138,10 @@ var termAPI = {
 
 	"scroll": function(L) {
 		var amount = C.luaL_checkint(L, 1);
-		// Extra rendering crap is handled here!
-		var imgd = context.getImageData(4, 4, canvas.width - 8, canvas.height - 8);
+		var imageData = context.getImageData(4, 4, canvas.width - 8, canvas.height - 8);
+
 		context.clearRect(0, 0, canvas.width, canvas.height);
-		context.putImageData(imgd, 4, config.cellHeight * amount * ( - 1) + 4);
+		context.putImageData(imageData, 4, config.cellHeight * amount * -1 + 4);
 		return 0;
 	},
 
@@ -205,20 +207,23 @@ var osAPI = {
 	"startTimer": function(L) {
 		var time = C.luaL_checknumber(L, 1);
 		latestID++;
+
 		var timerID = latestID;
 		setTimeout(function() {
 			eventStack.push(["timer", timerID]);
 			resumeThread();
 		}, time * 1000);
 		C.lua_pushnumber(L, timerID);
+
 		return 1;
 	},
 
 	"queueEvent": function(L) {
 		var queueObject = [];
 		queueObject.push(C.luaL_checkstring(L, 1));
+
 		var top = lua_gettop(L);
-		for (i = 1; i <= top; i++) {
+		for (var i = 1; i <= top; i++) {
 			var t = lua_type(L, i);
 			if (t == C.LUA_TSTRING) {
 				queueObject.push(C.lua_tostring(L, i));
@@ -234,6 +239,7 @@ var osAPI = {
 				queueObject.push(null);
 			}
 		}
+
 		eventStack.push(queueObject);
 		return 0;
 	},
@@ -262,13 +268,15 @@ var apis = {
 
 
 var loadAPIs = function() {
-	for (api in apis) {
+	C.luaL_openlibs(L);
+	
+	for (var api in apis) {
 		if (typeof(apis[api]) == "function") {
 			C.lua_pushcfunction(L, Lua5_1.Runtime.addFunction(apis[api]));
 			C.lua_setfield(L, 1, api)
 		} else {
 			C.lua_newtable(L);
-			for (key in apis[api]) {
+			for (var key in apis[api]) {
 				C.lua_pushcfunction(L, Lua5_1.Runtime.addFunction(apis[api][key]));
 				C.lua_setfield(L, 1, key)
 			}
@@ -302,57 +310,64 @@ callLua = function(data) {
 
 
 resumeThread = function() {
-	if (threadAlive) {
-		console.log("Resuming thread");
-		threadLoop = setInterval(function() {
-			if (eventStack.length > 0) {
-				var argumentsNumber = eventStack[0].length;
-
-				for (var index in eventStack[0]) {
-					C.lua_pushstring(mainThread, "" + eventStack[0][index]);
-				}
-				eventStack.splice(0, 1)
-
-				var resp = C.lua_resume(mainThread, argumentsNumber);
-				if (resp == C.LUA_YIELD) {
-
-				} else if (resp == 0) {
-					clearInterval(threadLoop);
-					threadAlive = false;
-					console.log("Program complete")
-					console.log("Thread closed")
-				} else {
-					console.log("Error: " + C.lua_tostring(mainThread, -1));
-					clearInterval(threadLoop);
-					threadAlive = false;
-					console.log("Thread closed")
-				}
-			} else {
-				clearInterval(threadLoop);
-				console.log("Thread suspended")
-			}
-		}, 10);
+	if (!threadAlive) {
+		return;
 	}
+
+	console.log("Resuming thread");
+	threadLoop = setInterval(function() {
+		if (eventStack.length > 0) {
+			var argumentsNumber = eventStack[0].length;
+
+			for (var index in eventStack[0]) {
+				C.lua_pushstring(mainThread, "" + eventStack[0][index]);
+			}
+			eventStack.splice(0, 1)
+
+			var resp = C.lua_resume(mainThread, argumentsNumber);
+			if (resp == C.LUA_YIELD) {
+
+			} else if (resp == 0) {
+				clearInterval(threadLoop);
+				threadAlive = false;
+				console.log("Program complete");
+				console.log("Thread closed");
+			} else {
+				console.log("Error: " + C.lua_tostring(mainThread, -1));
+				clearInterval(threadLoop);
+				threadAlive = false;
+				console.log("Thread closed");
+			}
+		} else {
+			clearInterval(threadLoop);
+			console.log("Thread suspended");
+		}
+	}, 10);
 }
 
 
 var initialization = function() {
 	termAPI.clear();
+
 	var resp = C.lua_resume(mainThread, 0);
 	if ((resp != C.LUA_YIELD) && (resp != 0)) {
 		var errorCode = C.lua_tostring(mainThread, -1);
 		var trace = C.lua_tostring(mainThread, -3);
+
 		console.log("Intialization Error: " + errorCode);
 		threadAlive = false;
 		console.log("Thread closed")
-		for (i = 1; i <= config.height; i++) {
+
+		for (var i = 1; i <= config.height; i++) {
 			drawText(1, i, " ".repeat(config.width), "#000000", "#0000aa");
 		}
-		drawText(13, 7, "WEBCC : FATAL : BIOS ERROR", "#0000aa", "#ffffff");
+
 		var startPos = Math.round(config.width / 2 - ((7 + errorCode.length) / 2));
+		drawText(13, 7, "FATAL : BIOS ERROR", "#0000aa", "#ffffff");
 		drawText(startPos, 9, "ERROR: " + errorCode, "#ffffff", "#0000aa");
+
 		if (trace) {
-			console.log("Details: "+trace);
+			console.log("Details: " + trace);
 			drawText(9,11,"-- SEE CONSOLE FOR MORE DETAILS --","#FFF","#0000AA");
 		}
 	}
@@ -360,7 +375,6 @@ var initialization = function() {
 
 
 var main = function() {
-	C.luaL_openlibs(L);
 	loadAPIs();
 
 	startClock = Date.now();
