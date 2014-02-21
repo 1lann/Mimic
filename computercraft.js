@@ -25,6 +25,9 @@ var computercraft = function() {
 	var bgColor = "#000";
 	var width = 51;
 	var height = 19;
+	for (i = 1; i <= height; i++) {
+		drawText(1,i," ".repeat(width),"#000",bgColor);
+	}
 
 	// OS variables
 	var osVersion = "CraftOS 1.5 (Web Alpha)";
@@ -157,8 +160,8 @@ var computercraft = function() {
 				var time = C.luaL_checknumber(L, 1);
 				latestID++;
 				var timerID = latestID;
-				setTimeout(function() { eventStack.push(["timer",latestID]); resumeThread(); }, time*1000);
-				C.lua_pushnumber(timerID);
+				setTimeout(function() { eventStack.push(["timer",timerID]); resumeThread(); }, time*1000);
+				C.lua_pushnumber(L, timerID);
 				return 1;
 			},
 			"queueEvent": function(L) {
@@ -226,12 +229,13 @@ var computercraft = function() {
 	startClock = Date.now();
 
 	var mainThread = C.lua_newthread(L);
-	C.luaL_loadstring(mainThread, "term.write('hi') term.write(' '..coroutine.yield()) coroutine.yield() term.write(' passed!')");
+	C.luaL_loadstring(mainThread, "term.write('hi') term.write(' '..coroutine.yield()) term.write(os.startTimer(2)..'') coroutine.yield() term.write(' passed! ') term.write(os.startTimer(3)..'') ");
 
 	var threadAlive = true;
 	var threadLoop;
 	resumeThread = function() {
 		if (threadAlive) {
+			console.log("Resuming thread");
 			threadLoop = setInterval(function () {
 				if (eventStack.length > 0) {
 					var argumentsNumber = eventStack[0].length;
@@ -246,13 +250,13 @@ var computercraft = function() {
 
 					} else if (resp == 0) {
 						clearInterval(threadLoop);
-						trheadAlive = false;
+						threadAlive = false;
 						console.log("Program complete")
 						console.log("Thread closed")
 					} else {
 						console.log("Error: "+C.lua_tostring(mainThread,-1));
 						clearInterval(threadLoop);
-						threadALive = false;
+						threadAlive = false;
 						console.log("Thread closed")
 					}
 				} else {
@@ -316,8 +320,6 @@ var computercraft = function() {
 		}
 	}
 	initialization();
-	eventStack.push(["test event"]);
-	resumeThread();
 	eventStack.push(["test event"]);
 	resumeThread();
 };
