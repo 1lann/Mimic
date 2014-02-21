@@ -146,20 +146,6 @@ var termAPI = {
 		return 0;
 	},
 
-	"redirect": function(L) {
-		// Function not supported
-		C.lua_pushstring(L, "redirect is not supported at this time!");
-		C.lua_error(L);
-		return 0;
-	},
-
-	"restore": function(L) {
-		// Function not supported
-		C.lua_pushstring(L, "restore is not supported at this time!");
-		C.lua_error(L);
-		return 0;
-	},
-
 };
 
 termAPI["setTextColour"] = termAPI["setTextColor"];

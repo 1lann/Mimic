@@ -34,8 +34,10 @@ window.onmousedown = function(event) {
 	var button = globals.buttons["click " + event.button];
 	var x = Math.floor((event.pageX - config.borderWidth) / config.cellWidth) + 1;
 	var y = Math.floor((event.pageY - config.borderHeight) / config.cellHeight) + 1;
-	eventStack.push(["mouse_click", button, x, y]);
-	resumeThread();
+	if (x >= 1 && y >= 1 && x <= config.width && y <= config.height) {
+		eventStack.push(["mouse_click", button, x, y]);
+		resumeThread();
+	}
 }
 
 
@@ -50,11 +52,13 @@ window.onmousemove = function(event) {
 	var button = globals.buttons["click " + event.button];
 
 	if (mouseDown && (previousMouseLocation[0] != button || previousMouseLocation[1] != x || previousMouseLocation[2] != y)) {
-		eventStack.push(["mouse_drag", button, x, y]);
-		resumeThread();
+		if (x >= 1 && y >= 1 && x <= config.width && y <= config.height) {
+			eventStack.push(["mouse_drag", button, x, y]);
+			resumeThread();
 
-		previousMouseLocation[0] = button;
-		previousMouseLocation[1] = x;
-		previousMouseLocation[2] = y;
+			previousMouseLocation[0] = button;
+			previousMouseLocation[1] = x;
+			previousMouseLocation[2] = y;
+		}
 	}
 }

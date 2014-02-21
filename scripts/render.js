@@ -20,7 +20,7 @@ var letterOffsets = {", ": 3, "l": 3, ".": 3, "i": 5, "t": 3, "f": 2, "I": 2, "!
 
 
 drawChar = function(x, y, char, color, bg) {
-	if (x >= 1 && y >= 1) {
+	if (x >= 1 && y >= 1 && x <= config.width && y <= config.height) {
 		var offset = 0;
 		if (typeof(letterOffsets[char]) != "undefined") {
 			offset = letterOffsets[char];
@@ -46,11 +46,9 @@ drawText = function(x, y, text, textColor, bgColor) {
 
 cursorBlinking = function() {
 	if (cursorBlink && blinkState) {
-		if (blinkState) {
-			overlayContext.fillStyle = textColor;
-			overlayContext.fillText("_", ((cursorPos[0] - 1) * config.cellWidth) + config.borderWidth + 1, ((cursorPos[1] - 1) * config.cellHeight) + 18);
-			blinkState = false;
-		}
+		overlayContext.fillStyle = textColor;
+		overlayContext.fillText("_", ((cursorPos[0] - 1) * config.cellWidth) + config.borderWidth + 1, ((cursorPos[1] - 1) * config.cellHeight) + 18);
+		blinkState = false;
 	} else {
 		overlayContext.clearRect(0, 0, canvas.width, canvas.height);
 		blinkState = true;
