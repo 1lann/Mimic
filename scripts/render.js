@@ -62,7 +62,7 @@ var link = document.createElement('link');
 var loaded = false;
 
 var image = new Image();
-image.src = "res/minecraftia - webfont.ttf";
+image.src = "res/minecraftia-webfont.ttf";
 
 image.onerror = function() {
 	setTimeout(function() {

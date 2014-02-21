@@ -25,7 +25,7 @@ var threadLoop;
 
 // Term variables
 var cursorPos = [1, 1];
-var textColor = "#FFF";
+var textColor = "#ffffff";
 var cursorBlink = false;
 var bgColor = "#000000";
 
@@ -52,6 +52,72 @@ var config = {
 
 	"cellWidth": 12,
 	"cellHeight": 18,
+
+};
+
+
+var globals = {
+
+	"buttons": {
+		"click 0": 0,
+		"click 2": 1,
+		"click 1": 2,
+		"scroll down": 3,
+		"scroll up": 4,
+		"drag 0": 5,
+		"drag 2": 6,
+		"drag 1": 7,
+	},
+
+	"colors": {
+		// Black
+		"0": "rgb(0, 0, 0)",
+
+		// Red
+		"1": "rgb(204, 76, 76)",
+
+		// Green
+		"2": "rgb(87, 166, 78)",
+
+		// Brown
+		"3": "rgb(127, 102, 76)",
+
+		// Blue
+		"4": "rgb(37, 49, 146)",
+
+		// Purple
+		"5": "rgb(178, 102, 229)",
+
+		// Cyan
+		"6": "rgb(76, 153, 178)",
+
+		// Light gray
+		"7": "rgb(153, 153, 153)",
+
+		// Gray
+		"8": "rgb(76, 76, 76)",
+
+		// Pink
+		"9": "rgb(242, 178, 204)",
+
+		// Lime
+		"a": "rgb(127, 204, 25)",
+
+		// Yellow
+		"b": "rgb(222, 222, 108)",
+
+		// Light blue
+		"c": "rgb(153, 178, 242)",
+
+		// Magenta
+		"d": "rgb(229, 127, 216)",
+
+		// Orange
+		"e": "rgb(242, 178, 51)",
+
+		// White
+		"f": "rgb(240, 240, 240)",
+	},
 
 };
 
@@ -123,15 +189,17 @@ var termAPI = {
 
 	"setTextColor": function(L) {
 		// Not properly supported
-		var color = C.luaL_checkstring(L, 1);
-		textColor = color;
+		var color = C.luaL_checkint(L, 1);
+		var hex = 15 - (Math.log(color) / Math.log(2));
+		textColor = globals.colors[hex.toString(16)];
 		return 0;
 	},
 
 	"setBackgroundColor": function(L) {
 		// Not properly supported
-		var color = C.luaL_checkstring(L, 1);
-		bgColor = color;
+		var color = C.luaL_checkint(L, 1);
+		var hex = 15 - (Math.log(color) / Math.log(2));
+		bgColor = globals.colors[hex.toString(16)];
 		return 0;
 	},
 
@@ -203,7 +271,7 @@ var osAPI = {
 
 	"clock": function(L) {
 		var diff = Date.now() - startClock;
-		var retDiff = Math.round(diff * 0.1)/100;
+		var retDiff = Math.round(diff * 0.1) / 100;
 		C.lua_pushnumber(L, retDiff);
 		return 1;
 	},
@@ -295,6 +363,7 @@ var loadAPIs = function() {
 
 
 var code = "\
+term.setTextColor(16384)\
 term.write('hi')\
 term.write(' '..coroutine.yield())\
 term.write(os.startTimer(2)..'')\
@@ -345,23 +414,20 @@ resumeThread = function() {
 
 
 var initialization = function() {
-	for (i = 1; i <= config.height; i++) {
-		drawText(1, i, " ".repeat(config.width), "#000000", bgColor);
-	}
-
+	termAPI.clear();
 	var resp = C.lua_resume(mainThread, 0);
 	if ((resp != C.LUA_YIELD) && (resp != 0)) {
-		var errorCode = C.lua_tostring(mainThread,  - 1);
-		var trace = C.lua_tostring(mainThread,  - 3);
+		var errorCode = C.lua_tostring(mainThread, -1);
+		var trace = C.lua_tostring(mainThread, -3);
 		console.log("Intialization Error: " + errorCode);
 		threadAlive = false;
 		console.log("Thread closed")
 		for (i = 1; i <= config.height; i++) {
-			drawText(1, i, " ".repeat(config.width), "#000000", "#0000AA");
+			drawText(1, i, " ".repeat(config.width), "#000000", "#0000aa");
 		}
-		drawText(13, 7, "WEBCC : FATAL : BIOS ERROR", "#0000AA", "#FFF");
-		var startPos = Math.round(config.width/2 - ((7 + errorCode.length)/2));
-		drawText(startPos, 9, "ERROR: " + errorCode, "#FFF", "#0000AA");
+		drawText(13, 7, "WEBCC : FATAL : BIOS ERROR", "#0000aa", "#ffffff");
+		var startPos = Math.round(config.width / 2 - ((7 + errorCode.length) / 2));
+		drawText(startPos, 9, "ERROR: " + errorCode, "#ffffff", "#0000aa");
 		if (trace) {
 			function wordWrap(str, maxWidth) {
 				var white = new RegExp(/^\s$/);
@@ -390,12 +456,12 @@ var initialization = function() {
 				return res;
 			}
 			var words = wordWrap(trace, 40)
-			drawText(17, 11, "-- MORE DETAILS --", "#FFF", "#0000AA");
+			drawText(17, 11, "-- MORE DETAILS --", "#ffffff", "#0000aa");
 			var yIndex = 11;
 			for (var index in words) {
 				yIndex++;
-				var startPos = Math.round(config.width/2 - ((words[index].length)/2));
-				drawText(startPos, yIndex, words[index], "#FFF", "#0000AA");
+				var startPos = Math.round(config.width / 2 - ((words[index].length) / 2));
+				drawText(startPos, yIndex, words[index], "#ffffff", "#0000aa");
 			}
 		}
 	}
