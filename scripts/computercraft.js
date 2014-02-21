@@ -86,7 +86,7 @@ var termAPI = {
 	"getCursorPos": function(L) {
 		C.lua_pushnumber(cursorPos[0]);
 		C.lua_pushnumber(cursorPos[1]);
-		return 1, 2;
+		return 2;
 	},
 
 	"setCursorBlink": function(L) {
