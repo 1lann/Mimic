@@ -49,6 +49,7 @@ var termAPI = {
 
 	"write": function(L) {
 		var str = C.luaL_checkstring(L, 1);
+		console.log(str);
 
 		drawText(cursorPos[0], cursorPos[1], str, textColor, bgColor);
 		cursorPos[0] += str.length;
@@ -63,7 +64,7 @@ var termAPI = {
 	},
 
 	"clear": function(L) {
-		for (var i = 1; i <= config.height; i++ ) {
+		for (var i = 1; i <= config.height; i++) {
 			drawText(1, i, " ".repeat(config.width), "#000000", bgColor);
 		}
 		return 0;
@@ -269,7 +270,7 @@ var apis = {
 
 var loadAPIs = function() {
 	C.luaL_openlibs(L);
-	
+
 	for (var api in apis) {
 		if (typeof(apis[api]) == "function") {
 			C.lua_pushcfunction(L, Lua5_1.Runtime.addFunction(apis[api]));
@@ -293,8 +294,13 @@ var loadAPIs = function() {
 var code = "\
 term.write('Self test...') \
 local startClock = os.clock() \
-os.startTimer(2)\
-while coroutine.yield() ~= 'timer' do end \
+os.startTimer(100000)\
+while true do \
+	local e, but, x, y = coroutine.yield() \
+	if e == 'timer' then break \
+	elseif e == 'mouse_click' then term.write(e .. ' ' .. but .. ' ' .. x .. ' ' .. y .. '\\n') \
+	elseif e == 'key' or e == 'char' then term.write(e .. ' ' .. but) end \
+end \
 local diff = (os.clock()-startClock) \
 term.scroll(1) \
 term.setCursorPos(1,1) \
@@ -356,7 +362,7 @@ var initialization = function() {
 
 		console.log("Intialization Error: " + errorCode);
 		threadAlive = false;
-		console.log("Thread closed")
+		console.log("Thread closed");
 
 		for (var i = 1; i <= config.height; i++) {
 			drawText(1, i, " ".repeat(config.width), "#000000", "#0000aa");
@@ -368,7 +374,7 @@ var initialization = function() {
 
 		if (trace) {
 			console.log("Details: " + trace);
-			drawText(9,11,"-- SEE CONSOLE FOR MORE DETAILS --","#FFF","#0000AA");
+			drawText(9,11,"-- SEE CONSOLE FOR MORE DETAILS --", "#ffffff", "#0000aa");
 		}
 	}
 }
@@ -383,8 +389,5 @@ var main = function() {
 	C.luaL_loadstring(mainThread, code);
 
 	threadAlive = true;
-	
 	initialization();
-	eventStack.push(["test event"]);
-	resumeThread();
 };

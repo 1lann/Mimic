@@ -26,12 +26,15 @@ drawChar = function(x, y, char, color, bg) {
 			offset = letterOffsets[char];
 		}
 
+		var realX = ((x - 1) * config.cellWidth + config.borderWidth);
+		var realY = ((y - 1) * config.cellHeight + config.borderHeight);
+
 		context.beginPath();
-		context.rect(((x - 1) * config.cellWidth + 4), ((y - 1) * config.cellHeight + 4), config.cellWidth, config.cellHeight)
+		context.rect(realX, realY, config.cellWidth, config.cellHeight)
 		context.fillStyle = bg;
 		context.fill();
 		context.fillStyle = color;
-		context.fillText(char, ((x - 1) * config.cellWidth) + 5 + offset, ((y - 1) * config.cellHeight) + 18);
+		context.fillText(char, ((x - 1) * config.cellWidth) + config.borderWidth + 1 + offset, ((y - 1) * config.cellHeight) + 18);
 	}
 }
 
@@ -45,7 +48,7 @@ cursorBlinking = function() {
 	if (cursorBlink && blinkState) {
 		if (blinkState) {
 			overlayContext.fillStyle = textColor;
-			overlayContext.fillText("_", ((cursorPos[0] - 1) * config.cellWidth) + 5, ((cursorPos[1] - 1) * config.cellHeight) + 18);
+			overlayContext.fillText("_", ((cursorPos[0] - 1) * config.cellWidth) + config.borderWidth + 1, ((cursorPos[1] - 1) * config.cellHeight) + 18);
 			blinkState = false;
 		}
 	} else {
@@ -54,27 +57,27 @@ cursorBlinking = function() {
 	}
 }
 
-renderMain = function() {
+render = function() {
 	setInterval(cursorBlinking, 500);
 }
 
-var link = document.createElement('link');
 var loaded = false;
-
 var image = new Image();
+
 image.src = "res/minecraftia-webfont.ttf";
 
 image.onerror = function() {
 	setTimeout(function() {
 		loaded = true;
-		document.getElementById("loading").style.display = "none";
-		renderMain();
+
+		document.getElementById("loading").setAttribute("style", "display: none;");
+
+		render();
 		if (typeof(main) != "undefined") {
 			main();
 		} else {
-			drawText(1, 1, "An error occured while loading ComputerCraft!", "#CC4C4C", "#000");
-			drawText(1, 2, "Check the JavaScript console for more details", "#CC4C4C", "#000");
+			drawText(1, 1, "An error occured while loading ComputerCraft!", "#CC4C4C", "#000000");
+			drawText(1, 2, "Check the JavaScript console for more details", "#CC4C4C", "#000000");
 		}
 	}, 100);
 }
-
