@@ -27,11 +27,11 @@ drawChar = function(x, y, char, color, bg) {
 		}
 
 		context.beginPath();
-		context.rect(((x - 1) * textWidth + 4), ((y - 1) * textHeight + 4), textWidth, textHeight)
+		context.rect(((x - 1) * config.cellWidth + 4), ((y - 1) * config.cellHeight + 4), config.cellWidth, config.cellHeight)
 		context.fillStyle = bg;
 		context.fill();
 		context.fillStyle = color;
-		context.fillText(char, ((x - 1) * textWidth) + 5 + offset, ((y - 1) * textHeight) + 18);
+		context.fillText(char, ((x - 1) * config.cellWidth) + 5 + offset, ((y - 1) * config.cellHeight) + 18);
 	}
 }
 
@@ -45,7 +45,7 @@ cursorBlinking = function() {
 	if (cursorBlink && blinkState) {
 		if (blinkState) {
 			overlayContext.fillStyle = textColor;
-			overlayContext.fillText("_", ((cursorPos[0] - 1) * textWidth) + 5, ((cursorPos[1] - 1) * textHeight) + 18);
+			overlayContext.fillText("_", ((cursorPos[0] - 1) * config.cellWidth) + 5, ((cursorPos[1] - 1) * config.cellHeight) + 18);
 			blinkState = false;
 		}
 	} else {

@@ -71,21 +71,21 @@ var termAPI = {
 		if (!blinkState) {
 			oCtxt.clearRect(0, 0, canvas.width, canvas.height);
 			oCtxt.fillStyle = textColor;
-			oCtxt.fillText("_", ((cursorPos[0] - 1) * textWidth) + 5, ((cursorPos[1] - 1) * textHeight) + 18);
+			oCtxt.fillText("_", ((cursorPos[0] - 1) * config.cellWidth) + 5, ((cursorPos[1] - 1) * config.cellHeight) + 18);
 		}
 
 		return 0;
 	},
 
 	"clear": function(L) {
-		for (var i = 1; i <= height; i++ ) {
-			drawText(1, i, " ".repeat(width), "#000000", bgColor);
+		for (var i = 1; i <= config.height; i++ ) {
+			drawText(1, i, " ".repeat(config.width), "#000000", bgColor);
 		}
 		return 0;
 	},
 
 	"clearLine": function(L) {
-		drawText(1, cursorPos[1], " ".repeat(width), "#000000", bgColor);
+		drawText(1, cursorPos[1], " ".repeat(config.width), "#000000", bgColor);
 		return 0;
 	},
 
@@ -96,7 +96,7 @@ var termAPI = {
 		if (!blinkState) {
 			oCtxt.clearRect(0, 0, canvas.width, canvas.height);
 			oCtxt.fillStyle = textColor;
-			oCtxt.fillText("_", ((x - 1) * textWidth) + 5, ((y - 1) * textHeight) + 18);
+			oCtxt.fillText("_", ((x - 1) * config.cellWidth) + 5, ((y - 1) * config.cellHeight) + 18);
 		}
 		return 0;
 	},
@@ -142,8 +142,8 @@ var termAPI = {
 	},
 
 	"getSize": function(L) {
-		C.lua_pushnumber(L, width);
-		C.lua_pushnumber(L, height);
+		C.lua_pushnumber(L, config.width);
+		C.lua_pushnumber(L, config.height);
 		return 2;
 	},
 
@@ -152,7 +152,7 @@ var termAPI = {
 		// Extra rendering crap is handled here!
 		var imgd = ctxt.getImageData(4, 4, canvas.width - 8, canvas.height - 8);
 		ctxt.clearRect(0, 0, canvas.width, canvas.height);
-		ctxt.putImageData(imgd, 4, textHeight * amount * ( - 1) + 4);
+		ctxt.putImageData(imgd, 4, config.cellHeight * amount * ( - 1) + 4);
 		return 0;
 	},
 
@@ -345,8 +345,8 @@ resumeThread = function() {
 
 
 var initialization = function() {
-	for (i = 1; i <= height; i++) {
-		drawText(1, i, " ".repeat(width), "#000000", bgColor);
+	for (i = 1; i <= config.height; i++) {
+		drawText(1, i, " ".repeat(config.width), "#000000", bgColor);
 	}
 
 	var resp = C.lua_resume(mainThread, 0);
@@ -356,11 +356,11 @@ var initialization = function() {
 		console.log("Intialization Error: " + errorCode);
 		threadAlive = false;
 		console.log("Thread closed")
-		for (i = 1; i <= height; i++) {
-			drawText(1, i, " ".repeat(width), "#000000", "#0000AA");
+		for (i = 1; i <= config.height; i++) {
+			drawText(1, i, " ".repeat(config.width), "#000000", "#0000AA");
 		}
 		drawText(13, 7, "WEBCC : FATAL : BIOS ERROR", "#0000AA", "#FFF");
-		var startPos = Math.round(width/2 - ((7 + errorCode.length)/2));
+		var startPos = Math.round(config.width/2 - ((7 + errorCode.length)/2));
 		drawText(startPos, 9, "ERROR: " + errorCode, "#FFF", "#0000AA");
 		if (trace) {
 			function wordWrap(str, maxWidth) {
@@ -394,7 +394,7 @@ var initialization = function() {
 			var yIndex = 11;
 			for (var index in words) {
 				yIndex++;
-				var startPos = Math.round(width/2 - ((words[index].length)/2));
+				var startPos = Math.round(config.width/2 - ((words[index].length)/2));
 				drawText(startPos, yIndex, words[index], "#FFF", "#0000AA");
 			}
 		}
