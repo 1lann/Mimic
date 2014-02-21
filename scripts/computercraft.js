@@ -218,9 +218,9 @@ var termAPI = {
 	"scroll": function(L) {
 		var amount = C.luaL_checkint(L, 1);
 		// Extra rendering crap is handled here!
-		var imgd = ctxt.getImageData(4, 4, canvas.width - 8, canvas.height - 8);
-		ctxt.clearRect(0, 0, canvas.width, canvas.height);
-		ctxt.putImageData(imgd, 4, config.cellHeight * amount * ( - 1) + 4);
+		var imgd = context.getImageData(4, 4, canvas.width - 8, canvas.height - 8);
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.putImageData(imgd, 4, config.cellHeight * amount * ( - 1) + 4);
 		return 0;
 	},
 
