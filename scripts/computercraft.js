@@ -437,7 +437,6 @@ while true do \
 	local e, but, x, y = coroutine.yield() \
 	if e == 'mouse_click' then term.write(e .. ' ' .. but .. ' ' .. x .. ' ' .. y .. '\\n') \
 	elseif e == 'key' or e == 'char' then term.write(e .. ' ' .. but) end \
-
 	local x, y = term.getCursorPos() \
 	local w, h = term.getSize() \
 	if y >= h then \
