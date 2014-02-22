@@ -15,12 +15,9 @@
 
 window.onload = function() {
 	var f = new Filer();
-	f.init({}, function(a){
-
-		f.ls("/", function(a){console.log(a)});
-		console.log(a)
-
-
+	f.init({}, function(a) {
+		f.ls("/owiefjoiwjf", function(a){console.log(a)}, function(a){console.log(a)});
+		f.mkdir("/test", false, function(a){console.log(a)}, function(a){console.log(a)});
 	}, function(a){console.log(a)});
 
 }
