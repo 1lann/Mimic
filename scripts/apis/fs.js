@@ -30,6 +30,19 @@ filesystem.setup = function(callback) {
 }
 
 
+filesystem.serializeTable = function(arr) {
+	var construct = "{";
+	for (var index in arr) {
+		var name = arr[index].replace("\"", "\\\"");
+		var correctIndex = parseInt(index) + 1;
+		construct = construct + "[" + correctIndex + "]=\"" + name + "\",";
+	}
+	construct = construct + "}";
+
+	return construct;
+}
+
+
 filesystem.resolve = function(path) {
 	path = path.replace("\\", "/");
 	if (path.substring(0, 1) != "/") {

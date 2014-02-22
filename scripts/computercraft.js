@@ -302,19 +302,24 @@ var initialization = function() {
 
 
 var main = function() {
-	loadAPIs();
+	filesystem.setup(function(err) {
+		if (err) {
+			return;
+		}
 
-	setInterval(function() {
-		term.cursorFlash = !term.cursorFlash;
-		render.cursorBlink();
-	}, 500);
+		loadAPIs();
 
-	startClock = Date.now();
+		setInterval(function() {
+			term.cursorFlash = !term.cursorFlash;
+			render.cursorBlink();
+		}, 500);
 
-	thread.main = C.lua_newthread(L);
-	C.luaL_loadstring(thread.main, code);
-	thread.alive = true;
+		startClock = Date.now();
 
-	setupFSAPI();
-	initialization();
+		thread.main = C.lua_newthread(L);
+		C.luaL_loadstring(thread.main, code);
+		thread.alive = true;
+
+		initialization();
+	});
 };
