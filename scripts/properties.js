@@ -17,6 +17,8 @@ var config = {
 	"borderWidth": 4,
 	"borderHeight": 4,
 
+	"maxStorageSize": 2097152,
+
 };
 
 
