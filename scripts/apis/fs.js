@@ -9,21 +9,28 @@
 var fsAPI = {};
 var filer = null;
 
-
-onFSError = function(err) {
-	console.log(err);
-}
+var filesystem = {};
 
 
-setupFSAPI = function() {
+
+//  ----------------  Filesystem API  ----------------  //
+
+
+filesystem.setup = function(callback) {
 	filer = new Filer();
 	filer.init({"persistent": true, "size": 4 * 1024 * 1024}, function(fs) {
-		console.log(fs);
-	}, onFSError);
+		callback(null);
+	}, function(err) {
+		console.log("Failed to load filesystem!");
+		console.log("Unable to start WebCC!");
+		console.log(err);
+
+		callback(err);
+	});
 }
 
 
-resolve = function(path) {
+filesystem.resolve = function(path) {
 	path = path.replace("\\", "/");
 	if (path.substring(0, 1) != "/") {
 		path = "/" + path;
@@ -67,7 +74,7 @@ resolve = function(path) {
 }
 
 
-exists = function(path, callback) {
+filesystem.exists = function(path, callback) {
 	var dir = path.substring(0, path.lastIndexOf("/"));
 	filer.ls(dir, function(items) {
 		for (var i in items) {
@@ -85,7 +92,7 @@ exists = function(path, callback) {
 }
 
 
-isDir = function(path, callback) {
+filesystem.isDir = function(path, callback) {
 	var dir = path.substring(0, path.lastIndexOf("/"));
 	filer.ls(dir, function(items) {
 		for (var i in items) {
@@ -103,28 +110,153 @@ isDir = function(path, callback) {
 }
 
 
-fsAPI.list = function(L) {
-	var path = resolve(C.luaL_checkstring(L, 1));
-	filer.ls(path, function(items) {
-		var files = [];
-		for (var i in items) {
-			var item = items[i];
-			files.push(item.name);
+filesystem.isReadOnly = function(path) {
+	return false;
+}
+
+
+filesystem.list = function(path, callback) {
+	isDir(path, function(is) {
+		if (!is) {
+			callback([], null);
+			return;
 		}
 
-		computer.eventStack.push(["fs_list", files]);
-		resumeThread();
+		filer.ls(path, function(items) {
+			var files = [];
+			for (var i in items) {
+				var item = items[i];
+				files.push(item.name);
+			}
+
+			callback(files, null);
+		}, function(err) {
+			if (err.code == err.NOT_FOUND_ERR) {
+				callback([], null);
+			} else {
+				callback(null, err);
+			}
+		});
+	});
+}
+
+
+filesystem.move = function(from, to, callback) {
+	isDir(to, function(is) {
+		var toDir = to.substring(0, to.lastIndexOf("/"));
+		var toName = to.substring(to.lastIndexOf("/") + 1);
+		if (is) {
+			toDir = to;
+			toName = from.substring(from.lastIndexOf("/") + 1);
+		}
+
+		filer.mv(from, toDir, toName, function(file) {
+			callback(null);
+		}, function(err) {
+			if (err.code == err.NOT_FOUND_ERR) {
+				callback(null);
+			} else {
+				callback(err);
+			}
+		});
+	});
+}
+
+
+filesystem.copy = function(from, to, callback) {
+	isDir(to, function(is) {
+		var toDir = to.substring(0, to.lastIndexOf("/"));
+		var toName = to.substring(to.lastIndexOf("/") + 1);
+		if (is) {
+			toDir = to;
+			toName = from.substring(from.lastIndexOf("/") + 1);
+		}
+
+		filer.cp(from, toDir, toName, function(file) {
+			callback(null);
+		}, function(err) {
+			if (err.code == err.NOT_FOUND_ERR) {
+				callback(null);
+			} else {
+				callback(err);
+			}
+		});
+	});
+}
+
+
+filesystem.delete = function(path, callback) {
+	filer.rm(path, function() {
+		callback(null);
 	}, function(err) {
 		if (err.code == err.NOT_FOUND_ERR) {
-			computer.eventStack.push(["fs_list", []]);
-			resumeThread();
+			callback(null);
 		} else {
-			computer.eventStack.push(["fs_list_failure"]);
-			resumeThread();
-			onFSError(err);
+			callback(err);
 		}
 	});
+}
 
+
+filesystem.read = function(path, callback) {
+	isDir(path, function(is) {
+		if (is) {
+			callback(null, "dir");
+			return;
+		}
+
+		filer.open(path, function(file) {
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				console.log(reader);
+				console.log(e);
+
+				callback(true, null);
+			}
+			console.log("reading...");
+		}, function(err) {
+			callback(null, err);
+		});
+	});
+}
+
+
+filesystem.write = function(path, contents, append, callback) {
+	isDir(path, function(is) {
+		if (is) {
+			callback("dir");
+			return;
+		}
+
+		var dir = path.substring(0, path.lastIndexOf("/"));
+		filer.mkdir(dir, false, function() {
+			filer.write(path, {"data": contents, "append": append}, function(entry, writer) {
+				callback(null);
+			}, function(err) {
+				callback(err);
+			})
+		}, function(err) {
+			callback(err);
+		});
+	});
+}
+
+
+filesystem.makeDir = function(path, callback) {
+	filer.mkdir(path, false, function(dir) {
+		callback(null);
+	}, function(err) {
+		callback(err);
+	});
+}
+
+
+
+//  ----------------  Lua Wrappers  ----------------  //
+
+
+fsAPI.list = function(L) {
+	var path = resolve(C.luaL_checkstring(L, 1));
 	return 0;
 }
 
@@ -159,11 +291,6 @@ fsAPI.isDir = function(L) {
 
 fsAPI.isReadOnly = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
-	if (path.substring(0, 4) == "/rom") {
-		C.lua_pushboolean(L, 1);
-	} else {
-		C.lua_pushboolean(L, 0);
-	}
 
 	return 1;
 }
@@ -171,12 +298,7 @@ fsAPI.isReadOnly = function(L) {
 
 fsAPI.makeDir = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
-	filer.mkdir(path, false, function(dir) {
-
-	}, function(err) {
-		onFSError(err);
-	});
-
+	
 	return 0;
 }
 
@@ -184,23 +306,7 @@ fsAPI.makeDir = function(L) {
 fsAPI.move = function(L) {
 	var from = resolve(C.luaL_checkstring(L, 1));
 	var to = resolve(C.luaL_checkstring(L, 2));
-	isDir(to, function(is) {
-		var toDir = to.substring(0, to.lastIndexOf("/"));
-		var toName = to.substring(to.lastIndexOf("/") + 1);
-		if (is) {
-			toDir = to;
-			toName = from.substring(from.lastIndexOf("/") + 1);
-		}
-
-		filer.mv(from, toDir, toName, function(file) {
-
-		}, function(err) {
-			if (err.code != err.NOT_FOUND_ERR) {
-				onFSError(err);
-			}
-		});
-	});
-
+	
 	return 0;
 }
 
@@ -208,86 +314,46 @@ fsAPI.move = function(L) {
 fsAPI.copy = function(L) {
 	var from = resolve(C.luaL_checkstring(L, 1));
 	var to = resolve(C.luaL_checkstring(L, 2));
-	isDir(to, function(is) {
-		var toDir = to.substring(0, to.lastIndexOf("/"));
-		var toName = to.substring(to.lastIndexOf("/") + 1);
-		if (is) {
-			toDir = to;
-			toName = from.substring(from.lastIndexOf("/") + 1);
-		}
-
-		filer.cp(from, toDir, toName, function(file) {
-
-		}, function(err) {
-			if (err.code != err.NOT_FOUND_ERR) {
-				onFSError(err);
-			}
-		});
-	});
-
+	
 	return 0;
 }
 
 
 fsAPI.delete = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
-	filer.rm(path, function() {
 
-	}, function(err) {
-		if (err.code != err.NOT_FOUND_ERR) {
-			onFSError(err);
-		}
-	})
+	return 0;
 }
 
 
 fsAPI.write = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
 	var contents = C.luaL_checkstring(L, 2);
-	filer.write(path, {"data": contents}, function(entry, writer) {
 
-	}, function(err) {
-		onFSError(err);
-	});
+	return 0;
 }
 
 
 fsAPI.append = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
 	var contents = C.luaL_checkstring(L, 2);
-	filer.write(path, {"data": contents, "append": true}, function(entry, writer) {
-
-	}, function(err) {
-		onFSError(err);
-	});
+	
+	return 0;
 }
 
 
 fsAPI.read = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
-	filer.open(path, function(file) {
-		var reader = new FileReader();
-		reader.onload = function(e) {
-			console.log(reader);
-			console.log(e);
-		}
-	}, function(err) {
-		if (err.code == err.NOT_FOUND_ERR) {
-			computer.eventStack.push(["fs_read", ""]);
-			resumeThread();
-		} else {
-			computer.eventStack.push(["fs_read_failure"]);
-			resumeThread();
-		}
-	})
+	
+	return 0;
 }
 
 
 fsAPI.getDrive = function(L) {
-
+	return 0;
 }
 
 
 fsAPI.getFreeSpace = function(L) {
-
+	return 0;
 }
