@@ -1,23 +1,29 @@
 
-//  ----------------  Peripheral API  ----------------  //
+//  
+//  WebCC
+//  Made by 1lann and GravityScore
+//  
 
 
-var peripheralAPI = {
 
-	"isPresent": function(L) {
+var peripheralAPI = {};
 
-	},
 
-	"getType": function(L) {
+peripheralAPI.isPresent = function(L) {
 
-	},
+}
 
-	"getMethods": function(L) {
 
-	},
+peripheralAPI.getType = function(L) {
 
-	"call": function(L) {
+}
 
-	},
 
-};
+peripheralAPI.getMethods = function(L) {
+
+}
+
+
+peripheralAPI.call = function(L) {
+
+}

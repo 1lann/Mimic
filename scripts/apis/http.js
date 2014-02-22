@@ -1,10 +1,14 @@
-//  ----------------  HTTP API  ----------------  //
+
+//  
+//  WebCC
+//  Made by 1lann and GravityScore
+//  
 
 
-var httpAPI = {
 
-	"request": function(L) {
+var httpAPI = {};
 
-	},
 
-};
+httpAPI.request = function(L) {
+
+}

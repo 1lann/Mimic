@@ -1,109 +1,115 @@
-// OS
-var computer = {
-	"id": 0,
-	"label": null,
 
-	"eventStack": [],
-	"lastTimerID": 0,
-};
-
-var startClock;
-
-//  ----------------  OS API  ----------------  //
+//  
+//  WebCC
+//  Made by 1lann and GravityScore
+//  
 
 
-var osAPI = {
 
-	"setAlarm": function(L) {
+var osAPI = {};
 
-	},
 
-	"getComputerID": function(L) {
-		C.lua_pushnumber(L, tempID);
+osAPI.setAlarm = function(L) {
+
+}
+
+
+osAPI.getComputerID = function(L) {
+	C.lua_pushnumber(L, tempID);
+	return 1;
+}
+
+
+osAPI.getComputerLabel = function(L) {
+	if (label) {
+		C.lua_pushstring(L, label);
 		return 1;
-	},
-
-	"getComputerLabel": function(L) {
-		if (label) {
-			C.lua_pushstring(L, label);
-			return 1;
-		} else {
-			return 0;
-		}
-	},
-
-	"setComputerLabel": function(L) {
-		var str = C.luaL_checkstring(L, 1);
-		label = str;
+	} else {
 		return 0;
-	},
+	}
+}
 
-	"clock": function(L) {
-		var diff = Date.now() - startClock;
-		var retDiff = Math.round(diff * 0.1) / 100;
-		C.lua_pushnumber(L, retDiff);
-		return 1;
-	},
 
-	"time": function(L) {
-		C.lua_pushstring(L, "Time not supported!");
-		C.lua_error(L);
-		return 0;
-	},
+osAPI.setComputerLabel = function(L) {
+	var str = C.luaL_checkstring(L, 1);
+	label = str;
+	return 0;
+}
 
-	"day": function(L) {
 
-	},
+osAPI.clock = function(L) {
+	var diff = Date.now() - startClock;
+	var retDiff = Math.round(diff * 0.1) / 100;
+	C.lua_pushnumber(L, retDiff);
+	return 1;
+}
 
-	"startTimer": function(L) {
-		var time = C.luaL_checknumber(L, 1);
-		computer.lastTimerID++;
 
-		var timerID = computer.lastTimerID;
-		setTimeout(function() {
-			computer.eventStack.push(["timer", timerID]);
-			resumeThread();
-		}, time * 1000);
-		C.lua_pushnumber(L, timerID);
+osAPI.time = function(L) {
+	var ticks = (Date.now() - startClock) * 20;
+	C.lua_pushnumber(L, ticks % 24000 / 1000);
+	return 1;
+}
 
-		return 1;
-	},
 
-	"queueEvent": function(L) {
-		var queueObject = [];
-		queueObject.push(C.luaL_checkstring(L, 1));
+osAPI.day = function(L) {
+	var ticks = (Date.now() - startClock) * 20;
+	C.lua_pushnumber(L, 1 + Math.floor(ticks / 24000));
+	return 1;
+}
 
-		var top = C.lua_gettop(L);
-		for (var i = 1; i <= top; i++) {
-			var t = C.lua_type(L, i);
-			if (t == C.LUA_TSTRING) {
-				queueObject.push(C.lua_tostring(L, i));
-			} else if (t == C.LUA_TBOOLEAN) {
-				if (C.lua_toboolean(L, i)) {
-					queueObject.push(true);
-				} else {
-					queueObject.push(false);
-				}
-			} else if (t == C.LUA_TNUMBER) {
-				queueObject.push(C.lua_tonumber(L, i));
+
+osAPI.startTimer = function(L) {
+	var time = C.luaL_checknumber(L, 1);
+	computer.lastTimerID++;
+
+	var timerID = computer.lastTimerID;
+	setTimeout(function() {
+		computer.eventStack.push(["timer", timerID]);
+		resumeThread();
+	}, time * 1000);
+	C.lua_pushnumber(L, timerID);
+
+	return 1;
+}
+
+
+osAPI.queueEvent = function(L) {
+	var queueObject = [];
+	queueObject.push(C.luaL_checkstring(L, 1));
+
+	var top = C.lua_gettop(L);
+	for (var i = 1; i <= top; i++) {
+		var t = C.lua_type(L, i);
+		if (t == C.LUA_TSTRING) {
+			queueObject.push(C.lua_tostring(L, i));
+		} else if (t == C.LUA_TBOOLEAN) {
+			if (C.lua_toboolean(L, i)) {
+				queueObject.push(true);
 			} else {
-				queueObject.push(null);
+				queueObject.push(false);
 			}
+		} else if (t == C.LUA_TNUMBER) {
+			queueObject.push(C.lua_tonumber(L, i));
+		} else {
+			queueObject.push(null);
 		}
+	}
 
-		computer.eventStack.push(queueObject);
-		return 0;
-	},
+	computer.eventStack.push(queueObject);
+	return 0;
+}
 
-	"shutdown": function(L) {
 
-	},
+osAPI.shutdown = function(L) {
 
-	"reboot": function(L) {
+}
 
-	},
 
-};
+osAPI.reboot = function(L) {
+
+}
+
 
 osAPI["computerLabel"] = osAPI["getComputerLabel"];
 osAPI["computerID"] = osAPI["getComputerID"];
