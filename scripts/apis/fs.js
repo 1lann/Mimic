@@ -11,7 +11,7 @@ var filer = null;
 
 
 onFSError = function(err) {
-	console.log(err);
+	console.log(err.name);
 }
 
 
