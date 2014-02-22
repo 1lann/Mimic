@@ -17,11 +17,10 @@ onFSError = function(err) {
 
 setupFSAPI = function() {
 	filer = new Filer();
-	filer.init({"persistent": true, "size": 4 * 1024 * 1024}, function(fs) {
+	filer.init({"persistent": true, "size": 8 * 1024 * 1024}, function(fs) {
 		console.log(fs);
 	}, onFSError);
 }
-
 
 resolve = function(path) {
 	if (path.substring(0, 1) != "/") {
@@ -44,8 +43,7 @@ fsAPI.list = function(L) {
 
 
 fsAPI.getSize = function(L) {
-	C.lua_pushnumber(L, config.maxStorageSize);
-	return 1;
+
 }
 
 
