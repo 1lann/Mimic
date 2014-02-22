@@ -33,12 +33,12 @@ testAPI = {
 			0: "hi",
 			1: "bye"
 		}
-		C.lua_newtable(L);
+		C.lua_createtable(L,4);
 		C.lua_pushstring(L,"this")
 		C.lua_pushstring(L,"is")
 		C.lua_pushstring(L,"a")
 		C.lua_pushstring(L,"test")
-		C.lua
+		C.lua_settable(L,-5)
 		return 1;
 	}
 }

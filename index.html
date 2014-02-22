@@ -67,7 +67,26 @@ h1 {
 	<h1 id="loading">Loading...</h1>
 
 </body>
+<script>
+// Prevent the backspace key from navigating back.
+$(document).unbind('keydown').bind('keydown', function (event) {
+    var doPrevent = false;
+    if (event.keyCode === 8) {
+        var d = event.srcElement || event.target;
+        if ((d.tagName.toUpperCase() === 'INPUT' && (d.type.toUpperCase() === 'TEXT' || d.type.toUpperCase() === 'PASSWORD' || d.type.toUpperCase() === 'FILE')) 
+             || d.tagName.toUpperCase() === 'TEXTAREA') {
+            doPrevent = d.readOnly || d.disabled;
+        }
+        else {
+            doPrevent = true;
+        }
+    }
 
+    if (doPrevent) {
+        event.preventDefault();
+    }
+});
+</script>
 <script src="scripts/lib/lua5.1.5.min.js"></script>
 <script src="scripts/lib/idb.filesystem.min.js"></script>
 <script src="scripts/lib/filer.min.js"></script>
