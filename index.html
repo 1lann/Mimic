@@ -7,39 +7,6 @@
 
 	<style>
 
-#canvas {
-	position:fixed;
-	height:350px;
-	width:620px;
-	margin-left:auto;
-	margin-right:auto;
-	background:#000;
-}
-
-#overlayCanvas {
-	z-index:10;
-	position:fixed;
-	height:350px;
-	width:620px;
-	margin-left:auto;
-	margin-right:auto;
-	background:none;
-}
-
-body {
-	margin: 0 0 0 0;
-}
-
-h1 {
-	font-size:20px;
-	-webkit-font-smoothing: none;
-	color:#FFFF55;
-	font-family:minecraftia;
-	position: fixed;
-	top: 130px;
-	left: 250px;
-}
-
 @font-face {
 	font-family: "minecraftia";
 	src: url("res/minecraftia-webfont.eot");
@@ -51,6 +18,44 @@ h1 {
 	font-style: normal;
 }
 
+#canvas {
+	position: fixed;
+	height: 350px;
+	width: 620px;
+	margin-left: auto;
+	margin-right: auto;
+
+	background: #000000;
+}
+
+#overlay-canvas {
+	z-index: 10;
+
+	position: fixed;
+	height: 350px;
+	width: 620px;
+	margin-left: auto;
+	margin-right: auto;
+
+	background: none;
+}
+
+body {
+	margin: 0 0 0 0;
+}
+
+h1 {
+	font-size: 20px;
+	-webkit-font-smoothing: none;
+
+	color: rgb(222, 222, 108);
+	font-family: minecraftia;
+
+	position: fixed;
+	top: 130px;
+	left: 250px;
+}
+
 	</style>
 </head>
 
@@ -58,6 +63,7 @@ h1 {
 
 	<canvas id="canvas" width=620 height=350></canvas>
 	<canvas id="overlay-canvas" width=620 height=350></canvas>
+
 	<h1 id="loading">Loading...</h1>
 
 </body>

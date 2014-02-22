@@ -23,6 +23,18 @@ var config = {
 var globals = {};
 
 
+globals.offsets = {
+	",": 3,
+	"l": 3,
+	".": 3,
+	"i": 5,
+	"t": 3,
+	"f": 2,
+	"I": 2,
+	"!": 5,
+}
+
+
 globals.buttons = {
 	"click 0": 0,
 	"click 2": 1,

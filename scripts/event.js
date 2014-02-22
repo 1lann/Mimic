@@ -19,12 +19,12 @@ window.onkeydown = function(event) {
 	var pushedSomething = false;
 
 	if (typeof(code) != "undefined") {
-		eventStack.push(["key", code]);
+		computer.eventStack.push(["key", parseInt(code)]);
 		pushedSomething = true;
 	}
 
 	if (typeof(character) != "undefined") {
-		eventStack.push(["char", character]);
+		computer.eventStack.push(["char", character]);
 		pushedSomething = true;
 	}
 
@@ -47,7 +47,7 @@ window.onmousedown = function(event) {
 	var x = Math.floor((event.pageX - config.borderWidth) / config.cellWidth) + 1;
 	var y = Math.floor((event.pageY - config.borderHeight) / config.cellHeight) + 1;
 	if (x >= 1 && y >= 1 && x <= config.width && y <= config.height) {
-		eventStack.push(["mouse_click", button, x, y]);
+		computer.eventStack.push(["mouse_click", button, x, y]);
 		resumeThread();
 	}
 }
@@ -65,7 +65,7 @@ window.onmousemove = function(event) {
 
 	if (mouseDown && (previousMouseLocation[0] != button || previousMouseLocation[1] != x || previousMouseLocation[2] != y)) {
 		if (x >= 1 && y >= 1 && x <= config.width && y <= config.height) {
-			eventStack.push(["mouse_drag", button, x, y]);
+			computer.eventStack.push(["mouse_drag", button, x, y]);
 			resumeThread();
 
 			previousMouseLocation[0] = button;

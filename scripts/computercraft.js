@@ -18,26 +18,37 @@ var version = "CraftOS 1.5 (Web Alpha)";
 var C = Lua5_1.C;
 var L = C.lua_open();
 
-var mainThread;
-var threadAlive;
+
+// Thread
+var thread = {
+	"main": null,
+	"alive": false,
+};
 
 
 // Term variables
-var cursorPos = [1, 1];
-var textColor = "#ffffff";
-var cursorBlink = false;
-var bgColor = "#000000";
+var term = {
+	"width": 51,
+	"height": 19,
+	"cursorX": 1,
+	"cursorY": 1,
+	"textColor": "#ffffff",
+	"backgroundColor": "#000000",
+	"cursorBlink": false,
+	"cursorFlash": true,
+};
 
 
 // OS
-var tempID = 1;
-var label;
+var computer = {
+	"id": 0,
+	"label": null,
+
+	"eventStack": [],
+	"lastTimerID": 0,
+};
+
 var startClock;
-
-
-// Events
-var eventStack = [];
-var latestID = 0;
 
 
 
@@ -48,29 +59,23 @@ var termAPI = {
 
 	"write": function(L) {
 		var str = C.luaL_checkstring(L, 1);
-		console.log(str);
 
-		drawText(cursorPos[0], cursorPos[1], str, textColor, bgColor);
-		cursorPos[0] += str.length;
-
-		if (!blinkState) {
-			overlayContext.clearRect(0, 0, canvas.width, canvas.height);
-			overlayContext.fillStyle = textColor;
-			overlayContext.fillText("_", ((cursorPos[0] - 1) * config.cellWidth) + 5, ((cursorPos[1] - 1) * config.cellHeight) + 18);
-		}
+		render.text(term.cursorX, term.cursorY, str, term.textColor, term.backgroundColor);
+		term.cursorX += str.length;
+		render.cursorBlink();
 
 		return 0;
 	},
 
 	"clear": function(L) {
-		for (var i = 1; i <= config.height; i++) {
-			drawText(1, i, " ".repeat(config.width), "#000000", bgColor);
+		for (var i = 1; i <= term.height; i++) {
+			render.text(1, i, " ".repeat(term.width), "#000000", term.backgroundColor);
 		}
 		return 0;
 	},
 
 	"clearLine": function(L) {
-		drawText(1, cursorPos[1], " ".repeat(config.width), "#000000", bgColor);
+		render.text(1, term.cursorY, " ".repeat(term.width), "#000000", term.backgroundColor);
 		return 0;
 	},
 
@@ -78,28 +83,26 @@ var termAPI = {
 		var x = C.luaL_checkint(L, 1);
 		var y = C.luaL_checkint(L, 2);
 
-		cursorPos = [x, y];
-		if (!blinkState) {
-			overlayContext.clearRect(0, 0, canvas.width, canvas.height);
-			overlayContext.fillStyle = textColor;
-			overlayContext.fillText("_", ((x - 1) * config.cellWidth) + 5, ((y - 1) * config.cellHeight) + 18);
+		term.cursorX = x;
+		term.cursorY = y;
+		if (!term.cursorFlash) {
+			render.cursorBlink();
 		}
 
 		return 0;
 	},
 
 	"getCursorPos": function(L) {
-		C.lua_pushnumber(L, cursorPos[0]);
-		C.lua_pushnumber(L, cursorPos[1]);
+		C.lua_pushnumber(L, term.cursorX);
+		C.lua_pushnumber(L, term.cursorY);
 		return 2;
 	},
 
 	"setCursorBlink": function(L) {
 		if (C.lua_isboolean(L, 1)){
-			cursorBlink = C.lua_toboolean(L, 1);
-			if (!cursorBlink) {
+			term.cursorBlink = C.lua_toboolean(L, 1);
+			if (!term.cursorBlink) {
 				overlayContext.clearRect(0, 0, overlayContext.width, overlayContext.height);
-				blinkState = false;
 			}
 		} else {
 			C.lua_pushstring(L, "Expected boolean");
@@ -112,7 +115,7 @@ var termAPI = {
 		// Not properly supported
 		var color = C.luaL_checkint(L, 1);
 		var hex = 15 - (Math.log(color) / Math.log(2));
-		textColor = globals.colors[hex.toString(16)];
+		term.textColor = globals.colors[hex.toString(16)];
 		return 0;
 	},
 
@@ -120,7 +123,7 @@ var termAPI = {
 		// Not properly supported
 		var color = C.luaL_checkint(L, 1);
 		var hex = 15 - (Math.log(color) / Math.log(2));
-		bgColor = globals.colors[hex.toString(16)];
+		term.backgroundColor = globals.colors[hex.toString(16)];
 		return 0;
 	},
 
@@ -131,8 +134,8 @@ var termAPI = {
 	},
 
 	"getSize": function(L) {
-		C.lua_pushnumber(L, config.width);
-		C.lua_pushnumber(L, config.height);
+		C.lua_pushnumber(L, term.width);
+		C.lua_pushnumber(L, term.height);
 		return 2;
 	},
 
@@ -201,11 +204,11 @@ var osAPI = {
 
 	"startTimer": function(L) {
 		var time = C.luaL_checknumber(L, 1);
-		latestID++;
+		computer.lastTimerID++;
 
-		var timerID = latestID;
+		var timerID = computer.lastTimerID;
 		setTimeout(function() {
-			eventStack.push(["timer", timerID]);
+			computer.eventStack.push(["timer", timerID]);
 			resumeThread();
 		}, time * 1000);
 		C.lua_pushnumber(L, timerID);
@@ -235,7 +238,7 @@ var osAPI = {
 			}
 		}
 
-		eventStack.push(queueObject);
+		computer.eventStack.push(queueObject);
 		return 0;
 	},
 
@@ -431,21 +434,86 @@ var loadAPIs = function() {
 
 
 var code = "\
-term.write('Self test...') \
-term.setCursorPos(1, 2) \
+local function newLine() \
+local wid, hi = term.getSize() \
+local x, y = term.getCursorPos() \
+if y == hi then \
+  term.scroll(1) \
+  term.setCursorPos(1, y) \
+else \
+  term.setCursorPos(1, y+1) \
+end \
+end \
+local nativeShutdown = os.shutdown \
+function os.shutdown() \
+nativeShutdown() \
 while true do \
-	local e, but, x, y = coroutine.yield() \
-	if e == 'mouse_click' then term.write(e .. ' ' .. but .. ' ' .. x .. ' ' .. y .. '\\n') \
-	elseif e == 'key' or e == 'char' then term.write(e .. ' ' .. but) end \
-
-	local x, y = term.getCursorPos() \
-	local w, h = term.getSize() \
-	if y >= h then \
-		term.scroll(1) \
-		term.setCursorPos(1, h) \
-	else \
-		term.setCursorPos(1, y + 1) \
-	end \
+  coroutine.yield() \
+end \
+end \
+local nativeReboot = os.reboot \
+function os.reboot() \
+nativeReboot() \
+while true do \
+  coroutine.yield() \
+end \
+end \
+local function reader() \
+local data = '' \
+local visibleData = '' \
+local startX, startY = term.getCursorPos() \
+local wid, hi = term.getSize() \
+while true do \
+  term.setCursorBlink(true) \
+  local e, p1 = coroutine.yield() \
+  if e == 'key' and p1 == 14 then \
+   data = data:sub(1, -2) \
+  elseif e == 'key' and p1 == 28 then \
+   newLine() \
+   return data \
+  elseif e == 'char' then \
+   data = data .. p1 \
+  end \
+  term.setCursorPos(startX, startY) \
+  if #data+startX+1 > wid then \
+   visibleData = data:sub(-1*(wid-startX-1)) \
+  else \
+   visibleData = data \
+  end \
+  term.write(visibleData .. ' ') \
+  local curX, curY = term.getCursorPos() \
+  term.setCursorPos(curX-1, curY) \
+end \
+end \
+while true do \
+term.setTextColor(1) \
+term.setBackgroundColor(32768) \
+term.write('lua> ') \
+local toRun, cError = loadstring(reader(), 'error') \
+if toRun then \
+  setfenv(toRun, getfenv(1)) \
+  local results = {pcall(toRun)} \
+  term.setBackgroundColor(32768) \
+  if results[1] then \
+    table.remove(results,1) \
+    term.write('-- Return values --') \
+    for k,v in pairs(results) do \
+      newLine() \
+      term.write(tostring(v)) \
+    end \
+  else \
+   if term.isColor() then \
+    term.setTextColor(16384) \
+   end \
+   term.write(results[2]) \
+  end \
+else \
+  if term.isColor() then \
+   term.setTextColor(16384) \
+  end \
+  term.write(cError) \
+end \
+newLine() \
 end \
 ";
 
@@ -456,37 +524,42 @@ callLua = function(data) {
 
 
 resumeThread = function() {
-	if (!threadAlive) {
+	if (!thread.alive) {
 		return;
 	}
 
-	console.log("Resuming thread");
 	var threadLoop = setInterval(function() {
-		if (eventStack.length > 0) {
-			var argumentsNumber = eventStack[0].length;
+		if (computer.eventStack.length > 0) {
+			var argumentsNumber = computer.eventStack[0].length;
 
-			for (var index in eventStack[0]) {
-				C.lua_pushstring(mainThread, "" + eventStack[0][index]);
+			for (var index in computer.eventStack[0]) {
+				var argument = computer.eventStack[0][index];
+				if (typeof(argument) == "string") {
+					C.lua_pushstring(thread.main, computer.eventStack[0][index]);
+				} else if (typeof(argument) == "number") {
+					C.lua_pushnumber(thread.main, computer.eventStack[0][index]);
+				} else {
+					C.lua_pushstring(thread.main, computer.eventStack[0][index].toString());
+				}
 			}
-			eventStack.splice(0, 1)
 
-			var resp = C.lua_resume(mainThread, argumentsNumber);
+			computer.eventStack.splice(0, 1);
+
+			var resp = C.lua_resume(thread.main, argumentsNumber);
 			if (resp == C.LUA_YIELD) {
 
 			} else if (resp == 0) {
 				clearInterval(threadLoop);
-				threadAlive = false;
-				console.log("Program complete");
-				console.log("Thread closed");
+				thread.alive = false;
+				console.log("Program ended. Closing thread.");
 			} else {
-				console.log("Error: " + C.lua_tostring(mainThread, -1));
+				console.log("Error occurred. Closing thread.")
+				console.log("Error: " + C.lua_tostring(thread.main, -1));
 				clearInterval(threadLoop);
-				threadAlive = false;
-				console.log("Thread closed");
+				thread.alive = false;
 			}
 		} else {
 			clearInterval(threadLoop);
-			console.log("Thread suspended");
 		}
 	}, 10);
 }
@@ -495,26 +568,26 @@ resumeThread = function() {
 var initialization = function() {
 	termAPI.clear();
 
-	var resp = C.lua_resume(mainThread, 0);
-	if ((resp != C.LUA_YIELD) && (resp != 0)) {
-		var errorCode = C.lua_tostring(mainThread, -1);
-		var trace = C.lua_tostring(mainThread, -3);
+	var resp = C.lua_resume(thread.main, 0);
+	if (resp != C.LUA_YIELD && resp != 0) {
+		var errorCode = C.lua_tostring(thread.main, -1);
+		var trace = C.lua_tostring(thread.main, -3);
 
 		console.log("Intialization Error: " + errorCode);
-		threadAlive = false;
+		thread.alive = false;
 		console.log("Thread closed");
 
-		for (var i = 1; i <= config.height; i++) {
-			drawText(1, i, " ".repeat(config.width), "#000000", "#0000aa");
+		for (var i = 1; i <= term.height; i++) {
+			render.text(1, i, " ".repeat(term.width), "#000000", "#0000aa");
 		}
 
-		var startPos = Math.round(config.width / 2 - ((7 + errorCode.length) / 2));
-		drawText(16, 7, "FATAL : BIOS ERROR", "#0000aa", "#ffffff");
-		drawText(startPos, 9, "ERROR: " + errorCode, "#ffffff", "#0000aa");
+		var startPos = Math.round((term.width / 2) - ((7 + errorCode.length) / 2));
+		render.text(16, 7, "FATAL : BIOS ERROR", "#0000aa", "#ffffff");
+		render.text(startPos, 9, "ERROR: " + errorCode, "#ffffff", "#0000aa");
 
 		if (trace) {
-			console.log("Details: " + trace);
-			drawText(9,11,"-- SEE CONSOLE FOR MORE DETAILS --", "#ffffff", "#0000aa");
+			console.log("Trace: " + trace);
+			render.text(9, 11, "-- SEE CONSOLE FOR MORE DETAILS --", "#ffffff", "#0000aa");
 		}
 	}
 }
@@ -523,11 +596,16 @@ var initialization = function() {
 var main = function() {
 	loadAPIs();
 
+	setInterval(function() {
+		term.cursorFlash = !term.cursorFlash;
+		render.cursorBlink();
+	}, 500);
+
 	startClock = Date.now();
 
-	mainThread = C.lua_newthread(L);
-	C.luaL_loadstring(mainThread, code);
+	thread.main = C.lua_newthread(L);
+	C.luaL_loadstring(thread.main, code);
+	thread.alive = true;
 
-	threadAlive = true;
 	initialization();
 };
