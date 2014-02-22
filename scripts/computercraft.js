@@ -41,6 +41,8 @@ testAPI = {
 		return 1;
 	}
 }
+
+
 // OS
 var computer = {
 	"id": 0,
@@ -304,5 +306,6 @@ var main = function() {
 	C.luaL_loadstring(thread.main, code);
 	thread.alive = true;
 
+	setupFSAPI();
 	initialization();
 };
