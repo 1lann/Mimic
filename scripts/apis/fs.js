@@ -1,67 +1,79 @@
-var filer = new Filer();
 
-filer.init({persistent: false, size: 1024 * 1024}, function(fs) {
+//  
+//  WebCC
+//  Made by 1lann and GravityScore
+//  
 
-}, function onError(e) {
-  console.log("Filer Error: " + e.name);
-});
 
-var fsAPI = {
 
-	"list": function(L) {
+var fsAPI = {};
 
-	},
 
-	"combine": function(L) {
+fsAPI.list = function(L) {
 
-	},
+}
 
-	"getName": function(L) {
 
-	},
+fsAPI.combine = function(L) {
 
-	"getSize": function(L) {
+}
 
-	},
 
-	"exists": function(L) {
+fsAPI.getName = function(L) {
 
-	},
+}
 
-	"isDir": function(L) {
 
-	},
+fsAPI.getSize = function(L) {
 
-	"isReadOnly": function(L) {
+}
 
-	},
 
-	"makeDir": function(L) {
+fsAPI.exists = function(L) {
 
-	},
+}
 
-	"move": function(L) {
 
-	},
+fsAPI.isDir = function(L) {
 
-	"copy": function(L) {
+}
 
-	},
 
-	"delete": function(L) {
+fsAPI.isReadOnly = function(L) {
 
-	},
+}
 
-	"open": function(L) {
 
-	},
+fsAPI.makeDir = function(L) {
 
-	"getDrive": function(L) {
+}
 
-	},
 
-	"getFreeSpace": function(L) {
+fsAPI.move = function(L) {
 
-	},
+}
 
-};
+
+fsAPI.copy = function(L) {
+
+}
+
+
+fsAPI.delete = function(L) {
+
+}
+
+
+fsAPI.open = function(L) {
+
+}
+
+
+fsAPI.getDrive = function(L) {
+
+}
+
+
+fsAPI.getFreeSpace = function(L) {
+
+}

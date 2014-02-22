@@ -1,35 +1,44 @@
 
-//  ----------------  Bit API  ----------------  //
+//  
+//  WebCC
+//  Made by 1lann and GravityScore
+//  
 
 
-var bitAPI = {
 
-	"bnot": function(L) {
+var bitAPI = {};
 
-	},
 
-	"band": function(L) {
+bitAPI.bnot = function(L) {
 
-	},
+}
 
-	"bor": function(L) {
 
-	},
+bitAPI.band = function(L) {
 
-	"bxor": function(L) {
+}
 
-	},
 
-	"brshift": function(L) {
+bitAPI.bor = function(L) {
 
-	},
+}
 
-	"blshift": function(L) {
 
-	},
+bitAPI.bxor = function(L) {
 
-	"blogic_rshift": function(L) {
+}
 
-	},
 
-};
+bitAPI.brshift = function(L) {
+
+}
+
+
+bitAPI.blshift = function(L) {
+
+}
+
+
+bitAPI.blogic_rshift = function(L) {
+
+}

@@ -25,36 +25,46 @@ var thread = {
 	"alive": false,
 };
 
-//  ----------------  APIs  ----------------  //
 
-testAPI = {
-	"table": function(L){
-		var exampleTable = {
-			0: "hi",
-			1: "bye"
-		}
-		C.lua_newtable(L);
-		C.lua_pushstring(L,"this")
-		C.lua_pushstring(L,"is")
-		C.lua_pushstring(L,"a")
-		C.lua_pushstring(L,"test")
-		C.lua
-		return 1;
-	}
-}
+// OS
+var computer = {
+	"id": 0,
+	"label": null,
 
-var apis = {
-	"bit": bitAPI,
-	"fs": fsAPI,
-	"http": httpAPI,
-	"os": osAPI,
-	"peripheral": peripheralAPI,
-	"term": termAPI,
-	"mimic": testAPI
+	"eventStack": [],
+	"lastTimerID": 0,
+};
+
+var startClock;
+
+
+// Terminal
+var term = {
+	"width": 51,
+	"height": 19,
+	"cursorX": 1,
+	"cursorY": 1,
+	"textColor": "#ffffff",
+	"backgroundColor": "#000000",
+	"cursorBlink": false,
+	"cursorFlash": true,
 };
 
 
+
+//  ----------------  APIs  ----------------  //
+
+
 var loadAPIs = function() {
+	var apis = {
+		"bit": bitAPI,
+		"fs": fsAPI,
+		"http": httpAPI,
+		"os": osAPI,
+		"peripheral": peripheralAPI,
+		"term": termAPI,
+	};
+
 	C.luaL_openlibs(L);
 
 	for (var api in apis) {
@@ -199,7 +209,7 @@ resumeThread = function() {
 		return;
 	}
 
-	var threadLoop = setInterval(function() {
+	var threadLoopID = setInterval(function() {
 		if (computer.eventStack.length > 0) {
 			var argumentsNumber = computer.eventStack[0].length;
 
@@ -220,17 +230,17 @@ resumeThread = function() {
 			if (resp == C.LUA_YIELD) {
 
 			} else if (resp == 0) {
-				clearInterval(threadLoop);
+				clearInterval(threadLoopID);
 				thread.alive = false;
 				console.log("Program ended. Closing thread.");
 			} else {
 				console.log("Error occurred. Closing thread.")
 				console.log("Error: " + C.lua_tostring(thread.main, -1));
-				clearInterval(threadLoop);
+				clearInterval(threadLoopID);
 				thread.alive = false;
 			}
 		} else {
-			clearInterval(threadLoop);
+			clearInterval(threadLoopID);
 		}
 	}, 10);
 }
