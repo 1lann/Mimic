@@ -85,7 +85,7 @@ var termAPI = {
 
 		term.cursorX = x;
 		term.cursorY = y;
-		if (!term.cursorFlash) {
+		if (term.cursorFlash) {
 			render.cursorBlink();
 		}
 
