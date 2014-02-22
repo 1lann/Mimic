@@ -9,11 +9,20 @@
 var fsAPI = {};
 var filer = null;
 
+serialize = function(arr) {
+	var construct = "{"
+	for (var index in arr) {
+		var name = arr[index].replace("\"","\\\"");
+		var correctIndex = parseInt(index)+1;
+		construct = construct+"["+correctIndex+"]=\""+name+"\","
+	}
+	construct = construct+"}"
+	return construct;
+}
 
 onFSError = function(err) {
 	console.log(err);
 }
-
 
 setupFSAPI = function() {
 	filer = new Filer();
