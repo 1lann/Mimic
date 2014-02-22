@@ -106,6 +106,10 @@ filesystem.exists = function(path, callback) {
 
 
 filesystem.isDir = function(path, callback) {
+	if (path == "/") {
+		return true;
+	}
+
 	var dir = path.substring(0, path.lastIndexOf("/"));
 	filer.ls(dir, function(items) {
 		for (var i in items) {
@@ -129,7 +133,7 @@ filesystem.isReadOnly = function(path) {
 
 
 filesystem.list = function(path, callback) {
-	isDir(path, function(is) {
+	filesystem.isDir(path, function(is) {
 		if (!is) {
 			callback([], null);
 			return;
@@ -141,9 +145,11 @@ filesystem.list = function(path, callback) {
 				var item = items[i];
 				files.push(item.name);
 			}
+			console.log(items);
 
 			callback(files, null);
 		}, function(err) {
+			console.log(err);
 			if (err.code == err.NOT_FOUND_ERR) {
 				callback([], null);
 			} else {
@@ -155,7 +161,7 @@ filesystem.list = function(path, callback) {
 
 
 filesystem.move = function(from, to, callback) {
-	isDir(to, function(is) {
+	filesystem.isDir(to, function(is) {
 		var toDir = to.substring(0, to.lastIndexOf("/"));
 		var toName = to.substring(to.lastIndexOf("/") + 1);
 		if (is) {
@@ -177,7 +183,7 @@ filesystem.move = function(from, to, callback) {
 
 
 filesystem.copy = function(from, to, callback) {
-	isDir(to, function(is) {
+	filesystem.isDir(to, function(is) {
 		var toDir = to.substring(0, to.lastIndexOf("/"));
 		var toName = to.substring(to.lastIndexOf("/") + 1);
 		if (is) {
@@ -212,7 +218,7 @@ filesystem.delete = function(path, callback) {
 
 
 filesystem.read = function(path, callback) {
-	isDir(path, function(is) {
+	filesystem.isDir(path, function(is) {
 		if (is) {
 			callback(null, "dir");
 			return;
@@ -235,7 +241,7 @@ filesystem.read = function(path, callback) {
 
 
 filesystem.write = function(path, contents, append, callback) {
-	isDir(path, function(is) {
+	filesystem.isDir(path, function(is) {
 		if (is) {
 			callback("dir");
 			return;
@@ -282,7 +288,7 @@ fsAPI.getSize = function(L) {
 
 fsAPI.exists = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
-	exists(path, function(exists) {
+	filesystem.exists(path, function(exists) {
 		computer.eventStack.push(["fs_exists", exists]);
 		resumeThread();
 	});
@@ -293,7 +299,7 @@ fsAPI.exists = function(L) {
 
 fsAPI.isDir = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
-	isDir(path, function(is) {
+	filesystem.isDir(path, function(is) {
 		computer.eventStack.push(["fs_isDir", is]);
 		resumeThread();
 	});
