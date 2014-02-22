@@ -244,6 +244,8 @@ resumeThread = function() {
 					C.lua_pushstring(thread.main, computer.eventStack[0][index]);
 				} else if (typeof(argument) == "number") {
 					C.lua_pushnumber(thread.main, computer.eventStack[0][index]);
+				} else if (typeof(argument) == "boolean") {
+					C.lua_pushboolean(thread.main, argument ? 1 : 0);
 				} else {
 					C.lua_pushstring(thread.main, computer.eventStack[0][index].toString());
 				}

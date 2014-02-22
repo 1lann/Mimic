@@ -33,13 +33,24 @@ resolve = function(path) {
 
 
 exists = function(path, callback) {
-
+	filer.open(path, function(file) {
+		callback(true);
+	}, function(err) {
+		if (err.message.indexOf("does not exist")) {
+			callback(false);
+		} else {
+			onFSError(err);
+		}
+	});
 }
 
 
 fsAPI.list = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
-
+	filer.ls(path, function(items) {
+		computer.eventStack.push(["fs_list", items]);
+		resumeThread();
+	}, onFSError);
 }
 
 
@@ -50,7 +61,11 @@ fsAPI.getSize = function(L) {
 
 
 fsAPI.exists = function(L) {
-
+	var path = resolve(C.luaL_checkstring(L, 1));
+	exists(path, function(exists) {
+		computer.eventStack.push(["fs_exists", exists]);
+		resumeThread();
+	});
 }
 
 
