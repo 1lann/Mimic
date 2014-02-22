@@ -58,7 +58,22 @@ var startClock;
 var termAPI = {
 
 	"write": function(L) {
-		var str = C.luaL_checkstring(L, 1);
+		var str = "";
+
+		var t = C.lua_type(L, 1);
+		if (t == C.LUA_TSTRING) {
+			str = C.lua_tostring(L, 1);
+		} else if (t == C.LUA_TBOOLEAN) {
+			if (C.lua_toboolean(L, 1)) {
+				str = "true";
+			} else {
+				str = "false";
+			}
+		} else if (t == C.LUA_TNUMBER) {
+			str = C.lua_tonumber(L, 1)+"";
+		} else {
+			str = "";
+		}
 
 		render.text(term.cursorX, term.cursorY, str, term.textColor, term.backgroundColor);
 		term.cursorX += str.length;
@@ -220,9 +235,9 @@ var osAPI = {
 		var queueObject = [];
 		queueObject.push(C.luaL_checkstring(L, 1));
 
-		var top = lua_gettop(L);
+		var top = C.lua_gettop(L);
 		for (var i = 1; i <= top; i++) {
-			var t = lua_type(L, i);
+			var t = C.lua_type(L, i);
 			if (t == C.LUA_TSTRING) {
 				queueObject.push(C.lua_tostring(L, i));
 			} else if (t == C.LUA_TBOOLEAN) {
@@ -395,6 +410,11 @@ var peripheralAPI = {
 
 };
 
+var coroutineAPI = {
+	"yield": function() {
+		return C.lua_yield(thread.main);
+	}
+}
 
 
 //  ----------------  APIs  ----------------  //
@@ -407,6 +427,7 @@ var apis = {
 	"os": osAPI,
 	"peripheral": peripheralAPI,
 	"term": termAPI,
+	"boroutine": coroutineAPI
 };
 
 
@@ -434,87 +455,114 @@ var loadAPIs = function() {
 
 
 var code = "\
-local function newLine() \
-local wid, hi = term.getSize() \
-local x, y = term.getCursorPos() \
-if y == hi then \
-  term.scroll(1) \
-  term.setCursorPos(1, y) \
-else \
-  term.setCursorPos(1, y+1) \
-end \
-end \
-local nativeShutdown = os.shutdown \
-function os.shutdown() \
-nativeShutdown() \
-while true do \
-  coroutine.yield() \
-end \
-end \
-local nativeReboot = os.reboot \
-function os.reboot() \
-nativeReboot() \
-while true do \
-  coroutine.yield() \
-end \
-end \
-local function reader() \
-local data = '' \
-local visibleData = '' \
-local startX, startY = term.getCursorPos() \
-local wid, hi = term.getSize() \
-while true do \
-  term.setCursorBlink(true) \
-  local e, p1 = coroutine.yield() \
-  if e == 'key' and p1 == 14 then \
-   data = data:sub(1, -2) \
-  elseif e == 'key' and p1 == 28 then \
-   newLine() \
-   return data \
-  elseif e == 'char' then \
-   data = data .. p1 \
-  end \
-  term.setCursorPos(startX, startY) \
-  if #data+startX+1 > wid then \
-   visibleData = data:sub(-1*(wid-startX-1)) \
-  else \
-   visibleData = data \
-  end \
-  term.write(visibleData .. ' ') \
-  local curX, curY = term.getCursorPos() \
-  term.setCursorPos(curX-1, curY) \
-end \
-end \
-while true do \
-term.setTextColor(1) \
-term.setBackgroundColor(32768) \
-term.write('lua> ') \
-local toRun, cError = loadstring(reader(), 'error') \
-if toRun then \
-  setfenv(toRun, getfenv(1)) \
-  local results = {pcall(toRun)} \
-  term.setBackgroundColor(32768) \
-  if results[1] then \
-    table.remove(results,1) \
-    term.write('-- Return values --') \
-    for k,v in pairs(results) do \
-      newLine() \
-      term.write(tostring(v)) \
-    end \
-  else \
-   if term.isColor() then \
-    term.setTextColor(16384) \
-   end \
-   term.write(results[2]) \
-  end \
-else \
-  if term.isColor() then \
-   term.setTextColor(16384) \
-  end \
-  term.write(cError) \
-end \
-newLine() \
-end \
+xpcall = function( _fn, _fnErrorHandler ) \n\
+	local typeT = type( _fn ) \n\
+	assert( typeT == 'function', 'bad argument #1 to xpcall (function expected, got '..typeT..')' ) \n\
+	local co = coroutine.create( _fn ) \n\
+	local tResults = { coroutine.resume( co ) } \n\
+	while coroutine.status( co ) ~= 'dead' do \n\
+		tResults = { coroutine.resume( co, coroutine.yield() ) } \n\
+	end \n\
+	if tResults[1] == true then \n\
+		return true, unpack( tResults, 2 ) \n\
+	else \n\
+		return false, _fnErrorHandler( tResults[2] ) \n\
+	end \n\
+end \n\
+pcall = function( _fn, ... ) \n\
+	local typeT = type( _fn ) \n\
+	assert( typeT == 'function', 'bad argument #1 to pcall (function expected, got '..typeT..')' ) \n\
+	local tArgs = { ... } \n\
+	return xpcall(  \n\
+		function() \n\
+			return _fn( unpack( tArgs ) ) \n\
+		end, \n\
+		function( _error ) \n\
+			return _error \n\
+		end \n\
+	) \n\
+end \n\
+local function newLine() \n\
+local wid, hi = term.getSize() \n\
+local x, y = term.getCursorPos() \n\
+if y == hi then \n\
+  term.scroll(1) \n\
+  term.setCursorPos(1, y) \n\
+else \n\
+  term.setCursorPos(1, y+1) \n\
+end \n\
+end \n\
+local nativeShutdown = os.shutdown \n\
+function os.shutdown() \n\
+nativeShutdown() \n\
+while true do \n\
+  coroutine.yield() \n\
+end \n\
+end \n\
+local nativeReboot = os.reboot \n\
+function os.reboot() \n\
+nativeReboot() \n\
+while true do \n\
+  coroutine.yield() \n\
+end \n\
+end \n\
+local function reader() \n\
+local data = '' \n\
+local visibleData = '' \n\
+local startX, startY = term.getCursorPos() \n\
+local wid, hi = term.getSize() \n\
+while true do \n\
+  term.setCursorBlink(true) \n\
+  local e, p1 = coroutine.yield() \n\
+  if e == 'key' and p1 == 14 then \n\
+   data = data:sub(1, -2) \n\
+  elseif e == 'key' and p1 == 28 then \n\
+   newLine() \n\
+   return data \n\
+  elseif e == 'char' then \n\
+   data = data .. p1 \n\
+  end \n\
+  term.setCursorPos(startX, startY) \n\
+  if #data+startX+1 > wid then \n\
+   visibleData = data:sub(-1*(wid-startX-1)) \n\
+  else \n\
+   visibleData = data \n\
+  end \n\
+  term.write(visibleData .. ' ') \n\
+  local curX, curY = term.getCursorPos() \n\
+  term.setCursorPos(curX-1, curY) \n\
+end \n\
+end \n\
+while true do \n\
+term.setTextColor(1) \n\
+term.setBackgroundColor(32768) \n\
+term.write('lua> ') \n\
+local toRun, cError = loadstring(reader(), 'error') \n\
+if toRun then \n\
+  setfenv(toRun, getfenv(1)) \n\
+  local results = {pcall(toRun)} \n\
+  term.setBackgroundColor(32768) \n\
+  if results[1] then \n\
+    table.remove(results,1) \n\
+    term.write('-- Return values --') \n\
+    for k,v in pairs(results) do \n\
+      newLine() \n\
+      term.write(tostring(v)) \n\
+    end \n\
+  else \n\
+   if term.isColor() then \n\
+    term.setTextColor(16384) \n\
+   end \n\
+   term.write(results[2]) \n\
+  end \n\
+else \n\
+  if term.isColor() then \n\
+   term.setTextColor(16384) \n\
+  end \n\
+  term.write(cError) \n\
+end \n\
+newLine() \n\
+end \n\
 ";
 
 
