@@ -33,11 +33,18 @@ testAPI = {
 			1: "bye"
 		}
 		C.lua_newtable(L);
+		C.lua_pushnumber(L,1);
 		C.lua_pushstring(L,"this")
+		C.lua_rawset(L, -3);
+		C.lua_pushnumber(L,2);
 		C.lua_pushstring(L,"is")
+		C.lua_rawset(L, -3);
+		C.lua_pushnumber(L,3);
 		C.lua_pushstring(L,"a")
+		C.lua_rawset(L, -3);
+		C.lua_pushnumber(L,4);
 		C.lua_pushstring(L,"test")
-		C.lua_settable(L,-5)
+		C.lua_rawset(L, -3);
 		return 1;
 	}
 }
