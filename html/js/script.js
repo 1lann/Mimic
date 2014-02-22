@@ -19,6 +19,7 @@ configureEditor = function() {
 	gui.editor.setShowPrintMargin(false);
 	gui.editor.setHighlightActiveLine(true);
 	gui.editor.getSession().setUseWrapMode(false);
+	gui.editor.getSession().setUseSoftTabs(false);
 
 	gui.editor.getSession().on("change", function(e) {
 		gui.tabs[gui.selected].contents = gui.editor.getValue();
