@@ -32,7 +32,7 @@ testAPI = {
 			0: "hi",
 			1: "bye"
 		}
-		C.lua_createtable(L,4);
+		C.lua_newtable(L);
 		C.lua_pushstring(L,"this")
 		C.lua_pushstring(L,"is")
 		C.lua_pushstring(L,"a")
@@ -78,6 +78,7 @@ var loadAPIs = function() {
 		"os": osAPI,
 		"peripheral": peripheralAPI,
 		"term": termAPI,
+		"mimic": testAPI,
 	};
 
 	C.luaL_openlibs(L);
