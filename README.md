@@ -10,7 +10,8 @@ File Descriptions
 * rom - Taken from ComputerCraft. All of the rom files from ComputerCraft (Not implemented into main code). - I do not own this code
 * minecraftia* - Generated Webfonts of the Minecraftia font (http://www.dafont.com/minecraftia.font). - I do not own this code
 * computercraft.js - Core ComputerCraft functions re-implemented in JS. - I own this code
-* render.js - Rendering management for drawing text and stuff. - I own this code
+* render.js - Rendering management for drawing. - I own this code
+* event.js - Event management. - I own this code
 * index.html - HTML document for displaying the canvas and loading screen. - I own this code
 * package.json - JSON package data for use with Node-Webkit. - I own this code
 * bios.lua - A temporary bios.lua that I will use to intially test WebCC (Not implemented into main code). - I own this code

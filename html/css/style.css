@@ -1,0 +1,175 @@
+
+body {
+	overflow: hidden;
+}
+
+.file-list {
+	position: absolute;
+	left: 0;
+	top: 87px;
+	bottom: 0;
+	width: 251px;
+
+	border: 1px solid #e7e7e7;
+	background-color: #f8f8f8;
+
+	overflow-y: auto;
+	overflow-x: auto;
+	white-space: nowrap;
+}
+
+.file-list-options-bar {
+	position: absolute;
+	top: 51px;
+	left: 0;
+	width: 251px;
+	height: 37px;
+
+	padding-top: 9px;
+
+	background-color: #f8f8f8;
+	border: 1px solid #e7e7e7;
+}
+
+.file-list-options-bar a {
+	margin-left: 15px;
+}
+
+.file-list > .breadcrumb {
+	margin-bottom: 0;
+}
+
+.computer {
+	position: absolute;
+	top: 88px;
+	bottom: 0;
+	right: 0;
+	left: 251px;
+
+	background-color: #ffffff;
+}
+
+.computer-tab-bar {
+	position: absolute;
+	top: 51px;
+	right: 0;
+	left: 250px;
+	height: 37px;
+
+	background-color: #f8f8f8;
+	border: 1px solid #e7e7e7;
+}
+
+.computer-tab-bar ul {
+	list-style: none;
+	padding: 0;
+}
+
+.computer-tab-bar ul > li {
+	padding: 8px 8px 20px 20px;
+	height: 35px;
+	width: 150px;
+
+	display: inline-block;
+	overflow: hidden;
+}
+
+.computer-tab-bar ul > li.active {
+	background-color: #e7e7e7;
+}
+
+.computer-tab-bar ul > li a, .computer-tab-bar ul > li a:link, .computer-tab-bar ul > li a:visited {
+	color: #777777;
+	-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;
+}
+
+.computer-tab-bar ul > li.active a, .computer-tab-bar ul > li.active a:link, .computer-tab-bar ul > li.active a:visited {
+	color: #555555;
+}
+
+.computer-tab-bar ul > li:hover {
+	cursor: pointer;
+}
+
+.computer-tab-bar ul > li:hover a {
+	text-decoration: none;
+	color: #555555;
+}
+
+.computer-tab-bar ul > li span {
+	margin-top: 2px;
+}
+
+.navbar-default {
+	border-radius: 0px;
+}
+
+#editor {
+	position: absolute;
+	top: 88px;
+	bottom: 0;
+	right: 0;
+	left: 251px;
+}
+
+.open-file, .dropdown-menu a {
+	cursor: pointer;
+}
+
+
+.popup {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 0;
+	margin: 0;
+
+	background-color: rgba(0, 0, 0, 0.6);
+}
+
+.popup-inner {
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	width: 450px;
+	height: 415px;
+	margin-left: -225px;
+	margin-top: -207px;
+	padding: 0;
+
+	background-color: #ffffff;
+}
+
+.popup-close {
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	margin-left: -210px;
+	margin-top: -192px;
+	color: #555555;
+	cursor: pointer;
+}
+
+.popup-close:hover {
+	color: #333333;
+}
+
+.popup-header {
+	background-color: #f8f8f8;
+	border-bottom: 1px solid #e7e7e7;
+	margin: 0;
+
+	padding: 10px 20px;
+	text-align: center;
+}
+
+.popup-header h1 {
+	margin: 0;
+}
+
+.popup-body {
+	margin: 0;
+	padding: 10px 20px;
+}
