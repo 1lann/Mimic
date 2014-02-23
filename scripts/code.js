@@ -6,7 +6,7 @@
 
 
 
-var prebios = '
+var prebios = '\
 xpcall = function(_fn, _fnErrorHandler)\n\
 	assert(type(_fn) == "function", "bad argument #1 to xpcall (function expected, got " .. type(_fn) .. ")")\n\
 \n\
@@ -87,12 +87,23 @@ local waitFor = function(evtName, evtID)\n\
 end\n\
 \n\
 \n\
+local function unserializeTable(s)\n\
+	local func, e = loadstring("return " .. s, "serialize")\n\
+	if not func then\n\
+		return s\n\
+	else\n\
+		setfenv(func, {})\n\
+		return func()\n\
+	end\n\
+end\n\
+\n\
+\n\
 local fs_list = fs.list\n\
 fs.list = function(path)\n\
 	local id = fs_list(path)\n\
 	local e = waitFor("fs_list", id)\n\
 	if e then\n\
-		return e[3]\n\
+		return unserializeTable(e[3])\n\
 	end\n\
 	return nil\n\
 end\n\
@@ -109,7 +120,7 @@ fs.exists = function(path)\n\
 end\n\
 ';
 
-var bios = '
+var bios = '\
 local function newLine()\n\
 	local wid, hi = term.getSize()\n\
 	local x, y = term.getCursorPos()\n\

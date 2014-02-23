@@ -129,13 +129,15 @@ resumeThread = function() {
 			for (var index in computer.eventStack[0]) {
 				var argument = computer.eventStack[0][index];
 				if (typeof(argument) == "string") {
-					C.lua_pushstring(thread.main, computer.eventStack[0][index]);
+					C.lua_pushstring(thread.main, argument);
 				} else if (typeof(argument) == "number") {
-					C.lua_pushnumber(thread.main, computer.eventStack[0][index]);
+					C.lua_pushnumber(thread.main, argument);
 				} else if (typeof(argument) == "boolean") {
 					C.lua_pushboolean(thread.main, argument ? 1 : 0);
+				} else if (typeof(argument) == "object") {
+					C.lua_pushstring(thread.main, filesystem.serializeTable(argument));
 				} else {
-					C.lua_pushstring(thread.main, computer.eventStack[0][index].toString());
+					C.lua_pushstring(thread.main, argument.toString());
 				}
 			}
 

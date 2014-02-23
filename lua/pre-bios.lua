@@ -79,12 +79,23 @@ local waitFor = function(evtName, evtID)
 end
 
 
+local function unserializeTable(s)
+	local func, e = loadstring("return " .. s, "serialize")
+	if not func then
+		return s
+	else
+		setfenv(func, {})
+		return func()
+	end
+end
+
+
 local fs_list = fs.list
 fs.list = function(path)
 	local id = fs_list(path)
 	local e = waitFor("fs_list", id)
 	if e then
-		return e[3]
+		return unserializeTable(e[3])
 	end
 	return nil
 end

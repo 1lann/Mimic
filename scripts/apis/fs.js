@@ -40,11 +40,7 @@ filesystem.serializeTable = function(arr) {
 	for (var index in arr) {
 		var name = arr[index].replace("\"", "\\\"");
 		var correctIndex = parseInt(index) + 1;
-		if (typeof(index) == "string") {
-			construct = construct + "[\"" + correctIndex.replace("\"", "\\\"") + "\"]=\"" + name + "\",";
-		} else {
-			construct = construct + "[" + correctIndex.toString() + "]=\"" + name + "\",";
-		}
+		construct = construct + "[" + correctIndex.toString() + "]=\"" + name + "\",";
 	}
 	construct = construct + "}";
 
@@ -379,6 +375,7 @@ fsAPI.list = function(L) {
 			return;
 		}
 
+		console.log("list", files);
 		computer.eventStack.push(["fs_list", currentCallID, files]);
 		resumeThread();
 	});
@@ -394,7 +391,7 @@ fsAPI.getSize = function(L) {
 
 
 fsAPI.exists = function(L) {
-	var path = resolve(C.luaL_checkstring(L, 1));
+	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 
 	var currentCallID = callID;
 	C.lua_pushnumber(L, currentCallID);
@@ -410,7 +407,7 @@ fsAPI.exists = function(L) {
 
 
 fsAPI.isDir = function(L) {
-	var path = resolve(C.luaL_checkstring(L, 1));
+	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 
 	var currentCallID = callID;
 	C.lua_pushnumber(L, currentCallID);
@@ -426,7 +423,7 @@ fsAPI.isDir = function(L) {
 
 
 fsAPI.isReadOnly = function(L) {
-	var path = resolve(C.luaL_checkstring(L, 1));
+	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 	var isReadOnly = filesystem.isReadOnly(path);
 	C.lua_pushnumber(L, isReadOnly ? 1 : 0);
 
@@ -435,7 +432,7 @@ fsAPI.isReadOnly = function(L) {
 
 
 fsAPI.makeDir = function(L) {
-	var path = resolve(C.luaL_checkstring(L, 1));
+	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 
 	var currentCallID = callID;
 	C.lua_pushnumber(L, currentCallID);
@@ -455,8 +452,8 @@ fsAPI.makeDir = function(L) {
 
 
 fsAPI.move = function(L) {
-	var from = resolve(C.luaL_checkstring(L, 1));
-	var to = resolve(C.luaL_checkstring(L, 2));
+	var from = filesystem.resolve(C.luaL_checkstring(L, 1));
+	var to = filesystem.resolve(C.luaL_checkstring(L, 2));
 
 	var currentCallID = callID;
 	C.lua_pushnumber(L, currentCallID);
@@ -476,8 +473,8 @@ fsAPI.move = function(L) {
 
 
 fsAPI.copy = function(L) {
-	var from = resolve(C.luaL_checkstring(L, 1));
-	var to = resolve(C.luaL_checkstring(L, 2));
+	var from = filesystem.resolve(C.luaL_checkstring(L, 1));
+	var to = filesystem.resolve(C.luaL_checkstring(L, 2));
 
 	var currentCallID = callID;
 	C.lua_pushnumber(L, currentCallID);
@@ -497,12 +494,12 @@ fsAPI.copy = function(L) {
 
 
 fsAPI.delete = function(L) {
-	var path = resolve(C.luaL_checkstring(L, 1));
+	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 
 	var currentCallID = callID;
 	C.lua_pushnumber(L, currentCallID);
 	callID += 1;
-	
+
 	filesystem.delete(path, function(err) {
 		if (err) {
 			console.log("fs_delete error", err);
@@ -517,7 +514,7 @@ fsAPI.delete = function(L) {
 
 
 fsAPI.write = function(L) {
-	var path = resolve(C.luaL_checkstring(L, 1));
+	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 	var contents = C.luaL_checkstring(L, 2);
 
 	var currentCallID = callID;
@@ -538,7 +535,7 @@ fsAPI.write = function(L) {
 
 
 fsAPI.append = function(L) {
-	var path = resolve(C.luaL_checkstring(L, 1));
+	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 	var contents = C.luaL_checkstring(L, 2);
 
 	var currentCallID = callID;
@@ -560,7 +557,7 @@ fsAPI.append = function(L) {
 
 
 fsAPI.read = function(L) {
-	var path = resolve(C.luaL_checkstring(L, 1));
+	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 
 	var currentCallID = callID;
 	C.lua_pushnumber(L, currentCallID);
