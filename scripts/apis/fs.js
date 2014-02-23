@@ -17,6 +17,15 @@ var readOnly = [
 ];
 
 
+triggerGUIUpdate = function() {
+	// if (typeof(onFilesystemChange) == "function") {
+	// 	filesystem.allFiles("/" + computer.id, function(files) {
+	// 		onFilesystemChange(files);
+	// 	});
+	// }
+}
+
+
 
 //  ----------------  Filesystem API  ----------------  //
 
@@ -24,6 +33,7 @@ var readOnly = [
 filesystem.setup = function(callback) {
 	filer = new Filer();
 	filer.init({"persistent": true, "size": 4 * 1024 * 1024}, function(fs) {
+		triggerGUIUpdate();
 		callback(null);
 	}, function(err) {
 		console.log("Failed to load filesystem!");
@@ -184,13 +194,64 @@ filesystem.list = function(path, callback) {
 
 		callback(files, null);
 	}, function(err) {
-		console.log(err);
 		if (err.code == err.NOT_FOUND_ERR) {
 			callback([], null);
 		} else {
 			callback(null, err);
 		}
 	});
+}
+
+
+filesystem.allFiles = function(path, callback) {
+	path = filesystem.sanitise(path);
+
+	var files = [];
+	var error = null;
+	var addFiles = function(dir) {
+		filer.ls(dir, function(items) {
+			for (var i in items) {
+				var item = items[i];
+				if (item.isDirectory) {
+					addFiles(item.fullPath);
+				} else {
+					var it = {};
+					for (var ii in item) {
+						if (item[ii].hasOwnProperty(ii)) {
+							it[ii] = item[ii];
+						}
+					}
+
+					filesystem.read(path, function(contents, err) {
+						if (err) {
+							error = err;
+							return;
+						}
+
+						files.push({
+							"path": it.fullPath,
+							"contents": contents,
+						});
+					});
+				}
+			}
+		}, function(err) {
+			if (err.code == err.NOT_FOUND_ERR) {
+				error = true;
+			} else {
+				error = err;
+			}
+		});
+	}
+
+	addFiles(path);
+	setTimeout(function() {
+		if (error) {
+			callback(null, error);
+		} else {
+			callback(files, null);
+		}
+	}, 10);
 }
 
 
@@ -445,6 +506,8 @@ fsAPI.makeDir = function(L) {
 
 		computer.eventStack.push(["fs_makeDir", currentCallID]);
 		resumeThread();
+
+		triggerGUIUpdate();
 	});
 
 	return 1;
@@ -466,6 +529,8 @@ fsAPI.move = function(L) {
 
 		computer.eventStack.push(["fs_move", currentCallID]);
 		resumeThread();
+
+		triggerGUIUpdate();
 	});
 	
 	return 1;
@@ -487,6 +552,8 @@ fsAPI.copy = function(L) {
 
 		computer.eventStack.push(["fs_copy", currentCallID]);
 		resumeThread();
+
+		triggerGUIUpdate();
 	});
 	
 	return 1;
@@ -507,6 +574,8 @@ fsAPI.delete = function(L) {
 
 		computer.eventStack.push(["fs_delete", currentCallID]);
 		resumeThread();
+
+		triggerGUIUpdate();
 	});
 
 	return 1;
@@ -528,6 +597,8 @@ fsAPI.write = function(L) {
 
 		computer.eventStack.push(["fs_write", currentCallID]);
 		resumeThread();
+
+		triggerGUIUpdate();
 	});
 
 	return 1;
@@ -550,6 +621,8 @@ fsAPI.append = function(L) {
 
 		computer.eventStack.push(["fs_append", currentCallID]);
 		resumeThread();
+
+		triggerGUIUpdate();
 	});
 	
 	return 1;

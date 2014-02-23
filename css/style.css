@@ -1,10 +1,90 @@
 
+
+/* ----------------  Fonts  ---------------- */
+
+
+@font-face {
+	font-family: "minecraftia";
+	src: url("../res/minecraftia-webfont.eot");
+	src: url("../res/minecraftia-webfont.eot?#iefix") format("embedded-opentype"),
+	url("../res/minecraftia-webfont.woff") format("woff"),
+	url("../res/minecraftia-webfont.ttf") format("truetype"),
+	url("../res/minecraftia-webfont.svg#minecraftiaregular") format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+
+
+
+/* ----------------  Computer Canvas  ---------------- */
+
+
+#canvas {
+	position: fixed;
+	height: 350px;
+	width: 620px;
+
+	left: 400px;
+	top: 87px;
+
+	background: #000000;
+	border: 5px solid #e7e7e7;
+}
+
+#overlay-canvas {
+	z-index: 5;
+
+	position: fixed;
+	height: 350px;
+	width: 620px;
+
+	left: 400px;
+	top: 150px;
+
+	background: none;
+	border: 5px solid rgba(0, 0, 0, 0);
+}
+
+
+
+/* ----------------  General  ---------------- */
+
+
 body {
 	overflow: hidden;
 }
 
+
+hr {
+	margin: 0;
+	margin-bottom: 5px;
+	border-color: #e7e7e7;
+}
+
+p {
+	margin-bottom: 5px;
+}
+
+
+
+/* ----------------  Navigation Bar  ---------------- */
+
+
+.navbar-default {
+	border-radius: 0px;
+}
+
+.open-file, .dropdown-menu a {
+	cursor: pointer;
+}
+
+
+
+/* ----------------  File List  ---------------- */
+
+
 .file-list {
-	position: absolute;
+	position: fixed;
 	left: 0;
 	top: 87px;
 	bottom: 0;
@@ -18,8 +98,12 @@ body {
 	white-space: nowrap;
 }
 
+.file-list > .breadcrumb {
+	margin-bottom: 0;
+}
+
 .file-list-options-bar {
-	position: absolute;
+	position: fixed;
 	top: 51px;
 	left: 0;
 	width: 251px;
@@ -35,12 +119,13 @@ body {
 	margin-left: 15px;
 }
 
-.file-list > .breadcrumb {
-	margin-bottom: 0;
-}
+
+
+/* ----------------  Computer  ---------------- */
+
 
 .computer {
-	position: absolute;
+	position: fixed;
 	top: 88px;
 	bottom: 0;
 	right: 0;
@@ -50,7 +135,7 @@ body {
 }
 
 .computer-tab-bar {
-	position: absolute;
+	position: fixed;
 	top: 51px;
 	right: 0;
 	left: 250px;
@@ -100,26 +185,47 @@ body {
 	margin-top: 2px;
 }
 
-.navbar-default {
-	border-radius: 0px;
+
+.computer-options {
+	position: fixed;
+	left: 251px;
+	top: 88px;
+	width: 150px;
+	bottom: 0;
+
+	background-color: #f8f8f8;
+	border-right: 1px solid #e7e7e7;
+
+	padding: 5px 10px;
 }
 
+
+.computer-options hr {
+	margin: 0 -10px;
+	margin-bottom: 5px;
+}
+
+
+
+/* ----------------  Editor  ---------------- */
+
+
 #editor {
-	position: absolute;
+	position: fixed;
 	top: 88px;
 	bottom: 0;
 	right: 0;
 	left: 251px;
 }
 
-.open-file, .dropdown-menu a {
-	cursor: pointer;
-}
+
+
+/* ----------------  Popups  ---------------- */
 
 
 .popup {
 	z-index: 10;
-	position: absolute;
+	position: fixed;
 	top: 0;
 	bottom: 0;
 	left: 0;

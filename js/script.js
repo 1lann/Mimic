@@ -202,6 +202,12 @@ addFileResponders = function() {
 }
 
 
+onFilesystemChange = function(files) {
+	gui.files = files;
+	reloadFileList();
+}
+
+
 setupFileList = function() {
 	reloadFileList();
 }

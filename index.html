@@ -3,70 +3,122 @@
 
 <head>
 
-	<title>Web CC</title>
+	<title>Mimic</title>
 
-	<style>
+	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+	<link rel="stylesheet" href="css/style.css" type="text/css"/>
 
-@font-face {
-	font-family: "minecraftia";
-	src: url("res/minecraftia-webfont.eot");
-	src: url("res/minecraftia-webfont.eot?#iefix") format("embedded-opentype"),
-	url("res/minecraftia-webfont.woff") format("woff"),
-	url("res/minecraftia-webfont.ttf") format("truetype"),
-	url("res/minecraftia-webfont.svg#minecraftiaregular") format("svg");
-	font-weight: normal;
-	font-style: normal;
-}
-
-#canvas {
-	position: fixed;
-	height: 350px;
-	width: 620px;
-	margin-left: auto;
-	margin-right: auto;
-
-	background: #000000;
-}
-
-#overlay-canvas {
-	z-index: 10;
-
-	position: fixed;
-	height: 350px;
-	width: 620px;
-	margin-left: auto;
-	margin-right: auto;
-
-	background: none;
-}
-
-body {
-	margin: 0 0 0 0;
-}
-
-h1 {
-	font-size: 20px;
-	-webkit-font-smoothing: none;
-
-	color: rgb(222, 222, 108);
-	font-family: minecraftia;
-
-	position: fixed;
-	top: 130px;
-	left: 250px;
-}
-
-	</style>
 </head>
 
 <body>
 
-	<canvas id="canvas" width=620 height=350></canvas>
-	<canvas id="overlay-canvas" width=620 height=350></canvas>
-	<textarea autofocus=true style="opacity:0; position:fixed; width:100%; height:100%; z-index:100; cursor:default;"></textarea>
-	<h1 id="loading">Loading...</h1>
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Mimic</a>
+			</div>
+
+			<div class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							File <b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a id="about-popup-open">About</a></li>
+							<li><a id="settings-popup-open">Settings</a></li>
+							<li class="divider"></li>
+							<li><a>New Computer</a></li>
+							<li><a>Close Computer</a></li>
+						</ul>
+					</li>
+					<li class="active"><a href="#">Computer 1</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+
+	<div class="file-list" id="file-list">
+
+	</div>
+
+	<div class="file-list-options-bar">
+		<a href="#">New File</a>
+	</div>
+
+
+	<div class="computer-tab-bar">
+		<ul id="tabs">
+
+		</ul>
+	</div>
+
+
+	<div id="computer" class="computer">
+		<div class="computer-options">
+			<p>Peripherals</p>
+			<hr>
+			<p>Top:</p>
+		</div>
+
+		<canvas id="canvas" width="620" height="350"></canvas>
+		<canvas id="overlay-canvas" width="620" height="350"></canvas>
+		<textarea autofocus=true style="opacity:0; position:fixed; width:100%; height:100%; z-index:100; cursor:default;"></textarea>
+	</div>
+
+
+	<div id="editor" class="computer"></div>
+
+
+	<div id="about-popup" class="popup" style="display: none;">
+		<div class="popup-inner">
+			<div class="popup-header">
+				<span class="glyphicon glyphicon-remove popup-close"></span>
+				<h1>About</h1>
+			</div>
+
+			<div class="popup-body" style="text-align: center;">
+				<br>
+				<p><strong>Created By</strong></p>
+				<p>GravityScore and 1lann</p>
+				<br>
+
+				<p><strong>ComputerCraft By</strong></p>
+				<p>dan200</p>
+				<br>
+
+				<p><strong>Minecraftia Font By</strong></p>
+				<p>Andrew Tyler</p>
+				<br>
+
+				<p><a href="https://github.com/1lann/WebCC" target="_blank">GitHub Repository</a></p>
+				<p><a href="http://..." target="_blank">ComputerCraft Forums Thread</a></p>
+			</div>
+		</div>
+	</div>
+
+
+	<div id="settings-popup" class="popup" style="display: none;">
+		<div class="popup-inner">
+			<div class="popup-header">
+				<span class="glyphicon glyphicon-remove popup-close"></span>
+				<h1>Settings</h1>
+			</div>
+			
+			<div class="popup-body" style="text-align: center;">
+				
+			</div>
+		</div>
+	</div>
 
 </body>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="ace/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/script.js"></script>
+
 
 <script src="scripts/code.js"></script>
 
@@ -85,5 +137,27 @@ h1 {
 <script src="scripts/apis/os.js"></script>
 <script src="scripts/apis/peripheral.js"></script>
 <script src="scripts/apis/term.js"></script>
+
+<script>
+
+var canvasMinX = 400;
+var canvasMinY = 87;
+
+window.onresize = function() {
+	var y = canvasMinY + (window.innerHeight - canvasMinY) / 2 - canvas.height / 2;
+	var x = canvasMinX + (window.innerWidth - canvasMinX) / 2 - canvas.width / 2;
+	y = Math.max(y, canvasMinY);
+	x = Math.max(x, canvasMinX);
+
+	$("#canvas").attr("style", "left: " + x + "px; top: " + y + "px;");
+	$("#overlay-canvas").attr("style", "left: " + x + "px; top: " + y + "px;");
+}
+
+$(document).ready(function() {
+	window.onresize();
+	main();
+});
+
+</script>
 
 </html>

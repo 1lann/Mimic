@@ -70,26 +70,3 @@ render.cursorBlink = function() {
 		overlayContext.clearRect(0, 0, canvas.width, canvas.height);
 	}
 }
-
-
-
-//  ----------------  Main  ----------------  //
-
-
-var image = new Image();
-image.src = "res/minecraftia-webfont.ttf";
-
-image.onerror = function() {
-	setTimeout(function() {
-		loaded = true;
-
-		document.getElementById("loading").setAttribute("style", "display: none;");
-
-		if (typeof(main) != "undefined") {
-			main();
-		} else {
-			render.text(1, 1, "An error occured while loading ComputerCraft!", "#CC4C4C", "#000000");
-			render.text(1, 2, "Check the JavaScript console for more details", "#CC4C4C", "#000000");
-		}
-	}, 100);
-}
