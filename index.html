@@ -62,10 +62,14 @@
 			<p>Top:</p>
 		</div>
 
-		<canvas id="canvas" width="620" height="350"></canvas>
-		<canvas id="overlay-canvas" width="620" height="350"></canvas>
-		<textarea autofocus=true style="opacity: 0; position: fixed; width: 100%; height: 100%; z-index: 100; cursor: default;"></textarea>
+		<div class="canvas-container">
+			<canvas id="canvas" width="620" height="350"></canvas>
+			<canvas id="overlay-canvas" width="620" height="350"></canvas>
+		</div>
 	</div>
+
+
+	<textarea autofocus=true style="opacity: 0; position: fixed; width: 100%; height: 100%; z-index: 100; cursor: default;"></textarea>
 
 
 	<div id="editor" class="computer"></div>
@@ -140,8 +144,8 @@
 
 <script>
 
-var canvasMinX = 400;
-var canvasMinY = 87;
+var canvasMinX = 401;
+var canvasMinY = 88;
 
 window.onresize = function() {
 	var y = canvasMinY + (window.innerHeight - canvasMinY) / 2 - canvas.height / 2;

@@ -19,6 +19,11 @@
 /* ----------------  Computer Canvas  ---------------- */
 
 
+.computer-container {
+	border: 5px solid #e7e7e7;
+}
+
+
 #canvas {
 	position: fixed;
 	height: 350px;
@@ -28,7 +33,6 @@
 	top: 87px;
 
 	background: #000000;
-	border: 5px solid #e7e7e7;
 }
 
 #overlay-canvas {
@@ -42,7 +46,6 @@
 	top: 150px;
 
 	background: none;
-	border: 5px solid rgba(0, 0, 0, 0);
 }
 
 
