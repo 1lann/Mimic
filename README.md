@@ -1,4 +1,4 @@
-WebCC
+Mimic
 =====
 
 A Soon(tm) to be a full featured implementation of ComputerCraft that works straight in web browsers!
@@ -14,7 +14,7 @@ File Descriptions
 * event.js - Event management. - I own this code
 * index.html - HTML document for displaying the canvas and loading screen. - I own this code
 * package.json - JSON package data for use with Node-Webkit. - I own this code
-* bios.lua - A temporary bios.lua that I will use to intially test WebCC (Not implemented into main code). - I own this code
+* bios.lua - A temporary bios.lua that I will use to intially test Mimic (Not implemented into main code). - I own this code
 
 
 License
