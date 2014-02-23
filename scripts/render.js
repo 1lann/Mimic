@@ -56,8 +56,10 @@ render.character = function(x, y, text, foreground, background, ctx) {
 
 
 render.text = function(x, y, text, foreground, background, ctx) {
-	for (var i = 0; i < text.length; i++) {
-		render.character(x + i, y, text.charAt(i), foreground, background, ctx);
+	if (x >= 1 && y >= 1 && x <= term.width && y <= term.height) {
+		for (var i = 0; i < text.length; i++) {
+			render.character(x + i, y, text.charAt(i), foreground, background, ctx);
+		}
 	}
 }
 
