@@ -274,7 +274,9 @@ resumeThread = function() {
 
 
 var initialization = function() {
-	termAPI.clear();
+	for (var i = 1; i <= term.height; i++) {
+		render.text(1, i, " ".repeat(term.width), "#ffffff", "#000000");
+	}
 
 	var resp = C.lua_resume(thread.main, 0);
 	if (resp != C.LUA_YIELD && resp != 0) {
@@ -286,7 +288,7 @@ var initialization = function() {
 		console.log("Thread closed");
 
 		for (var i = 1; i <= term.height; i++) {
-			render.text(1, i, " ".repeat(term.width), "#000000", "#0000aa");
+			render.text(1, i, " ".repeat(term.width), "#ffffff", "#0000aa");
 		}
 
 		var startPos = Math.round((term.width / 2) - ((7 + errorCode.length) / 2));
@@ -295,31 +297,43 @@ var initialization = function() {
 
 		if (trace) {
 			console.log("Trace: " + trace);
-			render.text(9, 11, "-- SEE CONSOLE FOR MORE DETAILS --", "#ffffff", "#0000aa");
+			render.text(9, 11, "-- SEE CONSOLE FOR STACK TRACE --", "#ffffff", "#0000aa");
 		}
 	}
 }
 
 
-var main = function() {
+var setup = function(callback) {
 	filesystem.setup(function(err) {
 		if (err) {
 			return;
 		}
 
-		loadAPIs();
+		callback();
+	});
+}
 
-		setInterval(function() {
-			term.cursorFlash = !term.cursorFlash;
-			render.cursorBlink();
-		}, 500);
 
-		startClock = Date.now();
+var run = function() {
+	loadAPIs();
 
-		thread.main = C.lua_newthread(L);
-		C.luaL_loadstring(thread.main, code);
-		thread.alive = true;
+	setInterval(function() {
+		term.cursorFlash = !term.cursorFlash;
+		render.cursorBlink();
+	}, 500);
 
-		initialization();
+	startClock = Date.now();
+
+	thread.main = C.lua_newthread(L);
+	C.luaL_loadstring(thread.main, code);
+	thread.alive = true;
+
+	initialization();
+}
+
+
+var main = function() {
+	setup(function() {
+		run();
 	});
 };

@@ -10,6 +10,11 @@ var fsAPI = {};
 var filer = null;
 
 var filesystem = {};
+var callID = 0;
+
+var readOnly = [
+	"/*/rom",
+];
 
 
 
@@ -48,15 +53,12 @@ filesystem.serializeTable = function(arr) {
 
 
 filesystem.resolve = function(path) {
-	path = path.replace("\\", "/");
-	if (path.substring(0, 1) != "/") {
-		path = "/" + path;
-	}
+	path = filesystem.sanitise(path);
 
 	// Replace simple resolutions
 	path = path.replace(/(\/(\.\/)+)|(\/\.$)/g, "/").replace(/\/{2,}/g, "/");
 
-	// Replace all ../
+	// Replace ../
 	var leadingParents = path.substring(1).match(/^(\.\.\/)+/) || '';
 	if (leadingParents) {
 		leadingParents = leadingParents[0];
@@ -79,12 +81,22 @@ filesystem.resolve = function(path) {
 	}
 
 	path = leadingParents + path.substring(1);
+	return filesystem.sanitise("/" + computer.id + "/" + path);
+}
 
-	// Append computer ID
-	path = "/" + computer.id + "/" + path;
+
+filesystem.sanitise = function(path) {
+	path = path.replace("\\", "/");
+	if (path.substring(0, 1) != "/") {
+		path = "/" + path;
+	}
 
 	if (path.substring(path.length - 1) == "/") {
 		path = path.substring(0, path.length - 1);
+	}
+
+	if (path.length == 0) {
+		path = "/";
 	}
 
 	return path;
@@ -92,6 +104,8 @@ filesystem.resolve = function(path) {
 
 
 filesystem.exists = function(path, callback) {
+	path = filesystem.sanitise(path);
+
 	var dir = path.substring(0, path.lastIndexOf("/"));
 	filer.ls(dir, function(items) {
 		for (var i in items) {
@@ -110,8 +124,10 @@ filesystem.exists = function(path, callback) {
 
 
 filesystem.isDir = function(path, callback) {
+	path = filesystem.sanitise(path);
 	if (path == "/") {
-		return true;
+		callback(true);
+		return;
 	}
 
 	var dir = path.substring(0, path.lastIndexOf("/"));
@@ -132,39 +148,60 @@ filesystem.isDir = function(path, callback) {
 
 
 filesystem.isReadOnly = function(path) {
+	path = filesystem.sanitise(path).substring(1);
+	var parts = path.split("/");
+	
+	for (var i in readOnly) {
+		var readOnlyPath = filesystem.sanitise(readOnly[i]).substring(1).split("/");
+		if (parts.length >= readOnlyPath.length) {
+			var isReadOnly = true;
+			for (var ii in readOnlyPath) {
+				if (readOnlyPath[ii] == "*") {
+					continue;
+				}
+
+				if (readOnlyPath[ii] != parts[ii]) {
+					isReadOnly = false;
+					break;
+				}
+			}
+
+			if (isReadOnly) {
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
 
 
 filesystem.list = function(path, callback) {
-	filesystem.isDir(path, function(is) {
-		if (!is) {
-			callback([], null);
-			return;
+	path = filesystem.sanitise(path);
+	
+	filer.ls(path, function(items) {
+		var files = [];
+		for (var i in items) {
+			var item = items[i];
+			files.push(item.name);
 		}
 
-		filer.ls(path, function(items) {
-			var files = [];
-			for (var i in items) {
-				var item = items[i];
-				files.push(item.name);
-			}
-			console.log(items);
-
-			callback(files, null);
-		}, function(err) {
-			console.log(err);
-			if (err.code == err.NOT_FOUND_ERR) {
-				callback([], null);
-			} else {
-				callback(null, err);
-			}
-		});
+		callback(files, null);
+	}, function(err) {
+		console.log(err);
+		if (err.code == err.NOT_FOUND_ERR) {
+			callback([], null);
+		} else {
+			callback(null, err);
+		}
 	});
 }
 
 
 filesystem.move = function(from, to, callback) {
+	from = filesystem.sanitise(from);
+	to = filesystem.sanitise(to);
+	
 	filesystem.isDir(to, function(is) {
 		var toDir = to.substring(0, to.lastIndexOf("/"));
 		var toName = to.substring(to.lastIndexOf("/") + 1);
@@ -187,6 +224,9 @@ filesystem.move = function(from, to, callback) {
 
 
 filesystem.copy = function(from, to, callback) {
+	from = filesystem.sanitise(from);
+	to = filesystem.sanitise(to);
+	
 	filesystem.isDir(to, function(is) {
 		var toDir = to.substring(0, to.lastIndexOf("/"));
 		var toName = to.substring(to.lastIndexOf("/") + 1);
@@ -209,6 +249,8 @@ filesystem.copy = function(from, to, callback) {
 
 
 filesystem.delete = function(path, callback) {
+	path = filesystem.sanitise(path);
+	
 	filer.rm(path, function() {
 		callback(null);
 	}, function(err) {
@@ -222,6 +264,8 @@ filesystem.delete = function(path, callback) {
 
 
 filesystem.read = function(path, callback) {
+	path = filesystem.sanitise(path);
+	
 	filesystem.isDir(path, function(is) {
 		if (is) {
 			callback(null, "dir");
@@ -230,13 +274,19 @@ filesystem.read = function(path, callback) {
 
 		filer.open(path, function(file) {
 			var reader = new FileReader();
-			reader.onload = function(e) {
-				console.log(reader);
-				console.log(e);
-
-				callback(true, null);
+			reader.onloadend = function(e) {
+				callback(e.target.result, null);
 			}
-			console.log("reading...");
+
+			reader.onerror = function(err) {
+				callback(null, err);
+			}
+
+			reader.onabort = function(err) {
+				callback(null, err);
+			}
+
+			reader.readAsText(file);
 		}, function(err) {
 			callback(null, err);
 		});
@@ -245,32 +295,70 @@ filesystem.read = function(path, callback) {
 
 
 filesystem.write = function(path, contents, append, callback) {
+	path = filesystem.sanitise(path);
+	
 	filesystem.isDir(path, function(is) {
 		if (is) {
 			callback("dir");
 			return;
 		}
 
-		var dir = path.substring(0, path.lastIndexOf("/"));
-		filer.mkdir(dir, false, function() {
+		var complete = function() {
 			filer.write(path, {"data": contents, "append": append}, function(entry, writer) {
 				callback(null);
 			}, function(err) {
 				callback(err);
-			})
-		}, function(err) {
-			callback(err);
-		});
+			});
+		}
+
+		var dir = path.substring(0, path.lastIndexOf("/"));
+		if (dir.length > 0) {
+			filesystem.makeDir(dir, function(err) {
+				if (err) {
+					callback(err);
+				} else {
+					complete();
+				}
+			});
+		} else {
+			complete();
+		}
 	});
 }
 
 
 filesystem.makeDir = function(path, callback) {
-	filer.mkdir(path, false, function(dir) {
+	path = filesystem.sanitise(path) + "/";
+	if (path == "/") {
 		callback(null);
-	}, function(err) {
-		callback(err);
-	});
+		return;
+	}
+
+	var dir = path.substring(1);
+	var currentDir = "/" + dir.substring(0, dir.indexOf("/"));
+	dir = dir.substring(dir.indexOf("/") + 1);
+
+	var make = function() {
+		var next = function() {
+			if (dir.indexOf("/") == -1) {
+				callback(null);
+			} else {
+				currentDir = currentDir + "/" + dir.substring(0, dir.indexOf("/"));
+				dir = dir.substring(dir.indexOf("/") + 1);
+				make();
+			}
+		}
+
+		filer.mkdir(currentDir, true, next, function(err) {
+			if (err.code != err.INVALID_MODIFICATION_ERR) {
+				callback(err);
+			} else {
+				next();
+			}
+		});
+	}
+
+	make();
 }
 
 
@@ -279,8 +367,23 @@ filesystem.makeDir = function(path, callback) {
 
 
 fsAPI.list = function(L) {
-	var path = resolve(C.luaL_checkstring(L, 1));
-	return 0;
+	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
+
+	var currentCallID = callID;
+	C.lua_pushnumber(L, currentCallID);
+	callID += 1;
+
+	filesystem.list(path, function(files, err) {
+		if (err) {
+			console.log("fs_list error", err);
+			return;
+		}
+
+		computer.eventStack.push(["fs_list", currentCallID, files]);
+		resumeThread();
+	});
+
+	return 1;
 }
 
 
@@ -292,28 +395,40 @@ fsAPI.getSize = function(L) {
 
 fsAPI.exists = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
+
+	var currentCallID = callID;
+	C.lua_pushnumber(L, currentCallID);
+	callID += 1;
+
 	filesystem.exists(path, function(exists) {
-		computer.eventStack.push(["fs_exists", exists]);
+		computer.eventStack.push(["fs_exists", currentCallID, exists]);
 		resumeThread();
 	});
 
-	return 0;
+	return 1;
 }
 
 
 fsAPI.isDir = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
+
+	var currentCallID = callID;
+	C.lua_pushnumber(L, currentCallID);
+	callID += 1;
+
 	filesystem.isDir(path, function(is) {
-		computer.eventStack.push(["fs_isDir", is]);
+		computer.eventStack.push(["fs_isDir", currentCallID, is]);
 		resumeThread();
 	});
 
-	return 0;
+	return 1;
 }
 
 
 fsAPI.isReadOnly = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
+	var isReadOnly = filesystem.isReadOnly(path);
+	C.lua_pushnumber(L, isReadOnly ? 1 : 0);
 
 	return 1;
 }
@@ -321,31 +436,83 @@ fsAPI.isReadOnly = function(L) {
 
 fsAPI.makeDir = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
-	
-	return 0;
+
+	var currentCallID = callID;
+	C.lua_pushnumber(L, currentCallID);
+	callID += 1;
+
+	filesystem.makeDir(path, function(err) {
+		if (err) {
+			console.log("fs_makeDir error", err);
+		}
+
+		computer.eventStack.push(["fs_makeDir", currentCallID]);
+		resumeThread();
+	});
+
+	return 1;
 }
 
 
 fsAPI.move = function(L) {
 	var from = resolve(C.luaL_checkstring(L, 1));
 	var to = resolve(C.luaL_checkstring(L, 2));
+
+	var currentCallID = callID;
+	C.lua_pushnumber(L, currentCallID);
+	callID += 1;
+
+	filesystem.move(from, to, function(err) {
+		if (err) {
+			console.log("fs_move error", err);
+		}
+
+		computer.eventStack.push(["fs_move", currentCallID]);
+		resumeThread();
+	});
 	
-	return 0;
+	return 1;
 }
 
 
 fsAPI.copy = function(L) {
 	var from = resolve(C.luaL_checkstring(L, 1));
 	var to = resolve(C.luaL_checkstring(L, 2));
+
+	var currentCallID = callID;
+	C.lua_pushnumber(L, currentCallID);
+	callID += 1;
+
+	filesystem.copy(from, to, function(err) {
+		if (err) {
+			console.log("fs_copy error", err);
+		}
+
+		computer.eventStack.push(["fs_copy", currentCallID]);
+		resumeThread();
+	});
 	
-	return 0;
+	return 1;
 }
 
 
 fsAPI.delete = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
 
-	return 0;
+	var currentCallID = callID;
+	C.lua_pushnumber(L, currentCallID);
+	callID += 1;
+	
+	filesystem.delete(path, function(err) {
+		if (err) {
+			console.log("fs_delete error", err);
+		}
+
+		computer.eventStack.push(["fs_delete", currentCallID]);
+		resumeThread();
+	});
+
+	return 1;
 }
 
 
@@ -353,22 +520,63 @@ fsAPI.write = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
 	var contents = C.luaL_checkstring(L, 2);
 
-	return 0;
+	var currentCallID = callID;
+	C.lua_pushnumber(L, currentCallID);
+	callID += 1;
+
+	filesystem.write(path, contents, false, function(err) {
+		if (err) {
+			console.log("fs_write error", err);
+		}
+
+		computer.eventStack.push(["fs_write", currentCallID]);
+		resumeThread();
+	});
+
+	return 1;
 }
 
 
 fsAPI.append = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
 	var contents = C.luaL_checkstring(L, 2);
+
+	var currentCallID = callID;
+	C.lua_pushnumber(L, currentCallID);
+	callID += 1;
+
+	filesystem.write(path, contents, true, function(err) {
+		if (err) {
+			console.log("fs_write error", err);
+			return;
+		}
+
+		computer.eventStack.push(["fs_append", currentCallID]);
+		resumeThread();
+	});
 	
-	return 0;
+	return 1;
 }
 
 
 fsAPI.read = function(L) {
 	var path = resolve(C.luaL_checkstring(L, 1));
+
+	var currentCallID = callID;
+	C.lua_pushnumber(L, currentCallID);
+	callID += 1;
+
+	filesystem.read(path, function(contents, err) {
+		if (err) {
+			console.log("fs_read error", err);
+			return;
+		}
+
+		computer.eventStack.push(["fs_read", currentCallID, contents]);
+		resumeThread();
+	});
 	
-	return 0;
+	return 1;
 }
 
 
