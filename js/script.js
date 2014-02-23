@@ -1,8 +1,15 @@
 
+//  
+//  WebCC
+//  Made by 1lann and GravityScore
+//  
+
+
+
 var gui = {
 	"tabs": [],
 	"selected": -1,
-	"files": [{"path": "/meh/test/lulz", "contents": "hello there"}, {"path": "/meh/mehhh", "contents": "hai\nhaithere"}],
+	"files": [],
 	"editor": null,
 }
 
@@ -38,7 +45,7 @@ configureEditor = function() {
 }
 
 
-function waitForWebfonts(fonts, callback) {
+waitForWebfonts = function(fonts, callback) {
 	var loadedFonts = 0;
 	for (var i = 0, l = fonts.length; i < l; ++i) {
 		(function(font) {
@@ -82,7 +89,7 @@ function waitForWebfonts(fonts, callback) {
 			}
 		})(fonts[i]);
 	}
-};
+}
 
 
 
@@ -107,6 +114,7 @@ reloadTabData = function() {
 
 	addTabResponders();
 }
+
 
 reloadTab = function() {
 	if (gui.selected != -1) {
