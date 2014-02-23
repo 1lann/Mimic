@@ -116,6 +116,27 @@ callLua = function(data) {
 	C.luaL_dostring(L, data);
 }
 
+threadHang = function() {
+	thread.alive = false;
+	for (var i = 1; i <= term.height; i++) {
+		render.text(1, i, " ".repeat(term.width), "#000000", "#0000aa");
+	}
+
+	var errorOne = "The Lua thread had hung, and has been";
+	var errorTwo = "been terminated. This is equivelant to";
+	var errorThree = "\"Too long without yielding.\"";
+	var errorFour = "Please reboot the computer";
+	var startOne = Math.round((term.width / 2) - ((errorOne.length) / 2));
+	var startTwo = Math.round((term.width / 2) - ((errorTwo.length) / 2));
+	var startThree = Math.round((term.width / 2) - ((errorThree.length) / 2));
+	var startFour = Math.round((term.width / 2) - ((errorFour.length) / 2));
+	term.cursorBlink = false;
+	render.text(16, 7, "FATAL : THREAD HANG", "#0000aa", "#ffffff");
+	render.text(startOne, 9, errorOne, "#ffffff", "#0000aa");
+	render.text(startTwo, 10, errorTwo, "#ffffff", "#0000aa");
+	render.text(startThree, 11, errorThree, "#ffffff", "#0000aa");
+	render.text(startFour, 13, errorFour, "#ffffff", "#0000aa");
+}
 
 resumeThread = function() {
 	if (!thread.alive) {
@@ -143,7 +164,10 @@ resumeThread = function() {
 
 			computer.eventStack.splice(0, 1);
 
+			//C.lua_sethook(thread.main, tooLongHook, C.LUA_MASKCOUNT, 2^11);
+			numberOfRuns = 0;
 			var resp = C.lua_resume(thread.main, argumentsNumber);
+			console.log("end")
 			if (resp == C.LUA_YIELD) {
 
 			} else if (resp == 0) {
@@ -182,6 +206,7 @@ var initialization = function() {
 		}
 
 		var startPos = Math.round((term.width / 2) - ((7 + errorCode.length) / 2));
+		term.cursorBlink = false;
 		render.text(16, 7, "FATAL : BIOS ERROR", "#0000aa", "#ffffff");
 		render.text(startPos, 9, "ERROR: " + errorCode, "#ffffff", "#0000aa");
 
