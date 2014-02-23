@@ -78,6 +78,10 @@ p {
 	cursor: pointer;
 }
 
+.dropdown-menu {
+	border-radius: 0;
+}
+
 
 
 /* ----------------  File List  ---------------- */
