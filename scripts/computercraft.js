@@ -167,7 +167,6 @@ resumeThread = function() {
 			//C.lua_sethook(thread.main, tooLongHook, C.LUA_MASKCOUNT, 2^11);
 			numberOfRuns = 0;
 			var resp = C.lua_resume(thread.main, argumentsNumber);
-			console.log("end")
 			if (resp == C.LUA_YIELD) {
 
 			} else if (resp == 0) {
