@@ -77,11 +77,7 @@ render.cursorBlink = function() {
 
 //  ----------------  Main  ----------------  //
 
-
-var image = new Image();
-image.src = "res/minecraftia-webfont.ttf";
-
-image.onerror = function() {
+window.onload = function() {
 	setTimeout(function() {
 		loaded = true;
 
