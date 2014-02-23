@@ -35,7 +35,11 @@ filesystem.serializeTable = function(arr) {
 	for (var index in arr) {
 		var name = arr[index].replace("\"", "\\\"");
 		var correctIndex = parseInt(index) + 1;
-		construct = construct + "[" + correctIndex + "]=\"" + name + "\",";
+		if (typeof(index) == "string") {
+			construct = construct + "[\"" + correctIndex.replace("\"", "\\\"") + "\"]=\"" + name + "\",";
+		} else {
+			construct = construct + "[" + correctIndex.toString() + "]=\"" + name + "\",";
+		}
 	}
 	construct = construct + "}";
 
