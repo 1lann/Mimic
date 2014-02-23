@@ -155,7 +155,9 @@ window.onresize = function() {
 
 $(document).ready(function() {
 	window.onresize();
-	main();
+	waitForWebfonts(["minecraftia"], function() {
+		main();
+	});
 });
 
 </script>
