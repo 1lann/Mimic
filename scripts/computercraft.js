@@ -60,6 +60,7 @@ var computer = {
 };
 
 var startClock;
+var coroutineClock;
 
 
 // Terminal
@@ -164,8 +165,7 @@ resumeThread = function() {
 
 			computer.eventStack.splice(0, 1);
 
-			//C.lua_sethook(thread.main, tooLongHook, C.LUA_MASKCOUNT, 2^11);
-			numberOfRuns = 0;
+			coroutineClock = Date.now();
 			var resp = C.lua_resume(thread.main, argumentsNumber);
 			if (resp == C.LUA_YIELD) {
 
