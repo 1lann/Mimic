@@ -292,6 +292,10 @@ var shutdown = function() {
 }
 
 var boot = function() {
+	if (thread.alive || L) {
+		console.error("Cannot boot if computer is still on!")
+		return;
+	}
 	coroutineClock = Date.now();
 
 	L = C.lua_open();
