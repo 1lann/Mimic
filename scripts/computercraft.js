@@ -18,6 +18,8 @@ var version = "CraftOS 1.5 (Web Alpha)";
 // Lua State
 var C = Lua5_1.C;
 var L = C.lua_open();
+var doShutdown = false;
+var doReboot = false;
 
 
 // Thread
@@ -173,7 +175,13 @@ resumeThread = function() {
 			coroutineClock = Date.now();
 			var resp = C.lua_resume(thread.main, argumentsNumber);
 			if (resp == C.LUA_YIELD) {
-
+				if (doShutdown) {
+					shutdown();
+					return;
+				} else if (doReboot) {
+					reboot();
+					return;
+				}
 			} else if (resp == 0) {
 				clearInterval(threadLoopID);
 				thread.alive = false;
@@ -250,7 +258,7 @@ var run = function() {
 	initialization();
 }
 
-var reboot = function(id) {
+var shutdown = function() {
 	coroutineClock = Date.now();
 
 	C.lua_close(L);
@@ -258,14 +266,6 @@ var reboot = function(id) {
 	thread = {
 		"main": null,
 		"alive": false,
-	};
-
-	computer = {
-		"id": id | 0,
-		"label": null,
-
-		"eventStack": [],
-		"lastTimerID": 0,
 	};
 	term = {
 		"width": 51,
@@ -277,6 +277,22 @@ var reboot = function(id) {
 		"cursorBlink": false,
 		"cursorFlash": true,
 	};
+	computer = {
+		"id": 0,
+		"label": null,
+
+		"eventStack": [],
+		"lastTimerID": 0,
+	};
+	doShutdown = false;
+	doReboot = false;
+	for (var i = 1; i <= term.height; i++) {
+		render.text(1, i, " ".repeat(term.width), "#000000", "#000000");
+	}
+}
+
+var boot = function() {
+	coroutineClock = Date.now();
 
 	L = C.lua_open();
 	loadAPIs();
@@ -288,6 +304,11 @@ var reboot = function(id) {
 	startClock = Date.now();
 
 	initialization();
+}
+
+var reboot = function() {
+	shutdown();
+	boot();
 }
 
 var main = function() {
