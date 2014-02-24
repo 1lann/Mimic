@@ -81,6 +81,11 @@ var term = {
 
 
 var loadAPIs = function() {
+	Lua5_1.Runtime.functionPointers = [];
+	for (var i = 1; i <= 256; i++) {
+		Lua5_1.Runtime.functionPointers.push(null);
+	}
+
 	var apis = {
 		"bit": bitAPI,
 		"fs": fsAPI,
@@ -236,15 +241,54 @@ var run = function() {
 		render.cursorBlink();
 	}, 500);
 
+	thread.main = C.lua_newthread(L);
+	C.luaL_loadstring(thread.main, getCode());
+	thread.alive = true;
+
 	startClock = Date.now();
+
+	initialization();
+}
+
+var reboot = function(id) {
+	coroutineClock = Date.now();
+
+	C.lua_close(L);
+	L = null;
+	thread = {
+		"main": null,
+		"alive": false,
+	};
+
+	computer = {
+		"id": id | 0,
+		"label": null,
+
+		"eventStack": [],
+		"lastTimerID": 0,
+	};
+	term = {
+		"width": 51,
+		"height": 19,
+		"cursorX": 1,
+		"cursorY": 1,
+		"textColor": "#ffffff",
+		"backgroundColor": "#000000",
+		"cursorBlink": false,
+		"cursorFlash": true,
+	};
+
+	L = C.lua_open();
+	loadAPIs();
 
 	thread.main = C.lua_newthread(L);
 	C.luaL_loadstring(thread.main, getCode());
 	thread.alive = true;
 
+	startClock = Date.now();
+
 	initialization();
 }
-
 
 var main = function() {
 	setup(function() {
