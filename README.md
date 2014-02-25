@@ -1,3 +1,5 @@
+NOTE: This readme is out of date
+
 Mimic
 =====
 
