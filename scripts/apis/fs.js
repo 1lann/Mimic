@@ -7,10 +7,7 @@
 
 
 var fsAPI = {};
-var filer = null;
-
 var filesystem = {};
-var callID = 0;
 
 var readOnly = [
 	"/*/rom",
@@ -18,7 +15,7 @@ var readOnly = [
 
 
 triggerGUIUpdate = function() {
-	
+
 }
 
 
@@ -27,7 +24,7 @@ triggerGUIUpdate = function() {
 
 
 filesystem.setup = function(callback) {
-
+	callback(null);
 }
 
 

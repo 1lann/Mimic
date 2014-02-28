@@ -124,6 +124,7 @@ callLua = function(data) {
 	C.luaL_dostring(L, data);
 }
 
+
 threadHang = function() {
 	thread.alive = false;
 	for (var i = 1; i <= term.height; i++) {
@@ -145,6 +146,7 @@ threadHang = function() {
 	render.text(startThree, 11, errorThree, "#ffffff", "#0000aa");
 	render.text(startFour, 13, errorFour, "#ffffff", "#0000aa");
 }
+
 
 resumeThread = function() {
 	if (!thread.alive) {
@@ -258,6 +260,7 @@ var run = function() {
 	initialization();
 }
 
+
 var shutdown = function() {
 	coroutineClock = Date.now();
 	if (L) {
@@ -292,6 +295,7 @@ var shutdown = function() {
 	}
 }
 
+
 var boot = function() {
 	if (thread.alive || L) {
 		console.error("Cannot boot if computer is still on!")
@@ -311,10 +315,12 @@ var boot = function() {
 	initialization();
 }
 
+
 var reboot = function() {
 	shutdown();
 	boot();
 }
+
 
 var main = function() {
 	setup(function() {
