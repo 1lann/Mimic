@@ -386,31 +386,28 @@ filesystem.write = function(path, contents, append, callback) {
 
 filesystem.makeDir = function(path, callback) {
 	path = filesystem.sanitise(path) + "/";
+	console.log(path)
 	if (path == "/") {
 		callback(null);
 		return;
 	}
 
-	var dir = path.substring(1);
-	var currentDir = "/" + dir.substring(0, dir.indexOf("/"));
-	dir = dir.substring(dir.indexOf("/") + 1);
-
-	var make = function() {
-		var next = function() {
-			if (dir.indexOf("/") == -1) {
-				callback(null);
-			} else {
-				currentDir = currentDir + "/" + dir.substring(0, dir.indexOf("/"));
-				dir = dir.substring(dir.indexOf("/") + 1);
-				make();
-			}
+	var dir = path.substring(0,path.length-1);
+	console.log("sub: "+dir)
+	for (var i = 0; i < path.length; i++) {
+		if (dir.indexOf("/",i) == -1) {
+			currentDir = dir.substring(0,i)
+			dir = dir.substring(i)
+			console.log("cur: "+currentDir)
+			break;
 		}
-
-		filer.mkdir(currentDir, true, next, function(err) {
+	}
+	console.log("end: "+dir)
+	var make = function() {
+		filer.mkdir(currentDir, true, function(){console.log("success")},function(err) {
 			if (err.code != err.INVALID_MODIFICATION_ERR) {
+				console.log("fail")
 				callback(err);
-			} else {
-				next();
 			}
 		});
 	}

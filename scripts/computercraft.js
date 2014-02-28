@@ -260,8 +260,9 @@ var run = function() {
 
 var shutdown = function() {
 	coroutineClock = Date.now();
-
-	C.lua_close(L);
+	if (L) {
+		C.lua_close(L);
+	}
 	L = null;
 	thread = {
 		"main": null,
