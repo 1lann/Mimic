@@ -115,17 +115,16 @@
 
 </body>
 
-<script src="js/jquery.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
+<script src="scripts/lib/jquery.min.js"></script>
+<script src="scripts/lib/bootstrap.min.js"></script>
 <script src="ace/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/script.js"></script>
+<script src="scripts/gui.js"></script>
 
 
 <script src="scripts/code.js"></script>
 
 <script src="scripts/lib/lua5.1.5.min.js"></script>
-<script src="scripts/lib/idb.filesystem.min.js"></script>
-<script src="scripts/lib/filer.min.js"></script>
+<script src="scripts/lib/browserfs.js"></script>
 
 <script src="scripts/properties.js"></script>
 <script src="scripts/computercraft.js"></script>
@@ -144,6 +143,7 @@
 var canvasMinX = 401;
 var canvasMinY = 88;
 
+
 window.onresize = function() {
 	var y = canvasMinY + (window.innerHeight - canvasMinY) / 2 - canvas.height / 2;
 	var x = canvasMinX + (window.innerWidth - canvasMinX) / 2 - canvas.width / 2;
@@ -153,6 +153,7 @@ window.onresize = function() {
 	$("#canvas").attr("style", "left: " + x + "px; top: " + y + "px;");
 	$("#overlay-canvas").attr("style", "left: " + x + "px; top: " + y + "px;");
 }
+
 
 $(document).ready(function() {
 	window.onresize();
