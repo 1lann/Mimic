@@ -83,11 +83,6 @@ var term = {
 
 
 var loadAPIs = function() {
-	Lua5_1.Runtime.functionPointers = [];
-	for (var i = 1; i <= 256; i++) {
-		Lua5_1.Runtime.functionPointers.push(null);
-	}
-
 	var apis = {
 		"bit": bitAPI,
 		"fs": fsAPI,
@@ -97,6 +92,11 @@ var loadAPIs = function() {
 		"term": termAPI,
 		"mimic": testAPI,
 	};
+
+	Lua5_1.Runtime.functionPointers = [];
+	for (var i = 1; i <= 256; i++) {
+		Lua5_1.Runtime.functionPointers.push(null);
+	}
 
 	C.luaL_openlibs(L);
 
@@ -117,7 +117,7 @@ var loadAPIs = function() {
 
 
 
-//  ----------------  Main  ----------------  //
+//  ----------------  Threading  ----------------  //
 
 
 callLua = function(data) {
@@ -232,6 +232,10 @@ var initialization = function() {
 }
 
 
+
+//  ----------------  Main  ----------------  //
+
+
 var setup = function(callback) {
 	filesystem.setup(function(err) {
 		if (err) {
@@ -256,69 +260,50 @@ var run = function() {
 	thread.alive = true;
 
 	startClock = Date.now();
+	coroutineClock = Date.now();
 
 	initialization();
 }
 
 
 var shutdown = function() {
-	coroutineClock = Date.now();
 	if (L) {
 		C.lua_close(L);
 	}
-	L = null;
-	thread = {
-		"main": null,
-		"alive": false,
-	};
-	term = {
-		"width": 51,
-		"height": 19,
-		"cursorX": 1,
-		"cursorY": 1,
-		"textColor": "#ffffff",
-		"backgroundColor": "#000000",
-		"cursorBlink": false,
-		"cursorFlash": true,
-	};
-	computer = {
-		"id": 0,
-		"label": null,
 
-		"eventStack": [],
-		"lastTimerID": 0,
-	};
-	doShutdown = false;
-	doReboot = false;
+	coroutineClock = Date.now();
 	for (var i = 1; i <= term.height; i++) {
 		render.text(1, i, " ".repeat(term.width), "#000000", "#000000");
 	}
-}
 
+	L = null;
 
-var boot = function() {
-	if (thread.alive || L) {
-		console.error("Cannot boot if computer is still on!")
-		return;
-	}
-	coroutineClock = Date.now();
+	doShutdown = false;
+	doReboot = false;
 
-	L = C.lua_open();
-	loadAPIs();
+	thread.main = null;
+	thread.alive = false;
 
-	thread.main = C.lua_newthread(L);
-	C.luaL_loadstring(thread.main, getCode());
-	thread.alive = true;
+	term.cursorX = 1;
+	term.cursorY = 1;
+	term.textColor = "#ffffff";
+	term.backgroundColor = "#000000";
+	term.cursorBlink = false;
 
-	startClock = Date.now();
-
-	initialization();
+	computer.eventStack = [];
+	computer.lastTimerID = 0;
 }
 
 
 var reboot = function() {
 	shutdown();
-	boot();
+
+	if (thread.alive || L) {
+		console.error("Cannot boot if computer is still on!")
+		return;
+	}
+
+	run();
 }
 
 
