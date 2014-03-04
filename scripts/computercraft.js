@@ -267,11 +267,12 @@ var run = function() {
 
 
 var shutdown = function() {
+	coroutineClock = Date.now();
+	
 	if (L) {
 		C.lua_close(L);
 	}
 
-	coroutineClock = Date.now();
 	for (var i = 1; i <= term.height; i++) {
 		render.text(1, i, " ".repeat(term.width), "#000000", "#000000");
 	}
