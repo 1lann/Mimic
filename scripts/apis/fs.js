@@ -29,7 +29,6 @@ filesystem.setup = function(callback) {
 
 	var lsfs = new BrowserFS.FileSystem.LocalStorage();
 	BrowserFS.initialize(lsfs);
-
 	fs = require("fs");
 
 	callback(null);
@@ -139,6 +138,36 @@ filesystem.getContainingFolder = function(path) {
 }
 
 
+filesystem.makeDirRecursive = function(path, mode, position) {
+	path = filesystem.sanitise(path);
+	mode = mode || 0777;
+	position = position || 0;
+
+	var parts = path.split("/");
+
+	if (position >= parts.length) {
+		return true;
+	}
+
+	var directory = parts.slice(0, position + 1).join("/") || "/";
+	try {
+		fs.statSync(directory);
+		filesystem.makeDirRecursive(path, mode, position + 1);
+	} catch (e) {
+		try {
+			fs.mkdirSync(directory, mode);
+			filesystem.makeDirRecursive(path, mode, position + 1);
+		} catch (e) {
+			if (e.code != "EEXIST") {
+				throw e;
+			}
+
+			filesystem.makeDirRecursive(path, mode, position + 1);
+		}
+	}
+}
+
+
 
 //  ----------------  Lua Functions  ----------------  //
 
@@ -201,7 +230,7 @@ fsAPI.isReadOnly = function(L) {
 
 fsAPI.makeDir = function(L) {
 	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
-	fs.mkdir(path);
+	filesystem.makeDirRecursive(path);
 
 	return 0;
 }

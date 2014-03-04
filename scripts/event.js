@@ -31,6 +31,8 @@ window.onkeydown = function(event) {
 	if (pushedSomething) {
 		resumeThread();
 	}
+
+	event.preventDefault();
 }
 
 
