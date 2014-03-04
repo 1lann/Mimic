@@ -121,6 +121,7 @@ end\n\
 ';
 
 var bios = '\
+local function bios()\n\
 local function newLine()\n\
 	local wid, hi = term.getSize()\n\
 	local x, y = term.getCursorPos()\n\
@@ -207,6 +208,19 @@ while true do\n\
 	end\n\
 	newLine()\n\
 end\n\
+end\n\
+\n\
+main = coroutine.create(bios)\n\
+local events = {}\n\
+while true do\n\
+	--debug.sethook(main,function() print("Safe too long without yielding") error("Too long without yielding",2) end, "", 1000)\n\
+	coroutine.resume(main,unpack(events))\n\
+	--debug.sethook(main)\n\
+	events = {}\n\
+	events = {coroutine.yield()}\n\
+end\n\
+\n\
+--bios();\n\
 ';
 
 
