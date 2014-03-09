@@ -267,10 +267,29 @@ var run = function() {
 	initialization();
 }
 
+var boot = function() {
+	if (thread.alive || L) {
+		console.error("Cannot boot if computer is still on!")
+		return;
+	}
+	coroutineClock = Date.now();
+
+	L = C.lua_open();
+	loadAPIs();
+
+	thread.main = C.lua_newthread(L);
+	C.luaL_loadstring(thread.main, getCode());
+	thread.alive = true;
+
+	startClock = Date.now();
+
+	initialization();
+}
+
 
 var shutdown = function() {
 	coroutineClock = Date.now();
-	
+
 	if (L) {
 		C.lua_close(L);
 	}
@@ -300,13 +319,7 @@ var shutdown = function() {
 
 var reboot = function() {
 	shutdown();
-
-	if (thread.alive || L) {
-		console.error("Cannot boot if computer is still on!")
-		return;
-	}
-
-	run();
+	boot();
 }
 
 
