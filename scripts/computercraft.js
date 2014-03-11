@@ -238,13 +238,15 @@ var initialization = function() {
 
 var setup = function(callback) {
 	waitForWebfonts(["minecraftia"], function() {
-		filesystem.setup(function(err) {
-			if (err) {
-				return;
-			}
+		setTimeout(function() {
+			filesystem.setup(function(err) {
+				if (err) {
+					return;
+				}
 
-			callback();
-		});
+				callback();
+			});
+		}, 500);
 	});
 }
 
