@@ -237,18 +237,6 @@ var initialization = function() {
 
 
 var setup = function(callback) {
-	// waitForWebfonts(["minecraftia"], function() {
-	// 	setTimeout(function() {
-	// 		filesystem.setup(function(err) {
-	// 			if (err) {
-	// 				return;
-	// 			}
-
-	// 			callback();
-	// 		});
-	// 	}, 500);
-	// });
-	
 	render.setup(function() {
 		filesystem.setup(function(err) {
 			if (err) {
