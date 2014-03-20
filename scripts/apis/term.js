@@ -37,14 +37,14 @@ termAPI.write = function(L) {
 
 termAPI.clear = function(L) {
 	for (var i = 1; i <= term.height; i++) {
-		render.text(1, i, " ".repeat(term.width), "#000000", term.backgroundColor);
+		render.text(1, i, " ".repeat(term.width), "0", term.backgroundColor);
 	}
 	return 0;
 }
 
 
 termAPI.clearLine = function(L) {
-	render.text(1, term.cursorY, " ".repeat(term.width), "#000000", term.backgroundColor);
+	render.text(1, term.cursorY, " ".repeat(term.width), "0", term.backgroundColor);
 	return 0;
 }
 
@@ -85,19 +85,17 @@ termAPI.setCursorBlink = function(L) {
 
 
 termAPI.setTextColor = function(L) {
-	// Not properly supported
 	var color = C.luaL_checkint(L, 1);
 	var hex = 15 - (Math.log(color) / Math.log(2));
-	term.textColor = globals.colors[hex.toString(16)];
+	term.textColor = hex.toString(16);
 	return 0;
 }
 
 
 termAPI.setBackgroundColor = function(L) {
-	// Not properly supported
 	var color = C.luaL_checkint(L, 1);
 	var hex = 15 - (Math.log(color) / Math.log(2));
-	term.backgroundColor = globals.colors[hex.toString(16)];
+	term.backgroundColor = hex.toString(16);
 	return 0;
 }
 

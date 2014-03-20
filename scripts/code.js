@@ -165,7 +165,7 @@ function read(replaceCharacter, history)\n\
 			elseif param == 199 then\n\
 				redraw(" ")\n\
 				pos = 0\n\
-				redraw()		\n\
+				redraw()\n\
 			elseif param == 211 then\n\
 				if pos < string.len(line) then\n\
 					redraw(" ")\n\
@@ -183,7 +183,7 @@ function read(replaceCharacter, history)\n\
 	term.setCursorBlink(false)\n\
 	term.setCursorPos(w + 1, sy)\n\
 	newLine()\n\
-	\n\
+\n\
 	return line\n\
 end\n\
 \n\
