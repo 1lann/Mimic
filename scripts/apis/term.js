@@ -27,6 +27,7 @@ termAPI.write = function(L) {
 		str = "";
 	}
 
+	str.replace("\n", " ");
 	render.text(term.cursorX, term.cursorY, str, term.textColor, term.backgroundColor);
 	term.cursorX += str.length;
 	render.cursorBlink();

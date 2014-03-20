@@ -11,10 +11,6 @@ String.prototype.repeat = function(num) {
 }
 
 
-// Version
-var version = "CraftOS 1.5 (Web Alpha)";
-
-
 // Lua State
 var C = Lua5_1.C;
 var L = C.lua_open();

@@ -1,32 +1,121 @@
 
-local commandHistory = {}
+--  Almost all functions are taken from the ComputerCraft bios.lua, 
+--  which was written by dan200
 
-local function newLine()
-	local wid, hi = term.getSize()
+--  I just cleaned up the code a bit
+
+
+local jsConsolePrint = print
+
+
+function os.version()
+	return "CraftOS 1.5"
+end
+
+
+function os.pullEventRaw(filter)
+	return coroutine.yield(filter)
+end
+
+
+function os.pullEvent(filter)
+	local eventData = {os.pullEventRaw(filter)}
+	if eventData[1] == "terminate" then
+		error("Terminated", 0)
+	end
+
+	return unpack(eventData)
+end
+
+
+function sleep(time)
+	local timer = os.startTimer(time)
+	while true do
+		local event, id = os.pullEvent("timer")
+		if timer == id then
+			break
+		end
+	end
+end
+
+
+function write(text)
+	local w, h = term.getSize()		
 	local x, y = term.getCursorPos()
-	if y == hi then
-		term.scroll(1)
-		term.setCursorPos(1, y)
-	else
-		term.setCursorPos(1, y + 1)
+	
+	local linesPrinted = 0
+	local function newLine()
+		if y + 1 <= h then
+			term.setCursorPos(1, y + 1)
+		else
+			term.setCursorPos(1, h)
+			term.scroll(1)
+		end
+		x, y = term.getCursorPos()
+		linesPrinted = linesPrinted + 1
 	end
+	
+	while string.len(text) > 0 do
+		local whitespace = string.match(text, "^[ \t]+")
+		if whitespace then
+			term.write(whitespace)
+			x, y = term.getCursorPos()
+			text = string.sub(text, string.len(whitespace) + 1)
+		end
+		
+		local newline = string.match(text, "^\n")
+		if newline then
+			newLine()
+			text = string.sub(text, 2)
+		end
+		
+		local text = string.match(text, "^[^ \t\n]+")
+		if text then
+			text = string.sub(text, string.len(text) + 1)
+			if string.len(text) > w then
+				while string.len(text) > 0 do
+					if x > w then
+						newLine()
+					end
+					term.write(text)
+					text = string.sub(text, (w - x) + 2)
+					x, y = term.getCursorPos()
+				end
+			else
+				if x + string.len(text) - 1 > w then
+					newLine()
+				end
+				term.write(text)
+				x, y = term.getCursorPos()
+			end
+		end
+	end
+	
+	return linesPrinted
 end
 
-local nativeShutdown = os.shutdown
-function os.shutdown()
-	nativeShutdown()
-	while true do
-		coroutine.yield()
+
+function print(...)
+	local args = {...}
+	local linesPrinted = 0
+	for k, v in pairs(args) do
+		write(tostring(k) .. ": " .. tostring(v) .. "\n")
+		linesPrinted = linesPrinted + 1
 	end
+
+	return linesPrinted
 end
 
-local nativeReboot = os.reboot
-function os.reboot()
-	nativeReboot()
-	while true do
-		coroutine.yield()
+
+function printError(...)
+	if term.isColour() then
+		term.setTextColour(colors.red)
 	end
+
+	print(...)
+	term.setTextColour(colors.white)
 end
+
 
 function read(replaceCharacter, history)
 	term.setCursorBlink(true)
@@ -136,6 +225,159 @@ function read(replaceCharacter, history)
 	return line
 end
 
+
+loadfile = function(path)
+	local file = fs.open(path, "r")
+	if file then
+		local func, err = loadstring(file.readAll(), fs.getName(path))
+		file.close()
+		return func, err
+	end
+	return nil, "File not found"
+end
+
+
+dofile = function(path)
+	local fnFile, e = loadfile(path)
+	if fnFile then
+		setfenv(fnFile, getfenv(2))
+		return fnFile()
+	else
+		error(e, 2)
+	end
+end
+
+
+function os.run(_tEnv, _sPath, ...)
+    local tArgs = { ... }
+    local fnFile, err = loadfile(_sPath)
+    if fnFile then
+        local tEnv = _tEnv
+		setmetatable(tEnv, { __index = _G })
+        setfenv(fnFile, tEnv)
+
+        local ok, err = pcall(function()
+        	fnFile(unpack(tArgs))
+        end)
+
+        if not ok then
+        	if err and err ~= "" then
+	        	printError(err)
+	        end
+        	return false
+        end
+        return true
+    end
+
+    if err and err ~= "" then
+		printError(err)
+	end
+
+    return false
+end
+
+
+local nativegetmetatable = getmetatable
+local nativetype = type
+local nativeerror = error
+
+function getmetatable(_t)
+	if nativetype(_t) == "string" then
+		nativeerror("Attempt to access string metatable", 2)
+		return nil
+	end
+	return nativegetmetatable(_t)
+end
+
+
+local tAPIsLoading = {}
+
+function os.loadAPI(_sPath)
+	local sName = fs.getName(_sPath)
+	if tAPIsLoading[sName] == true then
+		printError("API "..sName.." is already being loaded")
+		return false
+	end
+	tAPIsLoading[sName] = true
+		
+	local tEnv = {}
+	setmetatable(tEnv, { __index = _G })
+	local fnAPI, err = loadfile(_sPath)
+	if fnAPI then
+		setfenv(fnAPI, tEnv)
+		fnAPI()
+	else
+		printError(err)
+        tAPIsLoading[sName] = nil
+		return false
+	end
+	
+	local tAPI = {}
+	for k, v in pairs(tEnv) do
+		tAPI[k] =  v
+	end
+	
+	_G[sName] = tAPI	
+	tAPIsLoading[sName] = nil
+	return true
+end
+
+
+function os.unloadAPI(_sName)
+	if _sName ~= "_G" and type(_G[_sName]) == "table" then
+		_G[_sName] = nil
+	end
+end
+
+
+function os.sleep(_nTime)
+	sleep(_nTime)
+end
+
+
+local nativeShutdown = os.shutdown
+local nativeReboot = os.reboot
+
+function os.shutdown()
+	nativeShutdown()
+	while true do
+		coroutine.yield()
+	end
+end
+
+
+function os.reboot()
+	nativeReboot()
+	while true do
+		coroutine.yield()
+	end
+end
+
+
+if http then
+	local function wrapRequest(_url, _post)
+		local requestID = http.request(_url, _post)
+		while true do
+			local event, param1, param2 = os.pullEvent()
+			if event == "http_success" and param1 == _url then
+				return param2
+			elseif event == "http_failure" and param1 == _url then
+				return nil
+			end
+		end		
+	end
+	
+	http.get = function(_url)
+		return wrapRequest(_url, nil)
+	end
+
+	http.post = function(_url, _post)
+		return wrapRequest(_url, _post or "")
+	end
+end
+
+
+
 while true do
 	term.setTextColor(1)
 	term.setBackgroundColor(32768)
@@ -148,8 +390,8 @@ while true do
 		local results = {pcall(toRun)}
 		term.setBackgroundColor(32768)
 		if results[1] then
-			table.remove(results,1)
-			for k,v in pairs(results) do
+			table.remove(results, 1)
+			for k, v in pairs(results) do
 				newLine()
 				term.write(tostring(v))
 			end
@@ -167,3 +409,53 @@ while true do
 	end
 	newLine()
 end
+
+
+local tApis = fs.list("rom/apis")
+for n, sFile in ipairs(tApis) do
+	if string.sub(sFile, 1, 1) ~= "." then
+		local sPath = fs.combine("rom/apis", sFile)
+		if not fs.isDir(sPath) then
+			os.loadAPI(sPath)
+		end
+	end
+end
+
+
+if turtle then
+	local tApis = fs.list("rom/apis/turtle")
+	for n, sFile in ipairs(tApis) do
+		if string.sub(sFile, 1, 1) ~= "." then
+			local sPath = fs.combine("rom/apis/turtle", sFile)
+			if not fs.isDir(sPath) then
+				os.loadAPI(sPath)
+			end
+		end
+	end
+end
+
+
+local ok, err = pcall(function()
+	parallel.waitForAny(
+		function()
+			os.run({}, "rom/programs/shell")
+		end, 
+		function()
+			rednet.run()
+		end)
+end)
+
+
+if not ok then
+	printError(err)
+end
+
+
+pcall(function()
+	term.setCursorBlink(false)
+	print("Press any key to continue")
+	os.pullEvent("key") 
+end)
+
+os.shutdown()
+
