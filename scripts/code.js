@@ -50,7 +50,9 @@ end\n\
 \n\
 ';
 
-var bios = '\n\
+var bios = '\
+\n\
+local commandHistory = {}\n\
 \n\
 local function newLine()\n\
 	local wid, hi = term.getSize()\n\
@@ -165,7 +167,7 @@ function read(replaceCharacter, history)\n\
 			elseif param == 199 then\n\
 				redraw(" ")\n\
 				pos = 0\n\
-				redraw()\n\
+				redraw()		\n\
 			elseif param == 211 then\n\
 				if pos < string.len(line) then\n\
 					redraw(" ")\n\
@@ -183,7 +185,7 @@ function read(replaceCharacter, history)\n\
 	term.setCursorBlink(false)\n\
 	term.setCursorPos(w + 1, sy)\n\
 	newLine()\n\
-\n\
+	\n\
 	return line\n\
 end\n\
 \n\
@@ -191,7 +193,9 @@ while true do\n\
 	term.setTextColor(1)\n\
 	term.setBackgroundColor(32768)\n\
 	term.write("lua> ")\n\
-	local toRun, cError = loadstring(read(), "error")\n\
+	local command = read(nil, commandHistory)\n\
+	table.insert(commandHistory, command)\n\
+	local toRun, cError = loadstring(command, "error")\n\
 	if toRun then\n\
 		setfenv(toRun, getfenv(1))\n\
 		local results = {pcall(toRun)}\n\
@@ -207,7 +211,6 @@ while true do\n\
 				term.setTextColor(16384)\n\
 			end\n\
 			term.write(results[2])\n\
-			print("Lua prompt error: "..results[2])\n\
 		end\n\
 	else\n\
 		if term.isColor() then\n\

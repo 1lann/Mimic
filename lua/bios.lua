@@ -1,4 +1,6 @@
 
+local commandHistory = {}
+
 local function newLine()
 	local wid, hi = term.getSize()
 	local x, y = term.getCursorPos()
@@ -129,7 +131,7 @@ function read(replaceCharacter, history)
 	
 	term.setCursorBlink(false)
 	term.setCursorPos(w + 1, sy)
-	print()
+	newLine()
 	
 	return line
 end
@@ -138,7 +140,9 @@ while true do
 	term.setTextColor(1)
 	term.setBackgroundColor(32768)
 	term.write("lua> ")
-	local toRun, cError = loadstring(read(), "error")
+	local command = read(nil, commandHistory)
+	table.insert(commandHistory, command)
+	local toRun, cError = loadstring(command, "error")
 	if toRun then
 		setfenv(toRun, getfenv(1))
 		local results = {pcall(toRun)}

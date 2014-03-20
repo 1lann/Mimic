@@ -73,7 +73,7 @@ render.characterText = function(x, y, text, color, ctx) {
 			var offset = imgW / 2 - globals.characterWidths[loc] / 2 - 1;
 
 			var textX = (x - 1) * config.cellWidth + config.borderWidth + offset;
-			var textY = (y - 1) * config.cellHeight + config.borderHeight;
+			var textY = (y - 1) * config.cellHeight + config.borderHeight + 1;
 
 			ctx.drawImage(font, imgX, imgY, imgW, imgH, textX, textY, imgW, imgH);
 		}
