@@ -94,7 +94,7 @@ var loadAPIs = function() {
 	};
 
 	Lua5_1.Runtime.functionPointers = [];
-	for (var i = 1; i <= 256; i++) {
+	for (var i = 1; i <= 512; i++) {
 		Lua5_1.Runtime.functionPointers.push(null);
 	}
 

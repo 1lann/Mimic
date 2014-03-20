@@ -182,7 +182,6 @@ fsAPI.list = function(L) {
 			C.lua_pushstring(L, files[i]);
 			C.lua_rawset(L, -3);
 		}
-
 		return 1;
 	} else {
 		console.log("fs.list error", files);
@@ -200,7 +199,7 @@ fsAPI.getSize = function(L) {
 fsAPI.exists = function(L) {
 	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 	var exists = fs.existsSync(path);
-	C.lua_pushnumber(L, exists ? 1 : 0);
+	C.lua_pushboolean(L, exists ? 1 : 0);
 
 	return 1;
 }
@@ -210,9 +209,9 @@ fsAPI.isDir = function(L) {
 	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 	var stat = fs.statSync(path);
 	if (stat.isDirectory()) {
-		C.lua_pushnumber(L, 1);
+		C.lua_pushboolean(L, 1);
 	} else {
-		C.lua_pushnumber(L, 0);
+		C.lua_pushboolean(L, 0);
 	}
 
 	return 1;
@@ -222,7 +221,7 @@ fsAPI.isDir = function(L) {
 fsAPI.isReadOnly = function(L) {
 	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
 	var isReadOnly = filesystem.isReadOnly(path);
-	C.lua_pushnumber(L, isReadOnly ? 1 : 0);
+	C.lua_pushboolean(L, isReadOnly ? 1 : 0);
 
 	return 1;
 }

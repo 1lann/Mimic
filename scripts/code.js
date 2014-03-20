@@ -38,55 +38,6 @@ pcall = function(_fn, ...)\n\
 	)\n\
 end\n\
 \n\
-\n\
-local protectedEvents = {\n\
-	"fs_list",\n\
-	"fs_exists",\n\
-	"fs_isDir",\n\
-	"fs_makeDir",\n\
-	"fs_move",\n\
-	"fs_copy",\n\
-	"fs_read",\n\
-	"fs_write",\n\
-	"fs_append",\n\
-	"fs_delete",\n\
-}\n\
-\n\
-local isProtected = function(evt)\n\
-	for k, v in pairs(protectedEvents) do\n\
-		if v == evt then\n\
-			return true\n\
-		end\n\
-	end\n\
-	return false\n\
-end\n\
-\n\
-\n\
-local queueEvents = function(evts)\n\
-	for k, v in pairs(evts) do\n\
-		os.queueEvent(unpack(v))\n\
-	end\n\
-end\n\
-\n\
-\n\
-local waitFor = function(evtName, evtID)\n\
-	local events = {}\n\
-	local timeout = os.startTimer(1)\n\
-	while true do\n\
-		local e = {coroutine.yield()}\n\
-		if e[1] == evtName and e[2] == evtID then\n\
-			queueEvents(events)\n\
-			return e\n\
-		elseif e[1] == "timer" and e[2] == timeout then\n\
-			queueEvents(events)\n\
-			return nil\n\
-		elseif not isProtected(e[1]) then\n\
-			table.insert(events, e)\n\
-		end\n\
-	end\n\
-end\n\
-\n\
-\n\
 local function unserializeTable(s)\n\
 	local func, e = loadstring("return " .. s, "serialize")\n\
 	if not func then\n\
@@ -97,27 +48,6 @@ local function unserializeTable(s)\n\
 	end\n\
 end\n\
 \n\
-\n\
-local fs_list = fs.list\n\
-fs.list = function(path)\n\
-	local id = fs_list(path)\n\
-	local e = waitFor("fs_list", id)\n\
-	if e then\n\
-		return unserializeTable(e[3])\n\
-	end\n\
-	return nil\n\
-end\n\
-\n\
-\n\
-local fs_exists = fs.exists\n\
-fs.exists = function(path)\n\
-	local id = fs_exists(path)\n\
-	local e = waitFor("fs_exists", id)\n\
-	if e then\n\
-		return e[3]\n\
-	end\n\
-	return false\n\
-end\n\
 ';
 
 var bios = '\n\
@@ -277,6 +207,7 @@ while true do\n\
 				term.setTextColor(16384)\n\
 			end\n\
 			term.write(results[2])\n\
+			print("Lua prompt error: "..results[2])\n\
 		end\n\
 	else\n\
 		if term.isColor() then\n\
