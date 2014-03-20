@@ -28,29 +28,6 @@ var thread = {
 	"alive": false,
 };
 
-testAPI = {
-	"table": function(L){
-		var exampleTable = {
-			0: "hi",
-			1: "bye"
-		}
-		C.lua_newtable(L);
-		C.lua_pushnumber(L,1);
-		C.lua_pushstring(L,"this")
-		C.lua_rawset(L, -3);
-		C.lua_pushnumber(L,2);
-		C.lua_pushstring(L,"is")
-		C.lua_rawset(L, -3);
-		C.lua_pushnumber(L,3);
-		C.lua_pushstring(L,"a")
-		C.lua_rawset(L, -3);
-		C.lua_pushnumber(L,4);
-		C.lua_pushstring(L,"test")
-		C.lua_rawset(L, -3);
-		return 1;
-	}
-}
-
 
 // OS
 var computer = {
@@ -90,7 +67,6 @@ var loadAPIs = function() {
 		"os": osAPI,
 		"peripheral": peripheralAPI,
 		"term": termAPI,
-		"mimic": testAPI,
 	};
 
 	Lua5_1.Runtime.functionPointers = [];
