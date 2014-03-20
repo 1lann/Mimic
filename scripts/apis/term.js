@@ -116,7 +116,6 @@ termAPI.getSize = function(L) {
 
 termAPI.scroll = function(L) {
 	var amount = C.luaL_checkint(L, 1);
-	if ()
 	var imageData = context.getImageData(config.borderWidth, config.borderHeight, 
 		canvas.width - config.borderWidth * 2, 
 		canvas.height - config.borderHeight * 2);
