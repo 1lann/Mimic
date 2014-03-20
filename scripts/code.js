@@ -252,7 +252,7 @@ function read(replaceCharacter, history)\n\
 	\n\
 	term.setCursorBlink(false)\n\
 	term.setCursorPos(w + 1, sy)\n\
-	print()\n\
+	newLine()\n\
 	\n\
 	return line\n\
 end\n\
