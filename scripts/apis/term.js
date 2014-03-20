@@ -116,12 +116,13 @@ termAPI.getSize = function(L) {
 
 termAPI.scroll = function(L) {
 	var amount = C.luaL_checkint(L, 1);
+	if ()
 	var imageData = context.getImageData(config.borderWidth, config.borderHeight, 
 		canvas.width - config.borderWidth * 2, 
 		canvas.height - config.borderHeight * 2);
 
 	context.clearRect(0, 0, canvas.width, canvas.height);
-	context.putImageData(imageData, config.borderWidth, config.cellHeight * amount * -1 + config.borderHeight);
+	context.putImageData(imageData, config.borderWidth, config.cellHeight * (amount - 1) * -1 + config.borderHeight);
 
 	context.beginPath();
 	context.rect(0, 0, canvas.width, config.borderHeight);
