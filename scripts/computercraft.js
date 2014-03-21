@@ -103,9 +103,9 @@ threadHang = function() {
 		render.text(1, i, " ".repeat(term.width), "0", "4");
 	}
 
-	var errorOne = "The Lua thread had hung, and has been";
-	var errorTwo = "been terminated. This is equivelant to";
-	var errorThree = "\"Too long without yielding.\"";
+	var errorOne = "The Lua thread had hung, for extensive";
+	var errorTwo = "periods of time, and has been terminated.";
+	var errorThree = "Experiencing this error is a rare case.";
 	var errorFour = "Please reboot the computer";
 	var startOne = Math.round((term.width / 2) - ((errorOne.length) / 2));
 	var startTwo = Math.round((term.width / 2) - ((errorTwo.length) / 2));

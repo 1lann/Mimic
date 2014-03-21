@@ -9,13 +9,17 @@
 var prebios = '\
 xpcall = function(_fn, _fnErrorHandler)\n\
 	assert(type(_fn) == "function", "bad argument #1 to xpcall (function expected, got " .. type(_fn) .. ")")\n\
-\n\
 	local co = coroutine.create(_fn)\n\
+	local coroutineClock = os.clock()\n\
+	debug.sethook(co, function() if os.clock() >= coroutineClock+2 then print("Lua: Too long without yielding") error("Too long without yielding",2) end end, "", 10000)\n\
 	local results = {coroutine.resume(co)}\n\
+	debug.sethook(co)\n\
 	while coroutine.status(co) ~= "dead" do\n\
+		coroutineClock = os.clock()\n\
+		debug.sethook(co, function() if os.clock() >= coroutineClock+2 then print("Lua: Too long without yielding") error("Too long without yielding",2) end end, "", 10000)\n\
 		results = {coroutine.resume(co, coroutine.yield())}\n\
+		debug.sethook(co)\n\
 	end\n\
-\n\
 	if results[1] == true then\n\
 		return true, unpack(results, 2)\n\
 	else\n\
@@ -23,10 +27,8 @@ xpcall = function(_fn, _fnErrorHandler)\n\
 	end\n\
 end\n\
 \n\
-\n\
 pcall = function(_fn, ...)\n\
 	assert(type(_fn) == "function", "bad argument #1 to pcall (function expected, got " .. type(_fn) .. ")")\n\
-\n\
 	local args = {...}\n\
 	return xpcall(\n\
 		function()\n\
@@ -37,22 +39,9 @@ pcall = function(_fn, ...)\n\
 		end\n\
 	)\n\
 end\n\
-\n\
-local function unserializeTable(s)\n\
-	local func, e = loadstring("return " .. s, "serialize")\n\
-	if not func then\n\
-		return s\n\
-	else\n\
-		setfenv(func, {})\n\
-		return func()\n\
-	end\n\
-end\n\
-\n\
 ';
 
 var bios = '\
-local function bios()\n\
-\n\
 local commandHistory = {}\n\
 \n\
 local function newLine()\n\
@@ -221,8 +210,6 @@ while true do\n\
 	end\n\
 	newLine()\n\
 end\n\
-end\n\
-bios()\n\
 ';
 
 
