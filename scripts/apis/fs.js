@@ -7,87 +7,71 @@
 
 
 var fs;
-var fsAPI = {};
 var filesystem = {};
-
-var readOnly = [
-	// Must be absolute paths
-	"/*/rom",
-];
-
-
-triggerGUIUpdate = function() {
-
-}
+var computerFilesystem = {};
+var fsAPI = {};
 
 
 
-//  ----------------  Filesystem API Setup  ----------------  //
-
-
-filesystem.getGlobalMounts = function() {
-	// Must be absolute paths
-	return {
-		"/rom": rom,
-	};
-}
+//  ----------------  Setup  ----------------  //
 
 
 filesystem.setup = function(callback) {
 	BrowserFS.install(window);
 
-	var lsfs = new BrowserFS.FileSystem.LocalStorage();
-	BrowserFS.initialize(lsfs);
-	fs = require("fs");
+	var request = new XMLHttpRequest();
+	request.open("GET", "lua/rom.zip", true);
+	request.responseType = "arraybuffer";
 
-	filesystem.loadGlobalMounts();
-
-	callback();
-}
-
-
-filesystem.loadGlobalMounts = function() {
-	var globalMounts = filesystem.getGlobalMounts();
-	for (var mountPath in globalMounts) {
-		filesystem.makeDirRaw("/" + computer.id + mountPath);
-
-		for (var localPath in globalMounts[mountPath]) {
-			var path = mountPath + "/" + localPath;
-			var isDir = path.substring(path.length - 1) == "/";
-			if (isDir) {
-				filesystem.makeDirRaw("/" + computer.id + path);
-			} else {
-				filesystem.writeRaw("/" + computer.id + path, rom[path]);
-			}
+	request.onload = function(evt) {
+		if (!request.response) {
+			console.log("Failed to load ComputerCraft rom!");
+			console.log("Error: ", evt);
+			return;
 		}
+
+		var buffer = new Buffer(request.response);
+		var mfs = new BrowserFS.FileSystem.MountableFileSystem();
+		mfs.mount("/computers", new BrowserFS.FileSystem.LocalStorage());
+		mfs.mount("/rom", new BrowserFS.FileSystem.ZipFS(buffer));
+
+		BrowserFS.initialize(mfs);
+		fs = require("fs");
+
+		callback();
 	}
+
+	request.send(null);
 }
 
 
 
-//  ----------------  Filesystem API Utilities  ----------------  //
+//  ----------------  Utilities  ----------------  //
 
 
-filesystem.serializeTable = function(arr) {
-	var construct = "{";
-	for (var index in arr) {
-		var name = arr[index].replace("\"", "\\\"");
-		var correctIndex = parseInt(index) + 1;
-		construct = construct + "[" + correctIndex.toString() + "]=\"" + name + "\",";
+filesystem.format = function(path) {
+	path = path.replace("\\", "/");
+	if (path.substring(0, 1) != "/") {
+		path = "/" + path;
 	}
-	construct = construct + "}";
 
-	return construct;
+	if (path.substring(path.length - 1) == "/") {
+		path = path.substring(0, path.length - 1);
+	}
+
+	if (path.length == 0) {
+		path = "/";
+	}
+
+	return path;
 }
 
 
-filesystem.resolve = function(path) {
-	path = filesystem.sanitise(path);
+filesystem.sanitise = function(path) {
+	path = filesystem.format(path);
 
-	// Replace simple resolutions
 	path = path.replace(/(\/(\.\/)+)|(\/\.$)/g, "/").replace(/\/{2,}/g, "/");
 
-	// Replace ../
 	var leadingParents = path.substring(1).match(/^(\.\.\/)+/) || '';
 	if (leadingParents) {
 		leadingParents = leadingParents[0];
@@ -109,37 +93,19 @@ filesystem.resolve = function(path) {
 		path = path.substring(0, pos) + path.substring(parent + 3);
 	}
 
-	path = leadingParents + path.substring(1);
-	return filesystem.sanitise("/" + computer.id + "/" + path);
-}
-
-
-filesystem.sanitise = function(path) {
-	path = path.replace("\\", "/");
-	if (path.substring(0, 1) != "/") {
-		path = "/" + path;
-	}
-
-	if (path.substring(path.length - 1) == "/") {
-		path = path.substring(0, path.length - 1);
-	}
-
-	if (path.length == 0) {
-		path = "/";
-	}
-
-	return path;
+	path = leadingParents + path;
+	return filesystem.format(path);
 }
 
 
 filesystem.getName = function(path) {
-	path = filesystem.sanitise(path);
+	path = filesystem.format(path);
 	return path.substring(path.lastIndexOf("/") + 1);
 }
 
 
 filesystem.getContainingFolder = function(path) {
-	path = filesystem.sanitise(path);
+	path = filesystem.format(path);
 
 	var folder = path.substring(0, path.lastIndexOf("/"));
 	if (folder.length == 0) {
@@ -150,70 +116,19 @@ filesystem.getContainingFolder = function(path) {
 }
 
 
-filesystem.makeDirRaw = function(path, mode, position) {
-	path = filesystem.sanitise(path);
-	mode = mode || 0777;
-	position = position || 0;
 
-	var parts = path.split("/");
-
-	if (position >= parts.length) {
-		return true;
-	}
-
-	var directory = parts.slice(0, position + 1).join("/") || "/";
-	try {
-		fs.statSync(directory);
-		filesystem.makeDirRaw(path, mode, position + 1);
-	} catch (e) {
-		try {
-			fs.mkdirSync(directory, mode);
-			filesystem.makeDirRaw(path, mode, position + 1);
-		} catch (e) {
-			if (e.code != "EEXIST") {
-				throw e;
-			}
-
-			filesystem.makeDirRaw(path, mode, position + 1);
-		}
-	}
-}
-
-
-filesystem.writeRaw = function(path, contents) {
-	path = filesystem.resolve(path).substring(1 + computer.id.toString().length);
-
-	try {
-		if (!filesystem.isDirRaw(path)) {
-			var folder = filesystem.getContainingFolder(path).substring(1 + computer.id.toString().length);
-			if (!filesystem.exists(folder)) {
-				filesystem.makeDir(folder);
-			}
-
-			fs.writeFileSync(path, contents);
-			return true;
-		}
-	} catch (e) {}
-
-	return false;
-}
-
-
-filesystem.checkForRootDirectory = function() {
-	if (!filesystem.isDirRaw("/" + computer.id)) {
-		filesystem.makeDirRaw("/" + computer.id);
-		console.log("meh")
-	}
-}
+//  ----------------  Raw Filesystem Wrappers  ----------------  //
+//  These functions do not resolve the path to a particular computer
+//  They operate on absolute file paths starting from the actual root
+//  No concept of read only is present
 
 
 
-//  ----------------  Filesystem Wrapper  ----------------  //
+//  -------  Query
 
 
 filesystem.list = function(path) {
-	filesystem.checkForRootDirectory();
-	path = filesystem.resolve(path);
+	path = filesystem.sanitise(path);
 
 	var files;
 	try {
@@ -231,222 +146,321 @@ filesystem.list = function(path) {
 
 
 filesystem.exists = function(path) {
-	path = filesystem.resolve(path);
-	if (path != "/" + computer.id) {
-		filesystem.checkForRootDirectory();
-	}
-
+	path = filesystem.sanitise(path);
 	return fs.existsSync(path);
 }
 
 
-filesystem.isDirRaw = function(path) {
-	path = filesystem.resolve(path).substring(1 + computer.id.toString().length);
+filesystem.isDir = function(path) {
+	path = filesystem.sanitise(path);
 
-	var pathIsDir = false;
+	var is = false;
 	try {
 		var stat = fs.statSync(path);
-		pathIsDir = stat.isDirectory();
+		is = stat.isDirectory();
 	} catch (e) {
+		is = false;
 		if (e.code != "ENOENT") {
 			throw e;
 		}
 	}
 
-	return pathIsDir;
-}
-
-
-filesystem.isDir = function(path) {
-	return filesystem.isDirRaw(filesystem.resolve(path));
+	return is;
 }
 
 
 
-filesystem.write = function(path, contents) {
-	filesystem.checkForRootDirectory();
-	path = filesystem.resolve(path);
-	
-	if (filesystem.isReadOnly(path)) {
-		return;
-	}
-
-	return filesystem.writeRaw(path, contents);
-}
-
-
-filesystem.append = function(path, contents) {
-	filesystem.checkForRootDirectory();
-	path = filesystem.resolve(path);
-	
-	if (filesystem.isReadOnly(path)) {
-		return;
-	}
-
-	try {
-		if (!filesystem.isDirRaw(path)) {
-			var folder = filesystem.getContainingFolder(path);
-			if (!filesystem.exists(folder)) {
-				filesystem.makeDir(folder);
-			}
-
-			fs.appendFileSync(path, contents);
-			return true;
-		}
-	} catch (e) {}
-
-	return false;
-}
+//  -------  Modification
 
 
 filesystem.read = function(path) {
-	filesystem.checkForRootDirectory();
-	path = filesystem.resolve(path);
+	path = filesystem.sanitise(path);
 
-	var contents;
-	try {
-		var stat = fs.statSync(path);
-		if (stat.isFile()) {
-			contents = fs.readFileSync(path).toString();
-		}
-	} catch (e) {
-		if (e.code == "ENOENT") {
-			return null;
-		} else {
-			throw e;
-		}
+	var contents = null;
+	if (!filesystem.isDir(path)) {
+		contents = fs.readFileSync(path).toString();
 	}
 
 	return contents;
 }
 
 
-filesystem.isReadOnly = function(path) {
-	path = filesystem.sanitise(path).substring(1);
+filesystem.write = function(path, contents) {
+	path = filesystem.sanitise(path);
+
+	if (!filesystem.isDir(path)) {
+		var folder = filesystem.getContainingFolder(path);
+		if (!filesystem.exists(folder)) {
+			filesystem.makeDir(folder);
+		}
+
+		fs.writeFileSync(path, contents);
+	}
+}
+
+
+filesystem.append = function(path, contents) {
+	path = filesystem.sanitise(path);
+
+	if (!filesystem.isDir(path)) {
+		var folder = filesystem.getContainingFolder(path);
+		if (!filesystem.exists(folder)) {
+			filesystem.makeDir(folder);
+		}
+
+		fs.appendFileSync(path, contents);
+	}
+}
+
+
+filesystem.makeDir = function(path, mode, position) {
+	path = filesystem.sanitise(path);
+	mode = mode || 0777;
+	position = position || 0;
 
 	var parts = path.split("/");
-	var pathIsReadOnly = false;
 
-	for (var i in readOnly) {
-		var readOnlyPath = filesystem.sanitise(readOnly[i]).substring(1).split("/");
-
-		if (parts.length >= readOnlyPath.length) {
-			pathIsReadOnly = true;
-
-			for (var i2 in readOnlyPath) {
-				if (readOnlyPath[i2] == "*") {
-					continue;
-				}
-
-				if (readOnlyPath[i2] != parts[i2]) {
-					pathIsReadOnly = false;
-					break;
-				}
-			}
-
-			if (readOnly) {
-				pathIsReadOnly = true;
-			}
-		}
-	}
-
-	return pathIsReadOnly;
-}
-
-
-filesystem.makeDir = function(path) {
-	path = filesystem.resolve(path);
-	if (path != "/" + computer.id) {
-		filesystem.checkForRootDirectory();
-	}
-
-	if (filesystem.isReadOnly(path)) {
-		return;
-	}
-
-	filesystem.makeDirRaw(path);
-}
-
-
-filesystem.move = function(from, to) {
-	filesystem.checkForRootDirectory();
-	from = filesystem.resolve(from);
-	to = filesystem.resolve(to);
-
-	throw new Error("Move doesn't properly work for some weird reason");
-
-	try {
-		if (filesystem.isDirRaw(to)) {
-			fs.renameSync(from, to + filesystem.getName(from));
-		} else {
-			fs.renameSync(from, to);
-		}
-
+	if (position >= parts.length) {
 		return true;
-	} catch (e) {}
+	}
 
-	return false;
-}
+	var directory = parts.slice(0, position + 1).join("/") || "/";
+	try {
+		fs.statSync(directory);
+		filesystem.makeDir(path, mode, position + 1);
+	} catch (e) {
+		try {
+			fs.mkdirSync(directory, mode);
+			filesystem.makeDir(path, mode, position + 1);
+		} catch (e) {
+			if (e.code != "EEXIST") {
+				throw e;
+			}
 
-
-filesystem.copy = function(from, to) {
-	filesystem.checkForRootDirectory();
-	from = filesystem.resolve(from);
-	to = filesystem.resolve(to);
-
-	// TODO: Too lazy to implement
-	// CHUIE COMPLETE PLZ TY
-	throw new Error("Too lazy to implement, sorry");
-
-	return false;
+			filesystem.makeDir(path, mode, position + 1);
+		}
+	}
 }
 
 
 filesystem.delete = function(path) {
-	filesystem.checkForRootDirectory();
-	path = filesystem.resolve(path);
+	path = filesystem.sanitise(path);
 
-	if (filesystem.isReadOnly(path)) {
-		return;
+	if (path != "/") {
+		if (!filesystem.isDir(path)) {
+			fs.unlinkSync(path);
+		} else {
+			throw new Error("Not implemented");
+		}
+	}
+}
+
+
+
+//  -------  File Manipulation
+
+
+filesystem.move = function(from, to) {
+	from = filesystem.sanitise(from);
+	to = filesystem.sanitise(to);
+
+	throw new Error("Not implemented");
+
+	// try {
+	// 	if (filesystem.isDir(to)) {
+	// 		fs.renameSync(from, to + filesystem.getName(from));
+	// 	} else {
+	// 		fs.renameSync(from, to);
+	// 	}
+
+	// 	return true;
+	// } catch (e) {}
+}
+
+
+filesystem.copy = function(from, to) {
+	from = filesystem.sanitise(from);
+	to = filesystem.sanitise(to);
+
+	throw new Error("Not implemented");
+}
+
+
+
+
+//  ----------------  Computer File System  ----------------  //
+//  These functions use the current computer ID to resolve paths for
+//  a particular computer
+//  - Mounts the rom folder
+//  - Checks for read only
+
+
+computerFilesystem.resolve = function(path) {
+	if (path != "/") {
+		computerFilesystem.createRoot();
 	}
 
-	try {
-		if (path != "/" + computer.id) {
-			if (!filesystem.isDirRaw(path)) {
-				fs.unlinkSync(path);
-			} else {
-				// TODO: Too lazy to implement recursive directory deletion
-				// CHUIE COMPLETE PLZ TY
-				throw new Error("Too lazy to implement, sorry");
-			}
+	var base = "/computers/" + computer.id.toString();
+	var path = filesystem.format(base + filesystem.sanitise(path));
 
-			return true;
-		}
-	} catch (e) {}
+	if (path.indexOf(base + "/rom") == 0) {
+		path = filesystem.format(path.substring(path.indexOf("/rom")));
+	}
 
-	return false;
+	return path;
 }
 
 
-filesystem.getDrive = function() {
-	throw new Error("Too lazy to implement, sorry");
-	return 0;
+computerFilesystem.isReadOnly = function(path) {
+	var base = "/computers/" + computer.id.toString();
+	var is = true;
+
+	if (path.indexOf(base) == 0) {
+		return false;
+	}
+
+	return is;
 }
 
 
-filesystem.getFreeSpace = function() {
-	throw new Error("Too lazy to implement, sorry");
-	return 0;
+computerFilesystem.createRoot = function() {
+	var rootPath = computerFilesystem.resolve("/");
+	if (!filesystem.isDir(rootPath)) {
+		filesystem.makeDir(rootPath);
+	}
 }
 
 
 
-//  ----------------  Lua  ----------------  //
+//  -------  Query
+
+
+computerFilesystem.list = function(path) {
+	path = computerFilesystem.resolve(path);
+
+	var files = filesystem.list(path);
+
+	if (path == computerFilesystem.resolve("/")) {
+		files.push("rom");
+	}
+
+	return files;
+}
+
+
+computerFilesystem.exists = function(path) {
+	path = computerFilesystem.resolve(path);
+	return filesystem.exists(path);
+}
+
+
+computerFilesystem.isDir = function(path) {
+	path = computerFilesystem.resolve(path);
+	return filesystem.isDir(path);
+}
+
+
+
+//  -------  Modification
+
+
+computerFilesystem.read = function(path) {
+	path = computerFilesystem.resolve(path);
+	return filesystem.read(path);
+}
+
+
+computerFilesystem.write = function(path, contents) {
+	path = computerFilesystem.resolve(path);
+
+	if (!computerFilesystem.isReadOnly(path)) {
+		filesystem.write(path, contents);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+computerFilesystem.append = function(path, contents) {
+	path = computerFilesystem.resolve(path);
+
+	if (!computerFilesystem.isReadOnly(path)) {
+		filesystem.append(path, contents);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+computerFilesystem.makeDir = function(path) {
+	path = computerFilesystem.resolve(path);
+
+	if (!computerFilesystem.isReadOnly(path)) {
+		filesystem.makeDir(path);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+computerFilesystem.delete = function(path) {
+	path = computerFilesystem.resolve(path);
+
+	if (!computerFilesystem.isReadOnly(path)) {
+		filesystem.delete(path);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+//  -------  File Manipulation
+
+
+filesystem.move = function(from, to) {
+	from = computerFilesystem.resolve(from);
+	to = computerFilesystem.resolve(to);
+
+	throw new Error("Not implemented");
+
+	// try {
+	// 	if (filesystem.isDir(to)) {
+	// 		fs.renameSync(from, to + filesystem.getName(from));
+	// 	} else {
+	// 		fs.renameSync(from, to);
+	// 	}
+
+	// 	return true;
+	// } catch (e) {}
+}
+
+
+filesystem.copy = function(from, to) {
+	from = computerFilesystem.resolve(from);
+	to = computerFilesystem.resolve(to);
+
+	throw new Error("Not implemented");
+}
+
+
+
+//  ----------------  Lua Wrappers  ----------------  //
+//  These functions interface with the Lua runtime
+//  - Parse arguments from Lua runtime
+//  - Format return values for the Lua runtime
+
+
+//  -------  Query
 
 
 fsAPI.list = function(L) {
 	var path = C.luaL_checkstring(L, 1);
-	var files = filesystem.list(path);
+	var files = computerFilesystem.list(path);
 
 	if (files) {
 		C.lua_newtable(L);
@@ -463,92 +477,53 @@ fsAPI.list = function(L) {
 }
 
 
-fsAPI.getSize = function(L) {
-	C.lua_pushnumber(L, config.maxStorageSize);
-	return 1;
-}
-
-
 fsAPI.exists = function(L) {
 	var path = C.luaL_checkstring(L, 1);
-	var exists = filesystem.exists(path);
+	var exists = computerFilesystem.exists(path);
 	C.lua_pushboolean(L, exists ? 1 : 0);
-
 	return 1;
 }
 
 
 fsAPI.isDir = function(L) {
 	var path = C.luaL_checkstring(L, 1);
-	var isDir = filesystem.isDir(path);
+	var isDir = computerFilesystem.isDir(path);
 	C.lua_pushboolean(L, isDir ? 1 : 0);
-
 	return 1;
 }
 
 
 fsAPI.isReadOnly = function(L) {
-	var path = filesystem.resolve(C.luaL_checkstring(L, 1));
-	var isReadOnly = filesystem.isReadOnly(path);
-	C.lua_pushboolean(L, isReadOnly ? 1 : 0);
-
+	var path = C.luaL_checkstring(L, 1);
+	var is = computerFilesystem.isReadOnly(computerFilesystem.resolve(path));
+	C.lua_pushboolean(L, is ? 1 : 0);
 	return 1;
 }
 
 
-fsAPI.makeDir = function(L) {
-	var path = C.luaL_checkstring(L, 1);
-	filesystem.makeDir(path);
+fsAPI.getSize = function(L) {
+	C.lua_pushnumber(L, config.maxStorageSize);
+	return 1;
+}
 
+
+fsAPI.getDrive = function(L) {
 	return 0;
 }
 
 
-fsAPI.move = function(L) {
-	var from = C.luaL_checkstring(L, 1);
-	var to = C.luaL_checkstring(L, 2);
-
+fsAPI.getFreeSpace = function(L) {
 	return 0;
 }
 
 
-fsAPI.copy = function(L) {
-	var from = C.luaL_checkstring(L, 1);
-	var to = C.luaL_checkstring(L, 2);
 
-	return 0;
-}
-
-
-fsAPI.delete = function(L) {
-	var path = C.luaL_checkstring(L, 1);
-	filesystem.delete(path);
-
-	return 0;
-}
-
-
-fsAPI.write = function(L) {
-	var path = C.luaL_checkstring(L, 1);
-	var contents = C.luaL_checkstring(L, 2);
-	filesystem.write(path, contents);
-
-	return 0;
-}
-
-
-fsAPI.append = function(L) {
-	var path = C.luaL_checkstring(L, 1);
-	var contents = C.luaL_checkstring(L, 2);
-	filesystem.append(path, contents);
-
-	return 0;
-}
+//  -------  Modification
 
 
 fsAPI.read = function(L) {
 	var path = C.luaL_checkstring(L, 1);
-	var contents = filesystem.read(path);
+	var contents = computerFilesystem.read(path);
 
 	if (contents) {
 		C.lua_pushstring(L, contents);
@@ -559,11 +534,51 @@ fsAPI.read = function(L) {
 }
 
 
-fsAPI.getDrive = function(L) {
+fsAPI.write = function(L) {
+	var path = C.luaL_checkstring(L, 1);
+	var contents = C.luaL_checkstring(L, 2);
+	computerFilesystem.write(path, contents);
 	return 0;
 }
 
 
-fsAPI.getFreeSpace = function(L) {
+fsAPI.append = function(L) {
+	var path = C.luaL_checkstring(L, 1);
+	var contents = C.luaL_checkstring(L, 2);
+	computerFilesystem.append(path, contents);
+	return 0;
+}
+
+
+fsAPI.makeDir = function(L) {
+	var path = C.luaL_checkstring(L, 1);
+	computerFilesystem.makeDir(path);
+	return 0;
+}
+
+
+fsAPI.delete = function(L) {
+	var path = C.luaL_checkstring(L, 1);
+	computerFilesystem.delete(path);
+	return 0;
+}
+
+
+
+//  -------  File Manipulation
+
+
+fsAPI.move = function(L) {
+	var from = C.luaL_checkstring(L, 1);
+	var to = C.luaL_checkstring(L, 2);
+	computerFilesystem.move(from, to);
+	return 0;
+}
+
+
+fsAPI.copy = function(L) {
+	var from = C.luaL_checkstring(L, 1);
+	var to = C.luaL_checkstring(L, 2);
+	computerFilesystem.copy(from, to);
 	return 0;
 }
