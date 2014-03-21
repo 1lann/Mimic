@@ -22,7 +22,8 @@ xpcall = function(_fn, _fnErrorHandler)\n\
 \n\
 	debug.sethook(co, function()\n\
 		if os.clock() >= coroutineClock + 2 then\n\
-			print("Lua: Too long without yielding") error("Too long without yielding", 2)\n\
+			print("Lua: Too long without yielding")\n\
+			error("Too long without yielding", 2)\n\
 		end\n\
 	end, "", 10000)\n\
 \n\
