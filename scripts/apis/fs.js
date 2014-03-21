@@ -25,42 +25,25 @@ triggerGUIUpdate = function() {
 //  ----------------  Filesystem API Setup  ----------------  //
 
 
-filesystem.getGlobalMounts = function() {
-	// Must be absolute paths
-	return {
-		"/rom": rom,
-	};
-}
-
-
 filesystem.setup = function(callback) {
 	BrowserFS.install(window);
 
-	var lsfs = new BrowserFS.FileSystem.LocalStorage();
-	BrowserFS.initialize(lsfs);
-	fs = require("fs");
+	var request = new XMLHttpRequest();
+	request.open("GET", "lua/rom.zip", true);
+	request.responseType = "arraybuffer";
+	request.onload = function(err) {
+		var buffer = new Buffer(request.response);
+		var mfs = new BrowserFS.FileSystem.MountableFileSystem();
+		mfs.mount("/" + computer.id, new BrowserFS.FileSystem.LocalStorage());
+		mfs.mount("/" + computer.id + "/rom", new BrowserFS.FileSystem.ZipFS(buffer));
 
-	filesystem.loadGlobalMounts();
+		BrowserFS.initialize(mfs);
+		fs = require("fs");
 
-	callback();
-}
-
-
-filesystem.loadGlobalMounts = function() {
-	var globalMounts = filesystem.getGlobalMounts();
-	for (var mountPath in globalMounts) {
-		filesystem.makeDirRaw("/" + computer.id + mountPath);
-
-		for (var localPath in globalMounts[mountPath]) {
-			var path = mountPath + "/" + localPath;
-			var isDir = path.substring(path.length - 1) == "/";
-			if (isDir) {
-				filesystem.makeDirRaw("/" + computer.id + path);
-			} else {
-				filesystem.writeRaw("/" + computer.id + path, rom[path]);
-			}
-		}
+		callback();
 	}
+
+	request.send(null);
 }
 
 
