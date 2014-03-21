@@ -254,7 +254,7 @@ while true do\n\
 	term.write("lua> ")\n\
 	local command = read(nil, commandHistory)\n\
 	table.insert(commandHistory, command)\n\
-	local toRun, cError = loadstring("return "..command, "error")\n\
+	local toRun, cError = loadstring(command, "error")\n\
 	if toRun then\n\
 		setfenv(toRun, getfenv(1))\n\
 		local results = {pcall(toRun)}\n\
