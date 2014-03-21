@@ -252,20 +252,25 @@ while true do\n\
 	term.setTextColor(1)\n\
 	term.setBackgroundColor(32768)\n\
 	term.write("lua> ")\n\
-	local command = read(nil, commandHistory)\n\
+	local command = ("return "..read(nil, commandHistory))\n\
 	table.insert(commandHistory, command)\n\
 	local toRun, cError = loadstring(command, "error")\n\
 	if toRun then\n\
-		toRun = loadstring("return "..command, "error")\n\
 		setfenv(toRun, getfenv(1))\n\
 		local results = {pcall(toRun)}\n\
 		term.setBackgroundColor(32768)\n\
 		if results[1] then\n\
 			table.remove(results,1)\n\
-			for k,v in pairs(results) do\n\
-				newLine()\n\
-				term.write(tostring(v))\n\
+			if #results <= 0 then\n\
+				term.write("nil")\n\
+			else\n\
+				for k,v in pairs(results) do\n\
+					if k > 1 then newLine() end\n\
+					term.write(tostring(v))\n\
+				end\n\
 			end\n\
+		elseif not results[2] then\n\
+			term.write("nil")\n\
 		else\n\
 			if term.isColor() then\n\
 				term.setTextColor(16384)\n\
