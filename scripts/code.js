@@ -169,20 +169,20 @@ function write(text)\n\
 	end\n\
 	\n\
 	while string.len(text) > 0 do\n\
-		local whitespace = string.match(text, "^[ \t]+")\n\
+		local whitespace = string.match(text, "^[ \\t]+")\n\
 		if whitespace then\n\
 			term.write(whitespace)\n\
 			x, y = term.getCursorPos()\n\
 			text = string.sub(text, string.len(whitespace) + 1)\n\
 		end\n\
 		\n\
-		local newline = string.match(text, "^\n")\n\
+		local newline = string.match(text, "^\\\n")\n\
 		if newline then\n\
 			newLine()\n\
 			text = string.sub(text, 2)\n\
 		end\n\
 		\n\
-		local text = string.match(text, "^[^ \t\n]+")\n\
+		local text = string.match(text, "^[^ \\t\\\n]+")\n\
 		if text then\n\
 			text = string.sub(text, string.len(text) + 1)\n\
 			if string.len(text) > w then\n\
@@ -212,7 +212,7 @@ function print(...)\n\
 	local args = {...}\n\
 	local linesPrinted = 0\n\
 	for k, v in pairs(args) do\n\
-		write(tostring(k) .. ": " .. tostring(v) .. "\n")\n\
+		write(tostring(k) .. ": " .. tostring(v) .. "\\\n")\n\
 		linesPrinted = linesPrinted + 1\n\
 	end\n\
 \n\
@@ -792,7 +792,7 @@ local function save(path)\n\
 		for x=1,w-2 do\n\
 			file:write( getCharOf( canvas[y][x] ) )\n\
 		end\n\
-		file:write( "\n" )\n\
+		file:write( "\\n" )\n\
 	end\n\
 	file:close()\n\
 	return true\n\
@@ -1111,7 +1111,7 @@ local items = {\n\
 		monster = true,\n\
 		aliases = { "skeleton" },\n\
 		nocturnal = true,\n\
-		desc = "The head bone\'s connected to the neck bone, the neck bones connected to the chest bone, the chest bones connected to the arm bone, the arm bones connected to the bow, and the bow is pointed at you.",\n\
+		desc = "The head bone is connected to the neck bone, the neck bones connected to the chest bone, the chest bones connected to the arm bone, the arm bones connected to the bow, and the bow is pointed at you.",\n\
 	},\n\
 	["a zombie"] = {\n\
 		heavy = true,\n\
@@ -1158,11 +1158,11 @@ local items = {\n\
 	},\n\
 	["a crafting table"] = {\n\
 		aliases = { "crafting table", "craft table", "work bench", "workbench", "crafting bench", "table", },\n\
-		desc = "It\'s a crafting table. I shouldn\'t tell you this, but these don\'t actually do anything in this game, you can craft tools whenever you like.",\n\
+		desc = "It is a crafting table. I should not tell you this, but these do not actually do anything in this game, you can craft tools whenever you like.",\n\
 	},\n\
 	["a furnace"] = {\n\
 		aliases = { "furnace" },\n\
-		desc = "It\'s a furnace. Between you and me, these don\'t actually do anything in this game.",\n\
+		desc = "It is a furnace. Between you and me, these do not actually do anything in this game.",\n\
 	},\n\
 	["a wooden pickaxe"] = {\n\
 		aliases = { "pickaxe", "pick", "wooden pick", "wooden pickaxe", "wood pick", "wood pickaxe" },\n\
@@ -1275,7 +1275,7 @@ local items = {\n\
 		ore = true,\n\
 		toolLevel = 2,\n\
 		toolType = "pick",\n\
-		desc = "That iron looks mighty strong, you\'ll need a stone pickaxe to mine it.",\n\
+		desc = "That iron looks mighty strong, you will need a stone pickaxe to mine it.",\n\
 	},\n\
 	["some diamond"] = {\n\
 		aliases = { "diamond", "diamonds" },\n\
@@ -1287,11 +1287,11 @@ local items = {\n\
 	},\n\
 	["some torches"] = {\n\
 		aliases = { "torches", "torch" },\n\
-		desc = "These won\'t run out for a while.",\n\
+		desc = "These will not run out for a while.",\n\
 	},\n\
 	["a torch"] = {\n\
 		aliases = { "torch" },\n\
-		desc = "Fire, fire, burn so bright, won\'t you light my cave tonight?",\n\
+		desc = "Fire, fire, burn so bright, will not you light my cave tonight?",\n\
 	},\n\
 	["some wool"] = {\n\
 		aliases = { "wool" },\n\
@@ -1346,11 +1346,11 @@ local tGoWest = {\n\
 	"(life is peaceful there)",\n\
 	"(lots of open air)",\n\
 	"(to begin life anew)",\n\
-	"(this is what we\'ll do)",\n\
+	"(this is what we will do)",\n\
 	"(sun in winter time)",\n\
 	"(we will do just fine)",\n\
 	"(where the skies are blue)",\n\
-	"(this and more we\'ll do)",\n\
+	"(this and more we will do)",\n\
 }\n\
 local nGoWest = 0\n\
 \n\
@@ -1727,7 +1727,7 @@ function commands.look( _sTarget )\n\
 			if tItem then\n\
 				print( tItem.desc or ("You see nothing special about "..sItem..".") )\n\
 			else\n\
-				print( "You don\'t see any ".._sTarget.." here." )\n\
+				print( "You do not see any ".._sTarget.." here." )\n\
 			end\n\
 		end\n\
 	end\n\
@@ -1755,7 +1755,7 @@ function commands.go( _sDir )\n\
 	end\n\
 	\n\
 	if room.exits[_sDir] == nil then\n\
-		print( "You can\'t go that way." )\n\
+		print( "You cannot go that way." )\n\
 		return\n\
 	end\n\
 	\n\
@@ -1772,7 +1772,7 @@ function commands.go( _sDir )\n\
 	elseif _sDir == "down" then\n\
 		y = y - 1\n\
 	else\n\
-		print( "I don\'t understand that direction." )\n\
+		print( "I do not understand that direction." )\n\
 		return\n\
 	end\n\
 	\n\
@@ -1792,7 +1792,7 @@ function commands.dig( _sDir, _sTool )\n\
 	if _sTool ~= nil then\n\
 		sTool = findItem( inventory, _sTool )\n\
 		if not sTool then\n\
-			print( "You\'re not carrying a ".._sTool.."." )\n\
+			print( "You are not carrying a ".._sTool.."." )\n\
 			return\n\
 		end\n\
 		tTool = inventory[ sTool ]\n\
@@ -1829,7 +1829,7 @@ function commands.dig( _sDir, _sTool )\n\
 		\n\
 	elseif _sDir == "up" then\n\
 		if y == 0 then\n\
-			print( "You can\'t dig that way." )\n\
+			print( "You cannot dig that way." )\n\
 			return\n\
 		end\n\
 \n\
@@ -1864,7 +1864,7 @@ function commands.dig( _sDir, _sTool )\n\
 		end\n\
 		\n\
 	else\n\
-		print( "I don\'t understand that direction." )\n\
+		print( "I do not understand that direction." )\n\
 		return\n\
 	end\n\
 	\n\
@@ -1900,14 +1900,14 @@ function commands.drop( _sItem )\n\
 	if sItem then\n\
 		local tItem = inventory[ sItem ]\n\
 		if tItem.droppable == false then\n\
-			print( "You can\'t drop that." )\n\
+			print( "You cannot drop that." )\n\
 		else\n\
 			room.items[ sItem ] = tItem\n\
 			inventory[ sItem ] = nil\n\
 			print( "Dropped." )\n\
 		end\n\
 	else\n\
-		print( "You don\'t have a ".._sItem.."." )\n\
+		print( "You do not have a ".._sItem.."." )\n\
 	end\n\
 end\n\
 \n\
@@ -1931,7 +1931,7 @@ function commands.place( _sItem )\n\
 				print( "Placed." )\n\
 			end\n\
 		else\n\
-			print( "You don\'t have torches." )\n\
+			print( "You do not have torches." )\n\
 		end\n\
 		return\n\
 	end\n\
@@ -1950,7 +1950,7 @@ function commands.take( _sItem )\n\
 	if sItem then\n\
 		local tItem = room.items[ sItem ]\n\
 		if tItem.heavy == true then\n\
-			print( "You can\'t carry "..sItem.."." )\n\
+			print( "You cannot carry "..sItem.."." )\n\
 		elseif tItem.ore == true then\n\
 			print( "You need to mine this ore." )\n\
 		else\n\
@@ -1970,7 +1970,7 @@ function commands.take( _sItem )\n\
 			end\n\
 		end\n\
 	else\n\
-		print( "You don\'t see a ".._sItem.." here." )\n\
+		print( "You do not see a ".._sItem.." here." )\n\
 	end\n\
 end\n\
 \n\
@@ -2004,7 +2004,7 @@ function commands.cbreak( _sItem, _sTool )\n\
 	if _sTool ~= nil then\n\
 		sTool = findItem( inventory, _sTool )\n\
 		if sTool == nil then\n\
-			print( "You\'re not carrying a ".._sTool.."." )\n\
+			print( "You\\\'re not carrying a ".._sTool.."." )\n\
 			return\n\
 		end\n\
 	end\n\
@@ -2048,7 +2048,7 @@ function commands.cbreak( _sItem, _sTool )\n\
 					end\n\
 				end\n\
 			else\n\
-				print( "You can\'t break "..sItem.." with "..sTool..".")\n\
+				print( "You cannot break "..sItem.." with "..sTool..".")\n\
 			end\n\
 			\n\
 		elseif tItem.creature == true then\n\
@@ -2093,10 +2093,10 @@ function commands.cbreak( _sItem, _sTool )\n\
 			end\n\
 		\n\
 		else\n\
-			print( "You can\'t break "..sItem.."." )\n\
+			print( "You cannot break "..sItem.."." )\n\
 		end\n\
 	else\n\
-		print( "You don\'t see a ".._sItem.." here." )\n\
+		print( "You do not see a ".._sItem.." here." )\n\
 	end\n\
 end\n\
 \n\
@@ -2124,7 +2124,7 @@ function commands.craft( _sItem )\n\
 	if tRecipe then\n\
 		for n,sReq in ipairs( tRecipe ) do\n\
 			if inventory[sReq] == nil then\n\
-				print( "You don\'t have the items you need to craft "..sItem.."." )\n\
+				print( "You do not have the items you need to craft "..sItem.."." )\n\
 				return\n\
 			end\n\
 		end\n\
@@ -2138,7 +2138,7 @@ function commands.craft( _sItem )\n\
 		end\n\
 		print( "Crafted." )\n\
 	else\n\
-		print( "You don\'t know how to make "..(sItem or _sItem).."." )\n\
+		print( "You do not know how to make "..(sItem or _sItem).."." )\n\
 	end	\n\
 end\n\
 \n\
@@ -2157,13 +2157,13 @@ function commands.build( _sThing, _sMaterial )\n\
 			end\n\
 		end\n\
 		if sMaterial == nil then\n\
-			print( "You don\'t have any building materials." )\n\
+			print( "You do not have any building materials." )\n\
 			return\n\
 		end\n\
 	else\n\
 		sMaterial = findItem( inventory, _sMaterial )\n\
 		if not sMaterial then\n\
-			print( "You don\'t have any ".._sMaterial )\n\
+			print( "You do not have any ".._sMaterial )\n\
 			return\n\
 		end\n\
 		\n\
@@ -2206,7 +2206,7 @@ function commands.eat( _sItem )\n\
 \n\
 	local sItem = findItem( inventory, _sItem )\n\
 	if not sItem then\n\
-		print( "You don\'t have any ".._sItem.."." )\n\
+		print( "You do not have any ".._sItem.."." )\n\
 		return\n\
 	end\n\
 	\n\
@@ -2220,7 +2220,7 @@ function commands.eat( _sItem )\n\
 			bInjured = false\n\
 		end\n\
 	else\n\
-		print( "You can\'t eat "..sItem.."." )\n\
+		print( "You cannot eat "..sItem.."." )\n\
 	end\n\
 end\n\
 \n\
@@ -2230,17 +2230,17 @@ end\n\
 \n\
 function commands.badinput()\n\
 	local tResponses = {\n\
-		"I don\'t understand.",\n\
-		"I don\'t understand you.",\n\
-		"You can\'t do that.",\n\
+		"I do not understand.",\n\
+		"I do not understand you.",\n\
+		"You cannot do that.",\n\
 		"Nope.",\n\
 		"Huh?",\n\
 		"Say again?",\n\
-		"That\'s crazy talk.",\n\
+		"That is crazy talk.",\n\
 		"Speak clearly.",\n\
-		"I\'ll think about it.",\n\
+		"I will think about it.",\n\
 		"Let me get back to you on that one.",\n\
-		"That doesn\'t make any sense.",\n\
+		"That does not make any sense.",\n\
 		"What?",\n\
 	}\n\
 	print( tResponses[ math.random(1,#tResponses) ] )\n\
@@ -2251,7 +2251,7 @@ function commands.noinput()\n\
 		"Speak up.",\n\
 		"Enunciate.",\n\
 		"Project your voice.",\n\
-		"Don\'t be shy.",\n\
+		"Do not be shy.",\n\
 		"Use your words.",\n\
 	}\n\
 	print( tResponses[ math.random(1,#tResponses) ] )\n\
@@ -2878,7 +2878,7 @@ local function save( _sPath )\n\
 		file = fs.open( _sPath, "w" )\n\
 		if file then\n\
 			for n, sLine in ipairs( tLines ) do\n\
-				file.write( sLine .. "\n" )\n\
+				file.write( sLine .. "\\n" )\n\
 			end\n\
 		else\n\
 			error( "Failed to open ".._sPath )\n\
@@ -2936,8 +2936,8 @@ local function writeHighlighted( sLine )\n\
 		sLine = \n\
 			tryWrite( sLine, "^%-%-%[%[.-%]%]", commentColour ) or\n\
 			tryWrite( sLine, "^%-%-.*", commentColour ) or\n\
-			tryWrite( sLine, "^\".-[^\\]\"", stringColour ) or\n\
-			tryWrite( sLine, "^\'.-[^\\]\'", stringColour ) or\n\
+			tryWrite( sLine, "^\\".-[^\\\\]\\"", stringColour ) or\n\
+			tryWrite( sLine, "^\\\'.-[^\\\\]\\\'", stringColour ) or\n\
 			tryWrite( sLine, "^%[%[.-%]%]", stringColour ) or\n\
 			tryWrite( sLine, "^[%w_]+", function( match )\n\
 				if tKeywords[ match ] then\n\
@@ -3337,7 +3337,7 @@ while bRunning do\n\
 					spaces=0\n\
 				end\n\
 				tLines[y] = string.sub(sLine,1,x-1)\n\
-				table.insert( tLines, y+1, string.rep(\' \',spaces)..string.sub(sLine,x) )\n\
+				table.insert( tLines, y+1, string.rep(" ",spaces)..string.sub(sLine,x) )\n\
 				redrawText()\n\
 			\n\
 				x = spaces+1\n\
@@ -3513,7 +3513,7 @@ elseif sCommand == "host" then\n\
 		-- Position is to be determined using locate		\n\
 		x,y,z = gps.locate( 2, true )\n\
 		if x == nil then\n\
-			print( "Run \"gps host <x> <y> <z>\" to set position manually" )\n\
+			print( "Run \\"gps host <x> <y> <z>\\" to set position manually" )\n\
 			if bCloseChannel then\n\
 				print( "Closing GPS channel" )\n\
 				modem.close( gps.CHANNEL_GPS )\n\
@@ -3677,7 +3677,7 @@ if sCommand == "put" then\n\
                 \n\
         local sCode = string.match( sResponse, "[^/]+$" )\n\
         print( "Uploaded as "..sResponse )\n\
-        print( "Run \"pastebin get "..sCode.."\" to download anywhere" )\n\
+        print( "Run \\"pastebin get "..sCode.."\\" to download anywhere" )\n\
  \n\
     else\n\
         print( "Failed." )\n\
@@ -3744,7 +3744,7 @@ if sSide == nil then\n\
 	\n\
 	local label = os.getComputerLabel()\n\
 	if label then\n\
-		print( "This computer is labelled \""..label.."\"" )\n\
+		print( "This computer is labelled \\""..label.."\\"" )\n\
 	end\n\
 \n\
 else\n\
@@ -3758,7 +3758,7 @@ else\n\
 \n\
 	local label = disk.getLabel( sSide )\n\
 	if label then\n\
-		print( "The disk is labelled \""..label.."\"" )\n\
+		print( "The disk is labelled \\""..label.."\\"" )\n\
 	end\n\
 end\n\
 \n\
@@ -3816,14 +3816,14 @@ if sCommand == "get" then\n\
 	if sDrive ~= nil then\n\
 		sLabel = disk.getLabel( sDrive )\n\
 		if sLabel then\n\
-			print( "Disk label is \""..sLabel.."\"" )\n\
+			print( "Disk label is \\""..sLabel.."\\"" )\n\
 		else\n\
 			print( "No Disk label" )\n\
 		end\n\
 	else\n\
 		sLabel = os.getComputerLabel()\n\
 		if sLabel then\n\
-			print( "Computer label is \""..sLabel.."\"" )\n\
+			print( "Computer label is \\""..sLabel.."\\"" )\n\
 		else\n\
 			print( "No Computer label" )\n\
 		end\n\
@@ -3850,7 +3850,7 @@ elseif sCommand == "set" or sCommand == "clear" then\n\
 		disk.setLabel( sDrive, sText )\n\
 		sLabel = disk.getLabel( sDrive )\n\
 		if sLabel then\n\
-			print( "Disk label set to \""..sLabel.."\"" )\n\
+			print( "Disk label set to \\""..sLabel.."\\"" )\n\
 		else\n\
 			print( "Disk label cleared" )\n\
 		end\n\
@@ -3858,7 +3858,7 @@ elseif sCommand == "set" or sCommand == "clear" then\n\
 		os.setComputerLabel( sText )\n\
 		sLabel = os.getComputerLabel()\n\
 		if sLabel then\n\
-			print( "Computer label set to \""..sLabel.."\"" )\n\
+			print( "Computer label set to \\""..sLabel.."\\"" )\n\
 		else\n\
 			print( "Computer label cleared" )\n\
 		end\n\
@@ -4271,7 +4271,7 @@ end\n\
 \n\
 local function runLine( _sLine )\n\
 	local tWords = {}\n\
-	for match in string.gmatch( _sLine, "[^ \t]+" ) do\n\
+	for match in string.gmatch( _sLine, "[^ \\t]+" ) do\n\
 		table.insert( tWords, match )\n\
 	end\n\
 \n\
@@ -4309,7 +4309,7 @@ end\n\
 \n\
 function shell.resolve( _sPath )\n\
 	local sStartChar = string.sub( _sPath, 1, 1 )\n\
-	if sStartChar == "/" or sStartChar == "\\" then\n\
+	if sStartChar == "/" or sStartChar == "\\\\" then\n\
 		return fs.combine( "", _sPath )\n\
 	else\n\
 		return fs.combine( sDir, _sPath )\n\
@@ -4324,7 +4324,7 @@ function shell.resolveProgram( _sCommand )\n\
 \n\
     -- If the path is a global path, use it directly\n\
     local sStartChar = string.sub( _sCommand, 1, 1 )\n\
-    if sStartChar == "/" or sStartChar == "\\" then\n\
+    if sStartChar == "/" or sStartChar == "\\\\" then\n\
     	local sPath = fs.combine( "", _sCommand )\n\
     	if fs.exists( sPath ) and not fs.isDir( sPath ) then\n\
 			return sPath\n\
@@ -5701,7 +5701,7 @@ end\n\
 \n\
 function urlEncode( str )\n\
 	if str then\n\
-		str = string.gsub (str, "\n", "\r\n")\n\
+		str = string.gsub (str, "\\n", "\\r\\\n")\n\
 		str = string.gsub (str, "([^%w ])",\n\
 		function (c)\n\
 			return string.format ("%%%02X", string.byte(c))\n\
@@ -5788,5 +5788,5 @@ end\n\
 
 
 getCode = function() {
-	return prebios + "\n\n" + bios;
+	return prebios + "\n\\n" + bios;
 }
