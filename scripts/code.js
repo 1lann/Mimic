@@ -118,7 +118,7 @@ var bios = '\n\
 --  I just cleaned up the code a bit\n\
 \n\
 \n\
-local jsConsolePrint = print\n\
+jsConsolePrint = print\n\
 \n\
 \n\
 function os.version()\n\
@@ -176,13 +176,13 @@ function write(text)\n\
 			text = string.sub(text, string.len(whitespace) + 1)\n\
 		end\n\
 		\n\
-		local newline = string.match(text, "^\\\n")\n\
+		local newline = string.match(text, "^\\n")\n\
 		if newline then\n\
 			newLine()\n\
 			text = string.sub(text, 2)\n\
 		end\n\
 		\n\
-		local text = string.match(text, "^[^ \\t\\\n]+")\n\
+		local text = string.match(text, "^[^ \\t\\n]+")\n\
 		if text then\n\
 			text = string.sub(text, string.len(text) + 1)\n\
 			if string.len(text) > w then\n\
@@ -212,7 +212,7 @@ function print(...)\n\
 	local args = {...}\n\
 	local linesPrinted = 0\n\
 	for k, v in pairs(args) do\n\
-		write(tostring(k) .. ": " .. tostring(v) .. "\\\n")\n\
+		write(tostring(k) .. ": " .. tostring(v) .. "\\n")\n\
 		linesPrinted = linesPrinted + 1\n\
 	end\n\
 \n\
@@ -494,6 +494,7 @@ local tApis = fs.list("rom/apis")\n\
 for n, sFile in ipairs(tApis) do\n\
 	if string.sub(sFile, 1, 1) ~= "." then\n\
 		local sPath = fs.combine("rom/apis", sFile)\n\
+		jsConsolePrint(sPath)\n\
 		if not fs.isDir(sPath) then\n\
 			os.loadAPI(sPath)\n\
 		end\n\
@@ -506,6 +507,7 @@ if turtle then\n\
 	for n, sFile in ipairs(tApis) do\n\
 		if string.sub(sFile, 1, 1) ~= "." then\n\
 			local sPath = fs.combine("rom/apis/turtle", sFile)\n\
+			jsConsolePrint(sPath)\n\
 			if not fs.isDir(sPath) then\n\
 				os.loadAPI(sPath)\n\
 			end\n\
@@ -4939,7 +4941,7 @@ function open( _sPath, _sMode )\n\
 	if sMode == "r"then\n\
 		return {\n\
 			bFileHandle = true,\n\
-			bClosed = false,				\n\
+			bClosed = false,\n\
 			close = function( self )\n\
 				file.close()\n\
 				self.bClosed = true\n\
@@ -5701,7 +5703,7 @@ end\n\
 \n\
 function urlEncode( str )\n\
 	if str then\n\
-		str = string.gsub (str, "\\n", "\\r\\\n")\n\
+		str = string.gsub (str, "\\n", "\\r\\n")\n\
 		str = string.gsub (str, "([^%w ])",\n\
 		function (c)\n\
 			return string.format ("%%%02X", string.byte(c))\n\
