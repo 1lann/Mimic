@@ -74,9 +74,13 @@ function fs.open(path, mode)
 			["write"] = function(str)
 				f._buffer = f._buffer .. tostring(str)
 			end,
+			["flush"] = function()
+				fsWrite(path, f._buffer)
+			end,
 			["close"] = function()
 				fsWrite(path, f._buffer)
 				f.write = nil
+				f.flush = nil
 			end,
 		}
 

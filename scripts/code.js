@@ -105,7 +105,8 @@ function fs.open(path, mode)\n\
 end\n\
 ';
 
-var bios = '\
+
+var bios = '\n\
 local commandHistory = {}\n\
 \n\
 local function newLine()\n\
@@ -274,6 +275,127 @@ while true do\n\
 	end\n\
 	newLine()\n\
 end\n\
+';
+
+
+
+var rom = {
+	"help/": undefined,
+	"apis/": undefined,
+	"autorun/": undefined,
+
+	"programs/": undefined,
+	"programs/color/": undefined,
+	"programs/computer/": undefined,
+	"programs/http/": undefined,
+}
+
+
+rom["startup"] = '\n\
+\n\
+local sPath = ".:/rom/programs"\n\
+if turtle then\n\
+	sPath = sPath..":/rom/programs/turtle"\n\
+else\n\
+	sPath = sPath..":/rom/programs/computer"\n\
+end\n\
+if http then\n\
+	sPath = sPath..":/rom/programs/http"\n\
+end\n\
+if term.isColor() then\n\
+	sPath = sPath..":/rom/programs/color"\n\
+end\n\
+\n\
+shell.setPath( sPath )\n\
+help.setPath( "/rom/help" )\n\
+\n\
+shell.setAlias( "ls", "list" )\n\
+shell.setAlias( "dir", "list" )\n\
+shell.setAlias( "cp", "copy" )\n\
+shell.setAlias( "mv", "move" )\n\
+shell.setAlias( "rm", "delete" )\n\
+shell.setAlias( "preview", "edit" )\n\
+\n\
+if fs.exists( "/rom/autorun" ) and fs.isDir( "/rom/autorun" ) then\n\
+	local tFiles = fs.list( "/rom/autorun" )\n\
+	table.sort( tFiles )\n\
+	for n, sFile in ipairs( tFiles ) do\n\
+		if string.sub( sFile, 1, 1 ) ~= "." then\n\
+			local sPath = "/rom/autorun/"..sFile\n\
+			if not fs.isDir( sPath ) then\n\
+				shell.run( sPath )\n\
+			end\n\
+		end\n\
+	end\n\
+end\n\
+';
+
+
+rom["programs/alias"] = '\n\
+\n\
+local tArgs = { ... }\n\
+if #tArgs > 2 then\n\
+	print( "Usage: alias <alias> <program>" )\n\
+	return\n\
+end\n\
+\n\
+local sAlias = tArgs[1]\n\
+local sProgram = tArgs[2]\n\
+\n\
+if sAlias and sProgram then\n\
+	-- Set alias\n\
+	shell.setAlias( sAlias, sProgram )\n\
+elseif sAlias then\n\
+	-- Clear alias\n\
+	shell.clearAlias( sAlias )\n\
+else\n\
+	-- List aliases\n\
+	local tAliases = shell.aliases()\n\
+	local tList = {}\n\
+	for sAlias, sCommand in pairs( tAliases ) do\n\
+		table.insert( tList, sAlias )\n\
+	end\n\
+	table.sort( tList )\n\
+	textutils.pagedTabulate( tList )\n\
+end\n\
+';
+
+
+rom["programs/apis"] = '\n\
+\n\
+local tApis = {}\n\
+for k,v in pairs( _G ) do\n\
+	if type(k) == "string" and type(v) == "table" and k ~= "_G" then\n\
+		table.insert( tApis, k )\n\
+	end\n\
+end\n\
+table.insert( tApis, "shell" )\n\
+table.sort( tApis )\n\
+\n\
+textutils.pagedTabulate( tApis )\n\
+';
+
+
+rom["programs/cd"] = '\n\
+local tArgs = { ... }\n\
+if #tArgs < 1 then\n\
+	print( "Usage: cd <path>" )\n\
+	return\n\
+end\n\
+\n\
+local sNewDir = shell.resolve( tArgs[1] )\n\
+if fs.isDir( sNewDir ) then\n\
+	shell.setDir( sNewDir )\n\
+else\n\
+  	print( "Not a directory" )\n\
+  	return\n\
+end\n\
+';
+
+
+rom["programs/clear"] = '\n\
+term.clear()\n\
+term.setCursorPos( 1, 1 )\n\
 ';
 
 

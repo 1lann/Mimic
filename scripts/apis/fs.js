@@ -11,6 +11,7 @@ var fsAPI = {};
 var filesystem = {};
 
 var readOnly = [
+	// Must be absolute paths
 	"/*/rom",
 ];
 
@@ -21,7 +22,15 @@ triggerGUIUpdate = function() {
 
 
 
-//  ----------------  Filesystem API  ----------------  //
+//  ----------------  Filesystem API Setup  ----------------  //
+
+
+filesystem.getGlobalMounts = function() {
+	// Must be absolute paths
+	return {
+		"/rom": rom,
+	};
+}
 
 
 filesystem.setup = function(callback) {
@@ -31,8 +40,32 @@ filesystem.setup = function(callback) {
 	BrowserFS.initialize(lsfs);
 	fs = require("fs");
 
-	callback(null);
+	filesystem.loadGlobalMounts();
+
+	callback();
 }
+
+
+filesystem.loadGlobalMounts = function() {
+	var globalMounts = filesystem.getGlobalMounts();
+	for (var mountPath in globalMounts) {
+		filesystem.makeDirRaw("/" + computer.id + mountPath);
+
+		for (var localPath in globalMounts[mountPath]) {
+			var path = mountPath + "/" + localPath;
+			var isDir = path.substring(path.length - 1) == "/";
+			if (isDir) {
+				filesystem.makeDirRaw("/" + computer.id + path);
+			} else {
+				filesystem.writeRaw("/" + computer.id + path, rom[path]);
+			}
+		}
+	}
+}
+
+
+
+//  ----------------  Filesystem API Utilities  ----------------  //
 
 
 filesystem.serializeTable = function(arr) {
@@ -100,12 +133,20 @@ filesystem.sanitise = function(path) {
 
 
 filesystem.getName = function(path) {
+	path = filesystem.sanitise(path);
 	return path.substring(path.lastIndexOf("/") + 1);
 }
 
 
 filesystem.getContainingFolder = function(path) {
-	return path.substring(0, path.lastIndexOf("/"));
+	path = filesystem.sanitise(path);
+
+	var folder = path.substring(0, path.lastIndexOf("/"));
+	if (folder.length == 0) {
+		folder = "/";
+	}
+
+	return folder;
 }
 
 
@@ -136,6 +177,25 @@ filesystem.makeDirRaw = function(path, mode, position) {
 			filesystem.makeDirRaw(path, mode, position + 1);
 		}
 	}
+}
+
+
+filesystem.writeRaw = function(path, contents) {
+	path = filesystem.resolve(path).substring(1 + computer.id.toString().length);
+
+	try {
+		if (!filesystem.isDirRaw(path)) {
+			var folder = filesystem.getContainingFolder(path).substring(1 + computer.id.toString().length);
+			if (!filesystem.exists(folder)) {
+				filesystem.makeDir(folder);
+			}
+
+			fs.writeFileSync(path, contents);
+			return true;
+		}
+	} catch (e) {}
+
+	return false;
 }
 
 
@@ -206,26 +266,22 @@ filesystem.isDir = function(path) {
 filesystem.write = function(path, contents) {
 	filesystem.checkForRootDirectory();
 	path = filesystem.resolve(path);
+	
+	if (filesystem.isReadOnly(path)) {
+		return;
+	}
 
-	try {
-		if (!filesystem.isDirRaw(path)) {
-			var folder = filesystem.getContainingFolder(path).substring(1 + computer.id.toString().length);
-			if (!filesystem.exists(folder)) {
-				filesystem.makeDir(folder);
-			}
-
-			fs.writeFileSync(path, contents);
-			return true;
-		}
-	} catch (e) {}
-
-	return false;
+	return filesystem.writeRaw(path, contents);
 }
 
 
 filesystem.append = function(path, contents) {
 	filesystem.checkForRootDirectory();
 	path = filesystem.resolve(path);
+	
+	if (filesystem.isReadOnly(path)) {
+		return;
+	}
 
 	try {
 		if (!filesystem.isDirRaw(path)) {
@@ -288,7 +344,7 @@ filesystem.isReadOnly = function(path) {
 				}
 			}
 
-			if (isReadOnly) {
+			if (readOnly) {
 				pathIsReadOnly = true;
 			}
 		}
@@ -302,6 +358,10 @@ filesystem.makeDir = function(path) {
 	path = filesystem.resolve(path);
 	if (path != "/" + computer.id) {
 		filesystem.checkForRootDirectory();
+	}
+
+	if (filesystem.isReadOnly(path)) {
+		return;
 	}
 
 	filesystem.makeDirRaw(path);
@@ -345,6 +405,10 @@ filesystem.copy = function(from, to) {
 filesystem.delete = function(path) {
 	filesystem.checkForRootDirectory();
 	path = filesystem.resolve(path);
+
+	if (filesystem.isReadOnly(path)) {
+		return;
+	}
 
 	try {
 		if (path != "/" + computer.id) {
