@@ -252,10 +252,11 @@ while true do\n\
 	term.setTextColor(1)\n\
 	term.setBackgroundColor(32768)\n\
 	term.write("lua> ")\n\
-	local command = ("return "..read(nil, commandHistory))\n\
+	local command = read(nil, commandHistory)\n\
 	table.insert(commandHistory, command)\n\
 	local toRun, cError = loadstring(command, "error")\n\
 	if toRun then\n\
+		toRun = loadstring("return "..command, "error")\n\
 		setfenv(toRun, getfenv(1))\n\
 		local results = {pcall(toRun)}\n\
 		term.setBackgroundColor(32768)\n\
