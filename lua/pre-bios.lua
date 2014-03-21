@@ -10,12 +10,25 @@ xpcall = function(_fn, _fnErrorHandler)
 
 	local co = coroutine.create(_fn)
 	local coroutineClock = os.clock()
-	debug.sethook(co, function() if coroutineClock+3 >= os.clock() then print("Lua: Too long with") error("Too long without yielding",2) end end, "", 10000)
+
+	debug.sethook(co, function()
+		if os.clock() >= coroutineClock + 2 then
+			print("Lua: Too long without yielding") error("Too long without yielding", 2)
+		end
+	end, "", 10000)
+
 	local results = {coroutine.resume(co)}
+
 	debug.sethook(co)
 	while coroutine.status(co) ~= "dead" do
 		coroutineClock = os.clock()
-		debug.sethook(co, function() if coroutineClock+3 >= os.clock() then print("Lua: Too long with") error("Too long without yielding",2) end end, "", 10000)
+		debug.sethook(co, function()
+			if os.clock() >= coroutineClock + 2 then
+				print("Lua: Too long without yielding")
+				error("Too long without yielding", 2)
+			end
+		end, "", 10000)
+
 		results = {coroutine.resume(co, coroutine.yield())}
 		debug.sethook(co)
 	end
@@ -40,4 +53,43 @@ pcall = function(_fn, ...)
 			return _error
 		end
 	)
+end
+
+
+local fsWrite = fs.write
+fs.write = nil
+
+local fsAppend = fs.append
+fs.append = nil
+
+local fsRead = fs.read
+fs.read = nil
+
+
+function fs.open(path, mode)
+	if mode == "w" then
+		local f = {
+			["_buffer"] = "",
+			["write"] = function(str)
+				f._buffer = f._buffer .. tostring(str)
+			end,
+			["close"] = function()
+				fsWrite(path, f._buffer)
+				f.write = nil
+			end,
+		}
+
+		return f
+	elseif mode == "r" then
+		local f = {
+			["readAll"] = function()
+				return fsRead(path)
+			end,
+			["close"] = function() end,
+		}
+
+		return f
+	else
+		error("mode not supported")
+	end
 end

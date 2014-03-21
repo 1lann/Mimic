@@ -377,40 +377,6 @@ if http then
 end
 
 
-
-while true do
-	term.setTextColor(1)
-	term.setBackgroundColor(32768)
-	term.write("lua> ")
-	local command = read(nil, commandHistory)
-	table.insert(commandHistory, command)
-	local toRun, cError = loadstring(command, "error")
-	if toRun then
-		setfenv(toRun, getfenv(1))
-		local results = {pcall(toRun)}
-		term.setBackgroundColor(32768)
-		if results[1] then
-			table.remove(results, 1)
-			for k, v in pairs(results) do
-				newLine()
-				term.write(tostring(v))
-			end
-		else
-			if term.isColor() then
-				term.setTextColor(16384)
-			end
-			term.write(results[2])
-		end
-	else
-		if term.isColor() then
-			term.setTextColor(16384)
-		end
-		term.write(cError)
-	end
-	newLine()
-end
-
-
 local tApis = fs.list("rom/apis")
 for n, sFile in ipairs(tApis) do
 	if string.sub(sFile, 1, 1) ~= "." then

@@ -6,20 +6,42 @@
 
 
 
-var prebios = '\
+var prebios = '\n\
+\n\
+--  Some functions are taken from the ComputerCraft bios.lua,\n\
+--  which was written by dan200\n\
+\n\
+--  I just cleaned up the code a bit\n\
+\n\
+\n\
 xpcall = function(_fn, _fnErrorHandler)\n\
 	assert(type(_fn) == "function", "bad argument #1 to xpcall (function expected, got " .. type(_fn) .. ")")\n\
+\n\
 	local co = coroutine.create(_fn)\n\
 	local coroutineClock = os.clock()\n\
-	debug.sethook(co, function() if os.clock() >= coroutineClock+2 then print("Lua: Too long without yielding") error("Too long without yielding",2) end end, "", 10000)\n\
+\n\
+	debug.sethook(co, function()\n\
+		if os.clock() >= coroutineClock + 2 then\n\
+			print("Lua: Too long without yielding") error("Too long without yielding", 2)\n\
+		end\n\
+	end, "", 10000)\n\
+\n\
 	local results = {coroutine.resume(co)}\n\
+\n\
 	debug.sethook(co)\n\
 	while coroutine.status(co) ~= "dead" do\n\
 		coroutineClock = os.clock()\n\
-		debug.sethook(co, function() if os.clock() >= coroutineClock+2 then print("Lua: Too long without yielding") error("Too long without yielding",2) end end, "", 10000)\n\
+		debug.sethook(co, function()\n\
+			if os.clock() >= coroutineClock + 2 then\n\
+				print("Lua: Too long without yielding")\n\
+				error("Too long without yielding", 2)\n\
+			end\n\
+		end, "", 10000)\n\
+\n\
 		results = {coroutine.resume(co, coroutine.yield())}\n\
 		debug.sethook(co)\n\
 	end\n\
+\n\
 	if results[1] == true then\n\
 		return true, unpack(results, 2)\n\
 	else\n\
@@ -27,8 +49,10 @@ xpcall = function(_fn, _fnErrorHandler)\n\
 	end\n\
 end\n\
 \n\
+\n\
 pcall = function(_fn, ...)\n\
 	assert(type(_fn) == "function", "bad argument #1 to pcall (function expected, got " .. type(_fn) .. ")")\n\
+\n\
 	local args = {...}\n\
 	return xpcall(\n\
 		function()\n\
@@ -38,6 +62,45 @@ pcall = function(_fn, ...)\n\
 			return _error\n\
 		end\n\
 	)\n\
+end\n\
+\n\
+\n\
+local fsWrite = fs.write\n\
+fs.write = nil\n\
+\n\
+local fsAppend = fs.append\n\
+fs.append = nil\n\
+\n\
+local fsRead = fs.read\n\
+fs.read = nil\n\
+\n\
+\n\
+function fs.open(path, mode)\n\
+	if mode == "w" then\n\
+		local f = {\n\
+			["_buffer"] = "",\n\
+			["write"] = function(str)\n\
+				f._buffer = f._buffer .. tostring(str)\n\
+			end,\n\
+			["close"] = function()\n\
+				fsWrite(path, f._buffer)\n\
+				f.write = nil\n\
+			end,\n\
+		}\n\
+\n\
+		return f\n\
+	elseif mode == "r" then\n\
+		local f = {\n\
+			["readAll"] = function()\n\
+				return fsRead(path)\n\
+			end,\n\
+			["close"] = function() end,\n\
+		}\n\
+\n\
+		return f\n\
+	else\n\
+		error("mode not supported")\n\
+	end\n\
 end\n\
 ';
 
