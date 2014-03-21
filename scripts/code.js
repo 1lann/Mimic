@@ -51,6 +51,7 @@ end\n\
 ';
 
 var bios = '\
+local function bios()\n\
 \n\
 local commandHistory = {}\n\
 \n\
@@ -220,6 +221,8 @@ while true do\n\
 	end\n\
 	newLine()\n\
 end\n\
+end\n\
+bios()\n\
 ';
 
 
