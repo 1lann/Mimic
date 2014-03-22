@@ -76,6 +76,11 @@ fs.read = nil\n\
 \n\
 \n\
 function fs.open(path, mode)\n\
+	local containingFolder = path:sub(1, path:len() - fs.getName(path):len())\n\
+	if fs.isDir(path) or not fs.isDir(containingFolder) then\n\
+		return nil\n\
+	end\n\
+\n\
 	if mode == "w" then\n\
 		local f = {}\n\
 		f = {\n\
@@ -98,6 +103,10 @@ function fs.open(path, mode)\n\
 \n\
 		return f\n\
 	elseif mode == "r" then\n\
+		if not fs.exists(path) or fs.isDir(path) then\n\
+			return nil\n\
+		end\n\
+\n\
 		local contents = fsRead(path)\n\
 		if not contents then\n\
 			return\n\

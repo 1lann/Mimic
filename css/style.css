@@ -1,18 +1,7 @@
 
-
-/* ----------------  Fonts  ---------------- */
-
-
-@font-face {
-	font-family: "minecraftia";
-	src: url("../fonts/minecraftia-webfont.eot");
-	src: url("../fonts/minecraftia-webfont.eot?#iefix") format("embedded-opentype"),
-	url("../fonts/minecraftia-webfont.woff") format("woff"),
-	url("../fonts/minecraftia-webfont.ttf") format("truetype"),
-	url("../fonts/minecraftia-webfont.svg#minecraftiaregular") format("svg");
-	font-weight: normal;
-	font-style: normal;
-}
+/*
+ *   Mimic CSS
+ */
 
 
 
@@ -93,7 +82,7 @@ p {
 .file-list {
 	position: fixed;
 	left: 0;
-	top: 87px;
+	top: 51px;
 	bottom: 0;
 	width: 251px;
 
@@ -107,23 +96,6 @@ p {
 
 .file-list > .breadcrumb {
 	margin-bottom: 0;
-}
-
-.file-list-options-bar {
-	position: fixed;
-	top: 51px;
-	left: 0;
-	width: 251px;
-	height: 37px;
-
-	padding-top: 9px;
-
-	background-color: #f8f8f8;
-	border: 1px solid #e7e7e7;
-}
-
-.file-list-options-bar a {
-	margin-left: 15px;
 }
 
 

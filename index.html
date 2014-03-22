@@ -43,10 +43,6 @@
 
 	</div>
 
-	<div class="file-list-options-bar">
-		<a href="#">New File</a>
-	</div>
-
 
 	<div class="computer-tab-bar">
 		<ul id="tabs">
@@ -57,17 +53,33 @@
 
 	<div id="computer" class="computer">
 		<div class="computer-options">
+			<br>
+
+			<p>Details</p>
+			<hr>
+			<p>ID: <span id="computer-id-field">0</span></p>
+			<p>Type: <span id="computer-type-field">Advanced</span></p>
+
+			<br><br>
+
 			<p>Peripherals</p>
 			<hr>
-			<p>Top:</p>
+			<p>None</p>
+
+			<br><br>
+
+			<p>Storage</p>
+			<hr>
+			<p><span id="computer-total-storage-field">2</span> MB Total</p>
+			<p><span id="computer-free-storage-field">2</span> MB Free</p>
 		</div>
 
-		<canvas id="canvas" width="620" height="350"></canvas>
-		<canvas id="overlay-canvas" width="620" height="350"></canvas>
+		<canvas id="canvas" width="620" height="350" style="display: none;"></canvas>
+		<canvas id="overlay-canvas" width="620" height="350" style="display: none;"></canvas>
 	</div>
 
 
-	<div id="editor" class="computer"></div>
+	<div id="editor" class="computer" style="display: none;"></div>
 
 
 	<div id="about-popup" class="popup" style="display: none;">
@@ -85,10 +97,6 @@
 
 				<p><strong>ComputerCraft By</strong></p>
 				<p>dan200</p>
-				<br>
-
-				<p><strong>Minecraftia Font By</strong></p>
-				<p>Andrew Tyler</p>
 				<br>
 
 				<p><a href="https://github.com/1lann/WebCC" target="_blank">GitHub Repository</a></p>
@@ -162,7 +170,6 @@ window.onresize = function() {
 
 
 $(document).ready(function() {
-	window.onresize();
 	main();
 });
 

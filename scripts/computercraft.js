@@ -105,9 +105,10 @@ displayError = function(title, firstLine, secondLine, thirdLine, finalLine) {
 		render.text(1, i, " ".repeat(term.width), "0", "4");
 	}
 
-	var getCenter = function(text) {
+	getCenter = function(text) {
 		return Math.round((term.width / 2) - ((text.length) / 2))
 	}
+
 	term.cursorBlink = false;
 	render.text(getCenter(title), 7, title, "4", "f");
 	render.text(getCenter(firstLine), 9, firstLine, "f", "4");
@@ -122,6 +123,7 @@ resumeThread = function() {
 		if (!thread.alive) {
 			return;
 		}
+
 		if (computer.eventStack.length > 0) {
 			var argumentsNumber = computer.eventStack[0].length;
 
@@ -144,10 +146,11 @@ resumeThread = function() {
 
 			coroutineClock = Date.now();
 			var resp;
-			try{
+			try {
 				resp = C.lua_resume(thread.main, argumentsNumber);
-			} catch(e) {
-				console.log(e)
+			} catch (e) {
+				console.log("Javascript error", e);
+
 				clearInterval(threadLoopID);
 				thread.alive = false;
 				displayError("FATAL : JAVASCRIPT ERROR",
@@ -156,14 +159,13 @@ resumeThread = function() {
 					"See the console for more details.",
 					"Reboot the computer to continue");
 				return;
-			};
+			}
+
 			if (resp == C.LUA_YIELD) {
 				if (doShutdown) {
 					shutdown();
-					return;
 				} else if (doReboot) {
 					reboot();
-					return;
 				}
 			} else if (resp == 0) {
 				clearInterval(threadLoopID);
@@ -218,26 +220,8 @@ initialization = function() {
 }
 
 
-crashBios = function() {
-	
-}
-
-
 
 //  ----------------  Main  ----------------  //
-
-
-setup = function(callback) {
-	render.setup(function() {
-		filesystem.setup(function(err) {
-			if (err) {
-				return;
-			}
-
-			callback();
-		});
-	});
-}
 
 
 run = function() {
@@ -313,6 +297,23 @@ shutdown = function() {
 reboot = function() {
 	shutdown();
 	boot();
+}
+
+
+unhideHTMLElements = function() {
+	$("#canvas").attr("style", "");
+	$("#overlay-canvas").attr("style", "");
+	window.onresize();
+}
+
+
+setup = function(callback) {
+	render.setup(function() {
+		filesystem.setup(function() {
+			unhideHTMLElements();
+			callback();
+		});
+	});
 }
 
 
