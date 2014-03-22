@@ -638,7 +638,11 @@ fsAPI.makeDir = function(L) {
 
 fsAPI.delete = function(L) {
 	var path = C.luaL_checkstring(L, 1);
-	computerFilesystem.delete(path);
+	if (!computerFilesystem.delete(path)) {
+		C.lua_pushstring(L, "Access denied");
+		C.lua_error(L);
+	}
+	
 	return 0;
 }
 

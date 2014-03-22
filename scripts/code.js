@@ -82,6 +82,10 @@ function fs.open(path, mode)\n\
 	end\n\
 \n\
 	if mode == "w" then\n\
+		if fs.isReadOnly(path) then\n\
+			return nil\n\
+		end\n\
+\n\
 		local f = {}\n\
 		f = {\n\
 			["_buffer"] = "",\n\
@@ -139,6 +143,10 @@ function fs.open(path, mode)\n\
 \n\
 		return f\n\
 	elseif mode == "a" then\n\
+		if fs.isReadOnly(path) then\n\
+			return nil\n\
+		end\n\
+\n\
 		local f = {}\n\
 		f = {\n\
 			["_buffer"] = "",\n\
@@ -163,6 +171,7 @@ function fs.open(path, mode)\n\
 		error("mode not supported")\n\
 	end\n\
 end\n\
+\n\
 ';
 
 

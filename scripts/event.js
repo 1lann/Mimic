@@ -61,8 +61,6 @@ window.onmousedown = function(event) {
 		computer.eventStack.push(["mouse_click", button, x, y]);
 		resumeThread();
 	}
-
-	event.preventDefault();
 }
 
 
@@ -91,6 +89,4 @@ window.onmousemove = function(event) {
 			previousMouseLocation[2] = y;
 		}
 	}
-
-	event.preventDefault();
 }
