@@ -45,9 +45,10 @@ window.onkeyup = function(event) {
 window.onmousedown = function(event) {
 	mouseDown = true;
 
-	var button = globals.buttons["click " + event.button];
-	var x = Math.floor((event.pageX - config.borderWidth) / config.cellWidth) + 1;
-	var y = Math.floor((event.pageY - config.borderHeight) / config.cellHeight) + 1;
+	var loc = getCanvasLocation();
+	var button = globals.buttons["click " + event.button] + 1;
+	var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
+	var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
 	if (x >= 1 && y >= 1 && x <= config.width && y <= config.height) {
 		computer.eventStack.push(["mouse_click", button, x, y]);
 		resumeThread();
@@ -61,8 +62,9 @@ window.onmouseup = function(event) {
 
 
 window.onmousemove = function(event) {
-	var x = Math.floor((event.pageX - config.borderWidth) / config.cellWidth) + 1;
-	var y = Math.floor((event.pageY - config.borderHeight) / config.cellHeight) + 1;
+	var loc = getCanvasLocation();
+	var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
+	var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
 	var button = globals.buttons["click " + event.button];
 
 	if (mouseDown && (previousMouseLocation[0] != button || previousMouseLocation[1] != x || previousMouseLocation[2] != y)) {

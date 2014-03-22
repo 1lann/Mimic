@@ -568,6 +568,23 @@ fsAPI.delete = function(L) {
 //  -------  File Manipulation
 
 
+fsAPI.combine = function(L) {
+	var path1 = C.luaL_checkstring(L, 1);
+	var path2 = C.luaL_checkstring(L, 2);
+	var result = filesystem.sanitise(filesystem.format(path1) + "/" + filesystem.format(path2));
+	C.lua_pushstring(L, result);
+	return 1;
+}
+
+
+fsAPI.getName = function(L) {
+	var path = C.luaL_checkstring(L, 1);
+	var result = filesystem.getName(filesystem.format(path));
+	C.lua_pushstring(L, result);
+	return 1;
+}
+
+
 fsAPI.move = function(L) {
 	var from = C.luaL_checkstring(L, 1);
 	var to = C.luaL_checkstring(L, 2);

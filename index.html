@@ -134,6 +134,7 @@
 <script src="scripts/apis/http.js"></script>
 <script src="scripts/apis/os.js"></script>
 <script src="scripts/apis/peripheral.js"></script>
+<script src="scripts/apis/redstone.js"></script>
 <script src="scripts/apis/term.js"></script>
 
 <script>
@@ -142,14 +143,21 @@ var canvasMinX = 401;
 var canvasMinY = 88;
 
 
-window.onresize = function() {
+getCanvasLocation = function() {
 	var y = canvasMinY + (window.innerHeight - canvasMinY) / 2 - canvas.height / 2;
 	var x = canvasMinX + (window.innerWidth - canvasMinX) / 2 - canvas.width / 2;
 	y = Math.max(y, canvasMinY);
 	x = Math.max(x, canvasMinX);
 
-	$("#canvas").attr("style", "left: " + x + "px; top: " + y + "px;");
-	$("#overlay-canvas").attr("style", "left: " + x + "px; top: " + y + "px;");
+	return {"x": x, "y": y};
+}
+
+
+window.onresize = function() {
+	var loc = getCanvasLocation();
+
+	$("#canvas").attr("style", "left: " + loc.x + "px; top: " + loc.y + "px;");
+	$("#overlay-canvas").attr("style", "left: " + loc.x + "px; top: " + loc.y + "px;");
 }
 
 
