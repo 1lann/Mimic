@@ -57,6 +57,10 @@ render.characterText = function(x, y, text, color, ctx) {
 		ctx = context;
 	}
 
+	if (text == " ") {
+		return;
+	}
+
 	if (x >= 1 && y >= 1 && x <= term.width && y <= term.height) {
 		var loc = characters.indexOf(text);
 		if (loc != -1) {

@@ -99,6 +99,10 @@ function fs.open(path, mode)\n\
 		return f\n\
 	elseif mode == "r" then\n\
 		local contents = fsRead(path)\n\
+		if not contents then\n\
+			return\n\
+		end\n\
+\n\
 		local f = {}\n\
 		f = {\n\
 			["_cursor"] = 1,\n\
