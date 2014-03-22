@@ -10,6 +10,10 @@ var previousMouseLocation = [-1, -1, -1];
 
 
 window.onkeydown = function(event) {
+	if (gui.selected != -1) {
+		return;
+	}
+
 	var code = globals.keyCodes[event.keyCode];
 	var character = globals.characters.noshift[event.keyCode];
 	if (event.shiftKey) {
@@ -43,6 +47,10 @@ window.onkeyup = function(event) {
 
 
 window.onmousedown = function(event) {
+	if (gui.selected != -1) {
+		return;
+	}
+
 	mouseDown = true;
 
 	var loc = getCanvasLocation();
@@ -53,6 +61,8 @@ window.onmousedown = function(event) {
 		computer.eventStack.push(["mouse_click", button, x, y]);
 		resumeThread();
 	}
+
+	event.preventDefault();
 }
 
 
@@ -62,6 +72,10 @@ window.onmouseup = function(event) {
 
 
 window.onmousemove = function(event) {
+	if (gui.selected != -1) {
+		return;
+	}
+
 	var loc = getCanvasLocation();
 	var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
 	var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
@@ -77,4 +91,6 @@ window.onmousemove = function(event) {
 			previousMouseLocation[2] = y;
 		}
 	}
+
+	event.preventDefault();
 }

@@ -9,6 +9,11 @@
 var osAPI = {};
 
 
+osAPI.triggerBiosCrash = function(L) {
+	throw new Error("BIOS Crash");
+}
+
+
 osAPI.setAlarm = function(L) {
 
 }

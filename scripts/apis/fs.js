@@ -38,10 +38,44 @@ filesystem.setup = function(callback) {
 		BrowserFS.initialize(mfs);
 		fs = require("fs");
 
+		filesystem.triggerGUIUpdate();
+
 		callback();
 	}
 
 	request.send(null);
+}
+
+
+
+//  ----------------  GUI Interfacing  ----------------  //
+
+
+filesystem.triggerGUIUpdate = function() {
+	var computerPath = computerFilesystem.resolve("/");
+	var list = filesystem.listRecursively(computerPath);
+	var base = "/computers/" + computer.id.toString();
+
+	var files = [];
+	for (var i in list) {
+		var path = list[i];
+		files.push({
+			"path": path.substring(base.length),
+			"contents": filesystem.read(list[i]),
+		});
+	}
+
+	onFilesystemChange(files);
+}
+
+
+filesystem.saveFiles = function(files) {
+	var base = "/computers/" + computer.id.toString();
+	for (var i in files) {
+		var file = files[i];
+		var actualPath = filesystem.sanitise(base + "/" + file.path);
+		filesystem.write(actualPath, file.contents);
+	}
 }
 
 
@@ -138,6 +172,27 @@ filesystem.list = function(path) {
 			files = [];
 		} else {
 			throw e;
+		}
+	}
+
+	return files;
+}
+
+
+filesystem.listRecursively = function(path) {
+	path = filesystem.sanitise(path);
+
+	var files = [];
+	var inDir = filesystem.list(path);
+	for (var i in inDir) {
+		var filePath = path + "/" + inDir[i];
+		if (filesystem.isDir(filePath)) {
+			var dirFiles = filesystem.listRecursively(filePath);
+			for (var i in dirFiles) {
+				files.push(dirFiles[i]);
+			}
+		} else {
+			files.push(filePath);
 		}
 	}
 
@@ -353,7 +408,6 @@ computerFilesystem.list = function(path) {
 	path = computerFilesystem.resolve(path);
 
 	var files = filesystem.list(path);
-
 	if (path == computerFilesystem.resolve("/")) {
 		files.push("rom");
 	}
@@ -387,48 +441,59 @@ computerFilesystem.read = function(path) {
 computerFilesystem.write = function(path, contents) {
 	path = computerFilesystem.resolve(path);
 
+	var success = true;
 	if (!computerFilesystem.isReadOnly(path)) {
 		filesystem.write(path, contents);
-		return true;
 	} else {
-		return false;
+		success = false;
 	}
+
+	filesystem.triggerGUIUpdate();
+	return success;
 }
 
 
 computerFilesystem.append = function(path, contents) {
 	path = computerFilesystem.resolve(path);
 
+	var success = true;
 	if (!computerFilesystem.isReadOnly(path)) {
 		filesystem.append(path, contents);
-		return true;
 	} else {
-		return false;
+		success = false;
 	}
+
+	return success;
 }
 
 
 computerFilesystem.makeDir = function(path) {
 	path = computerFilesystem.resolve(path);
 
+	var success = true;
 	if (!computerFilesystem.isReadOnly(path)) {
 		filesystem.makeDir(path);
-		return true;
 	} else {
-		return false;
+		success = false;
 	}
+
+	filesystem.triggerGUIUpdate();
+	return success;
 }
 
 
 computerFilesystem.delete = function(path) {
 	path = computerFilesystem.resolve(path);
 
+	var success = true;
 	if (!computerFilesystem.isReadOnly(path)) {
 		filesystem.delete(path);
-		return true;
 	} else {
-		return false;
+		success = false;
 	}
+
+	filesystem.triggerGUIUpdate();
+	return success;
 }
 
 
@@ -542,9 +607,9 @@ fsAPI.read = function(L) {
 	if (contents) {
 		C.lua_pushstring(L, contents);
 		return 1;
+	} else {
+		return 0;
 	}
-
-	return 0;
 }
 
 

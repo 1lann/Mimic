@@ -113,9 +113,13 @@ function fs.open(path, mode)\n\
 				return contents\n\
 			end,\n\
 			["readLine"] = function()\n\
+				if f._cursor == f._contents:len() + 1 then\n\
+					return nil\n\
+				end\n\
+\n\
 				local nextLine = f._contents:find("\\n", f._cursor, true)\n\
 				if not nextLine then\n\
-					return nil\n\
+					nextLine = f._contents:len()\n\
 				end\n\
 				local line = f._contents:sub(f._cursor, nextLine - 1)\n\
 				f._cursor = nextLine + 1\n\

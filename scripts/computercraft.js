@@ -55,7 +55,7 @@ var term = {
 //  ----------------  APIs  ----------------  //
 
 
-var loadAPIs = function() {
+loadAPIs = function() {
 	var apis = {
 		"bit": bitAPI,
 		"fs": fsAPI,
@@ -187,7 +187,7 @@ resumeThread = function() {
 }
 
 
-var initialization = function() {
+initialization = function() {
 	for (var i = 1; i <= term.height; i++) {
 		render.text(1, i, " ".repeat(term.width), "f", "0");
 	}
@@ -218,11 +218,16 @@ var initialization = function() {
 }
 
 
+crashBios = function() {
+	
+}
+
+
 
 //  ----------------  Main  ----------------  //
 
 
-var setup = function(callback) {
+setup = function(callback) {
 	render.setup(function() {
 		filesystem.setup(function(err) {
 			if (err) {
@@ -235,7 +240,7 @@ var setup = function(callback) {
 }
 
 
-var run = function() {
+run = function() {
 	loadAPIs();
 
 	setInterval(function() {
@@ -255,7 +260,7 @@ var run = function() {
 	initialization();
 }
 
-var boot = function() {
+boot = function() {
 	if (thread.alive || L) {
 		console.error("Cannot boot if computer is still on!")
 		return;
@@ -275,7 +280,7 @@ var boot = function() {
 }
 
 
-var shutdown = function() {
+shutdown = function() {
 	coroutineClock = Date.now();
 
 	if (L) {
@@ -305,13 +310,13 @@ var shutdown = function() {
 }
 
 
-var reboot = function() {
+reboot = function() {
 	shutdown();
 	boot();
 }
 
 
-var main = function() {
+main = function() {
 	setup(function() {
 		run();
 	});
