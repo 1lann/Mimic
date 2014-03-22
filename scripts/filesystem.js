@@ -191,7 +191,7 @@ filesystem.list = function(path) {
 }
 
 
-filesystem.listRecursively = function(path, includeEmptyDirectories) {
+filesystem.listRecursively = function(path, includeDirectories) {
 	path = filesystem.sanitise(path);
 
 	var files = [];
@@ -199,11 +199,11 @@ filesystem.listRecursively = function(path, includeEmptyDirectories) {
 	for (var i in inDir) {
 		var filePath = path + "/" + inDir[i];
 		if (filesystem.isDir(filePath)) {
-			if (includeEmptyDirectories) {
+			if (includeDirectories) {
 				files.push(filePath);
 			}
 
-			var dirFiles = filesystem.listRecursively(filePath, includeEmptyDirectories);
+			var dirFiles = filesystem.listRecursively(filePath, includeDirectories);
 			for (var i in dirFiles) {
 				files.push(dirFiles[i]);
 			}
