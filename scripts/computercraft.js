@@ -99,35 +99,29 @@ callLua = function(data) {
 }
 
 
-threadHang = function() {
+displayError = function(title, firstLine, secondLine, thirdLine, finalLine) {
 	thread.alive = false;
 	for (var i = 1; i <= term.height; i++) {
 		render.text(1, i, " ".repeat(term.width), "0", "4");
 	}
 
-	var errorOne = "The Lua thread had hung, for extensive";
-	var errorTwo = "periods of time, and has been terminated.";
-	var errorThree = "Experiencing this error is a rare case.";
-	var errorFour = "Please reboot the computer";
-	var startOne = Math.round((term.width / 2) - ((errorOne.length) / 2));
-	var startTwo = Math.round((term.width / 2) - ((errorTwo.length) / 2));
-	var startThree = Math.round((term.width / 2) - ((errorThree.length) / 2));
-	var startFour = Math.round((term.width / 2) - ((errorFour.length) / 2));
+	var getCenter = function(text) {
+		return Math.round((term.width / 2) - ((text.length) / 2))
+	}
 	term.cursorBlink = false;
-	render.text(16, 7, "FATAL : THREAD HANG", "4", "f");
-	render.text(startOne, 9, errorOne, "f", "4");
-	render.text(startTwo, 10, errorTwo, "f", "4");
-	render.text(startThree, 11, errorThree, "f", "4");
-	render.text(startFour, 13, errorFour, "f", "4");
+	render.text(getCenter(title), 7, title, "4", "f");
+	render.text(getCenter(firstLine), 9, firstLine, "f", "4");
+	render.text(getCenter(secondLine), 10, secondLine, "f", "4");
+	render.text(getCenter(thirdLine), 11, thirdLine, "f", "4");
+	render.text(getCenter(finalLine), 13, finalLine, "f", "4");
 }
 
 
 resumeThread = function() {
-	if (!thread.alive) {
-		return;
-	}
-
 	var threadLoopID = setInterval(function() {
+		if (!thread.alive) {
+			return;
+		}
 		if (computer.eventStack.length > 0) {
 			var argumentsNumber = computer.eventStack[0].length;
 
@@ -149,7 +143,20 @@ resumeThread = function() {
 			computer.eventStack.splice(0, 1);
 
 			coroutineClock = Date.now();
-			var resp = C.lua_resume(thread.main, argumentsNumber);
+			var resp;
+			try{
+				resp = C.lua_resume(thread.main, argumentsNumber);
+			} catch(e) {
+				console.log(e)
+				clearInterval(threadLoopID);
+				thread.alive = false;
+				displayError("FATAL : JAVASCRIPT ERROR",
+					"An internal JavaScript error has occured!",
+					"Please report this error to us.",
+					"See the console for more details.",
+					"Reboot the computer to continue");
+				return;
+			};
 			if (resp == C.LUA_YIELD) {
 				if (doShutdown) {
 					shutdown();
@@ -163,10 +170,15 @@ resumeThread = function() {
 				thread.alive = false;
 				console.log("Program ended. Closing thread.");
 			} else {
-				console.log("Error occurred. Closing thread.")
-				console.log("Error: " + C.lua_tostring(thread.main, -1));
 				clearInterval(threadLoopID);
 				thread.alive = false;
+				displayError("FATAL : THREAD CRASH",
+					"The Lua thread has crashed!",
+					"Please report this error to us.",
+					"See the console for more details.",
+					"Reboot the computer to continue");
+				console.log("Error occurred. Closing thread.")
+				console.log("Error: " + C.lua_tostring(thread.main, -1));
 			}
 		} else {
 			clearInterval(threadLoopID);
