@@ -231,8 +231,10 @@ var run = function() {
 		render.cursorBlink();
 	}, 500);
 
+	var code = getCode();
+
 	thread.main = C.lua_newthread(L);
-	C.luaL_loadbuffer(thread.main, getCode(), getCode().length, "bios.lua");
+	C.luaL_loadbuffer(thread.main, code, code.length, "bios.lua");
 	thread.alive = true;
 
 	startClock = Date.now();
