@@ -6,9 +6,10 @@
 
 
 
-var prebios = '--bios file--\n\
+var prebios = '\n\
+--bios file--\n\
 \n\
---  Some functions are taken from the ComputerCraft bios.lua,\n\
+--  Some functions are taken from the ComputerCraft bios.lua, \n\
 --  which was written by dan200\n\
 \n\
 --  I just cleaned up the code a bit\n\
@@ -22,7 +23,6 @@ xpcall = function(_fn, _fnErrorHandler)\n\
 \n\
 	debug.sethook(co, function()\n\
 		if os.clock() >= coroutineClock + 2 then\n\
-			print("Lua: Too long without yielding")\n\
 			error("Too long without yielding", 2)\n\
 		end\n\
 	end, "", 10000)\n\
@@ -34,7 +34,6 @@ xpcall = function(_fn, _fnErrorHandler)\n\
 		coroutineClock = os.clock()\n\
 		debug.sethook(co, function()\n\
 			if os.clock() >= coroutineClock + 2 then\n\
-				print("Lua: Too long without yielding")\n\
 				error("Too long without yielding", 2)\n\
 			end\n\
 		end, "", 10000)\n\
@@ -58,7 +57,7 @@ pcall = function(_fn, ...)\n\
 	return xpcall(\n\
 		function()\n\
 			return _fn(unpack(args))\n\
-		end,\n\
+		end, \n\
 		function(_error)\n\
 			return _error\n\
 		end\n\
@@ -78,10 +77,14 @@ fs.read = nil\n\
 \n\
 function fs.open(path, mode)\n\
 	if mode == "w" then\n\
-		local f = {\n\
+		local f = {}\n\
+		f = {\n\
 			["_buffer"] = "",\n\
 			["write"] = function(str)\n\
 				f._buffer = f._buffer .. tostring(str)\n\
+			end,\n\
+			["writeLine"] = function(str)\n\
+				f._buffer = f._buffer .. tostring(str) .. "\\n"\n\
 			end,\n\
 			["flush"] = function()\n\
 				fsWrite(path, f._buffer)\n\
@@ -95,11 +98,47 @@ function fs.open(path, mode)\n\
 \n\
 		return f\n\
 	elseif mode == "r" then\n\
-		local f = {\n\
+		local contents = fsRead(path)\n\
+		local f = {}\n\
+		f = {\n\
+			["_cursor"] = 1,\n\
+			["_contents"] = contents,\n\
 			["readAll"] = function()\n\
-				return fsRead(path)\n\
+				local contents = f._contents:sub(f._cursor)\n\
+				f._cursor = f._contents:len() + 1\n\
+				return contents\n\
+			end,\n\
+			["readLine"] = function()\n\
+				local nextLine = f._contents:find("\\n", f._cursor, true)\n\
+				if not nextLine then\n\
+					return nil\n\
+				end\n\
+				local line = f._contents:sub(f._cursor, nextLine - 1)\n\
+				f._cursor = nextLine + 1\n\
+				return line\n\
 			end,\n\
 			["close"] = function() end,\n\
+		}\n\
+\n\
+		return f\n\
+	elseif mode == "a" then\n\
+		local f = {}\n\
+		f = {\n\
+			["_buffer"] = "",\n\
+			["write"] = function(str)\n\
+				f._buffer = f._buffer .. tostring(str)\n\
+			end,\n\
+			["writeLine"] = function(str)\n\
+				f._buffer = f._buffer .. tostring(str) .. "\\n"\n\
+			end,\n\
+			["flush"] = function()\n\
+				fsAppend(path, f._buffer)\n\
+			end,\n\
+			["close"] = function()\n\
+				fsAppend(path, f._buffer)\n\
+				f.write = nil\n\
+				f.flush = nil\n\
+			end,\n\
 		}\n\
 \n\
 		return f\n\
@@ -110,35 +149,123 @@ end\n\
 ';
 
 
-var bios = '\
-local commandHistory = {}\n\
+var bios = '\n\
 \n\
-local function newLine()\n\
-	local wid, hi = term.getSize()\n\
+--  Almost all functions are taken from the ComputerCraft bios.lua, \n\
+--  which was written by dan200\n\
+\n\
+--  I just cleaned up the code a bit\n\
+\n\
+\n\
+local jsConsolePrint = print\n\
+\n\
+\n\
+function os.version()\n\
+	return "CraftOS 1.5"\n\
+end\n\
+\n\
+\n\
+function os.pullEventRaw(filter)\n\
+	return coroutine.yield(filter)\n\
+end\n\
+\n\
+\n\
+function os.pullEvent(filter)\n\
+	local eventData = {os.pullEventRaw(filter)}\n\
+	if eventData[1] == "terminate" then\n\
+		error("Terminated", 0)\n\
+	end\n\
+\n\
+	return unpack(eventData)\n\
+end\n\
+\n\
+\n\
+function sleep(time)\n\
+	local timer = os.startTimer(time)\n\
+	while true do\n\
+		local event, id = os.pullEvent("timer")\n\
+		if timer == id then\n\
+			break\n\
+		end\n\
+	end\n\
+end\n\
+\n\
+\n\
+function write(sText)\n\
+	local w, h = term.getSize()\n\
 	local x, y = term.getCursorPos()\n\
-	if y == hi then\n\
-		term.scroll(1)\n\
-		term.setCursorPos(1, y)\n\
-	else\n\
-		term.setCursorPos(1, y + 1)\n\
+	\n\
+	local nLinesPrinted = 0\n\
+	local function newLine()\n\
+		if y + 1 <= h then\n\
+			term.setCursorPos(1, y + 1)\n\
+		else\n\
+			term.setCursorPos(1, h)\n\
+			term.scroll(1)\n\
+		end\n\
+		x, y = term.getCursorPos()\n\
+		nLinesPrinted = nLinesPrinted + 1\n\
 	end\n\
+	\n\
+	while string.len(sText) > 0 do\n\
+		local whitespace = string.match(sText, "^[ \\t]+")\n\
+		if whitespace then\n\
+			term.write(whitespace)\n\
+			x, y = term.getCursorPos()\n\
+			sText = string.sub(sText, string.len(whitespace) + 1)\n\
+		end\n\
+		\n\
+		local newline = string.match(sText, "^\\n")\n\
+		if newline then\n\
+			newLine()\n\
+			sText = string.sub(sText, 2)\n\
+		end\n\
+		\n\
+		local text = string.match(sText, "^[^ \\t\\n]+")\n\
+		if text then\n\
+			sText = string.sub(sText, string.len(text) + 1)\n\
+			if string.len(text) > w then\n\
+				while string.len(text) > 0 do\n\
+					if x > w then\n\
+						newLine()\n\
+					end\n\
+					term.write(text)\n\
+					text = string.sub(text, (w-x) + 2)\n\
+					x, y = term.getCursorPos()\n\
+				end\n\
+			else\n\
+				if x + string.len(text) - 1 > w then\n\
+					newLine()\n\
+				end\n\
+				term.write(text)\n\
+				x, y = term.getCursorPos()\n\
+			end\n\
+		end\n\
+	end\n\
+	\n\
+	return nLinesPrinted\n\
 end\n\
 \n\
-local nativeShutdown = os.shutdown\n\
-function os.shutdown()\n\
-	nativeShutdown()\n\
-	while true do\n\
-		coroutine.yield()\n\
+\n\
+print = function(...)\n\
+	local nLinesPrinted = 0\n\
+	for n, v in ipairs({...}) do\n\
+		nLinesPrinted = nLinesPrinted + write(tostring(v))\n\
 	end\n\
+	nLinesPrinted = nLinesPrinted + write("\\n")\n\
+	return nLinesPrinted\n\
 end\n\
 \n\
-local nativeReboot = os.reboot\n\
-function os.reboot()\n\
-	nativeReboot()\n\
-	while true do\n\
-		coroutine.yield()\n\
+\n\
+function printError(...)\n\
+	if term.isColour() then\n\
+		term.setTextColour(colors.red)\n\
 	end\n\
+\n\
+	print(...)\n\
+	term.setTextColour(colors.white)\n\
 end\n\
+\n\
 \n\
 function read(replaceCharacter, history)\n\
 	term.setCursorBlink(true)\n\
@@ -151,7 +278,7 @@ function read(replaceCharacter, history)\n\
 	end\n\
 	\n\
 	local w, h = term.getSize()\n\
-	local sx, sy = term.getCursorPos()	\n\
+	local sx, sy = term.getCursorPos()\n\
 	\n\
 	local function redraw(replChar)\n\
 		local scroll = 0\n\
@@ -209,7 +336,7 @@ function read(replaceCharacter, history)\n\
 					end\n\
 					if historyPos then\n\
                     	line = history[historyPos]\n\
-                    	pos = string.len(line) \n\
+                    	pos = string.len(line)\n\
                     else\n\
 						line = ""\n\
 						pos = 0\n\
@@ -226,7 +353,7 @@ function read(replaceCharacter, history)\n\
 			elseif param == 199 then\n\
 				redraw(" ")\n\
 				pos = 0\n\
-				redraw()		\n\
+				redraw()\n\
 			elseif param == 211 then\n\
 				if pos < string.len(line) then\n\
 					redraw(" ")\n\
@@ -243,48 +370,210 @@ function read(replaceCharacter, history)\n\
 	\n\
 	term.setCursorBlink(false)\n\
 	term.setCursorPos(w + 1, sy)\n\
-	newLine()\n\
+	print()\n\
 	\n\
 	return line\n\
 end\n\
 \n\
-while true do\n\
-	term.setTextColor(1)\n\
-	term.setBackgroundColor(32768)\n\
-	term.write("lua> ")\n\
-	local command = read(nil, commandHistory)\n\
-	table.insert(commandHistory, command)\n\
-	local toRun, cError = loadstring(command, "error")\n\
-	if toRun then\n\
-		setfenv(toRun, getfenv(1))\n\
-		local results = {pcall(toRun)}\n\
-		term.setBackgroundColor(32768)\n\
-		if results[1] then\n\
-			table.remove(results,1)\n\
-			if #results <= 0 then\n\
-				term.write("nil")\n\
-			else\n\
-				for k,v in pairs(results) do\n\
-					if k > 1 then newLine() end\n\
-					term.write(tostring(v))\n\
-				end\n\
-			end\n\
-		elseif not results[2] then\n\
-			term.write("nil")\n\
-		else\n\
-			if term.isColor() then\n\
-				term.setTextColor(16384)\n\
-			end\n\
-			term.write(results[2])\n\
-		end\n\
-	else\n\
-		if term.isColor() then\n\
-			term.setTextColor(16384)\n\
-		end\n\
-		term.write(cError)\n\
+\n\
+loadfile = function(path)\n\
+	local file = fs.open(path, "r")\n\
+	if file then\n\
+		local func, err = loadstring(file.readAll(), fs.getName(path))\n\
+		file.close()\n\
+		return func, err\n\
 	end\n\
-	newLine()\n\
+	return nil, "File not found"\n\
 end\n\
+\n\
+\n\
+dofile = function(path)\n\
+	local fnFile, e = loadfile(path)\n\
+	if fnFile then\n\
+		setfenv(fnFile, getfenv(2))\n\
+		return fnFile()\n\
+	else\n\
+		error(e, 2)\n\
+	end\n\
+end\n\
+\n\
+\n\
+function os.run(_tEnv, _sPath, ...)\n\
+    local tArgs = { ... }\n\
+    local fnFile, err = loadfile(_sPath)\n\
+    if fnFile then\n\
+        local tEnv = _tEnv\n\
+		setmetatable(tEnv, { __index = _G })\n\
+        setfenv(fnFile, tEnv)\n\
+\n\
+        local ok, err = pcall(function()\n\
+        	fnFile(unpack(tArgs))\n\
+        end)\n\
+\n\
+        if not ok then\n\
+        	if err and err ~= "" then\n\
+	        	printError(err)\n\
+	        end\n\
+        	return false\n\
+        end\n\
+        return true\n\
+    end\n\
+\n\
+    if err and err ~= "" then\n\
+		printError(err)\n\
+	end\n\
+\n\
+    return false\n\
+end\n\
+\n\
+\n\
+local nativegetmetatable = getmetatable\n\
+local nativetype = type\n\
+local nativeerror = error\n\
+\n\
+function getmetatable(_t)\n\
+	if nativetype(_t) == "string" then\n\
+		nativeerror("Attempt to access string metatable", 2)\n\
+		return nil\n\
+	end\n\
+	return nativegetmetatable(_t)\n\
+end\n\
+\n\
+\n\
+local tAPIsLoading = {}\n\
+\n\
+function os.loadAPI(_sPath)\n\
+	local sName = fs.getName(_sPath)\n\
+	if tAPIsLoading[sName] == true then\n\
+		printError("API "..sName.." is already being loaded")\n\
+		return false\n\
+	end\n\
+	tAPIsLoading[sName] = true\n\
+		\n\
+	local tEnv = {}\n\
+	setmetatable(tEnv, { __index = _G })\n\
+	local fnAPI, err = loadfile(_sPath)\n\
+	if fnAPI then\n\
+		setfenv(fnAPI, tEnv)\n\
+		fnAPI()\n\
+	else\n\
+		printError(err)\n\
+        tAPIsLoading[sName] = nil\n\
+		return false\n\
+	end\n\
+	\n\
+	local tAPI = {}\n\
+	for k, v in pairs(tEnv) do\n\
+		tAPI[k] =  v\n\
+	end\n\
+	\n\
+	_G[sName] = tAPI\n\
+	tAPIsLoading[sName] = nil\n\
+	return true\n\
+end\n\
+\n\
+\n\
+function os.unloadAPI(_sName)\n\
+	if _sName ~= "_G" and type(_G[_sName]) == "table" then\n\
+		_G[_sName] = nil\n\
+	end\n\
+end\n\
+\n\
+\n\
+function os.sleep(_nTime)\n\
+	sleep(_nTime)\n\
+end\n\
+\n\
+\n\
+local nativeShutdown = os.shutdown\n\
+local nativeReboot = os.reboot\n\
+\n\
+function os.shutdown()\n\
+	nativeShutdown()\n\
+	while true do\n\
+		coroutine.yield()\n\
+	end\n\
+end\n\
+\n\
+\n\
+function os.reboot()\n\
+	nativeReboot()\n\
+	while true do\n\
+		coroutine.yield()\n\
+	end\n\
+end\n\
+\n\
+\n\
+if http then\n\
+	local function wrapRequest(_url, _post)\n\
+		local requestID = http.request(_url, _post)\n\
+		while true do\n\
+			local event, param1, param2 = os.pullEvent()\n\
+			if event == "http_success" and param1 == _url then\n\
+				return param2\n\
+			elseif event == "http_failure" and param1 == _url then\n\
+				return nil\n\
+			end\n\
+		end\n\
+	end\n\
+	\n\
+	http.get = function(_url)\n\
+		return wrapRequest(_url, nil)\n\
+	end\n\
+\n\
+	http.post = function(_url, _post)\n\
+		return wrapRequest(_url, _post or "")\n\
+	end\n\
+end\n\
+\n\
+\n\
+local tApis = fs.list("rom/apis")\n\
+for n, sFile in ipairs(tApis) do\n\
+	if string.sub(sFile, 1, 1) ~= "." then\n\
+		local sPath = fs.combine("rom/apis", sFile)\n\
+		if not fs.isDir(sPath) then\n\
+			os.loadAPI(sPath)\n\
+		end\n\
+	end\n\
+end\n\
+\n\
+\n\
+if turtle then\n\
+	local tApis = fs.list("rom/apis/turtle")\n\
+	for n, sFile in ipairs(tApis) do\n\
+		if string.sub(sFile, 1, 1) ~= "." then\n\
+			local sPath = fs.combine("rom/apis/turtle", sFile)\n\
+			if not fs.isDir(sPath) then\n\
+				os.loadAPI(sPath)\n\
+			end\n\
+		end\n\
+	end\n\
+end\n\
+\n\
+\n\
+local ok, err = pcall(function()\n\
+	parallel.waitForAny(\n\
+		function()\n\
+			os.run({}, "rom/programs/shell")\n\
+		end, \n\
+		function()\n\
+			rednet.run()\n\
+		end)\n\
+end)\n\
+\n\
+\n\
+if not ok then\n\
+	printError(err)\n\
+end\n\
+\n\
+\n\
+pcall(function()\n\
+	term.setCursorBlink(false)\n\
+	print("Press any key to continue")\n\
+	os.pullEvent("key") \n\
+end)\n\
+\n\
+os.shutdown()\n\
 ';
 
 getCode = function() {

@@ -39,11 +39,11 @@ function sleep(time)
 end
 
 
-function write(text)
+function write(sText)
 	local w, h = term.getSize()		
 	local x, y = term.getCursorPos()
 	
-	local linesPrinted = 0
+	local nLinesPrinted = 0
 	local function newLine()
 		if y + 1 <= h then
 			term.setCursorPos(1, y + 1)
@@ -52,33 +52,33 @@ function write(text)
 			term.scroll(1)
 		end
 		x, y = term.getCursorPos()
-		linesPrinted = linesPrinted + 1
+		nLinesPrinted = nLinesPrinted + 1
 	end
 	
-	while string.len(text) > 0 do
-		local whitespace = string.match(text, "^[ \t]+")
+	while string.len(sText) > 0 do
+		local whitespace = string.match(sText, "^[ \t]+")
 		if whitespace then
 			term.write(whitespace)
 			x, y = term.getCursorPos()
-			text = string.sub(text, string.len(whitespace) + 1)
+			sText = string.sub(sText, string.len(whitespace) + 1)
 		end
 		
-		local newline = string.match(text, "^\n")
+		local newline = string.match(sText, "^\n")
 		if newline then
 			newLine()
-			text = string.sub(text, 2)
+			sText = string.sub(sText, 2)
 		end
 		
-		local text = string.match(text, "^[^ \t\n]+")
+		local text = string.match(sText, "^[^ \t\n]+")
 		if text then
-			text = string.sub(text, string.len(text) + 1)
+			sText = string.sub(sText, string.len(text) + 1)
 			if string.len(text) > w then
 				while string.len(text) > 0 do
 					if x > w then
 						newLine()
 					end
 					term.write(text)
-					text = string.sub(text, (w - x) + 2)
+					text = string.sub(text, (w-x) + 2)
 					x, y = term.getCursorPos()
 				end
 			else
@@ -91,7 +91,7 @@ function write(text)
 		end
 	end
 	
-	return linesPrinted
+	return nLinesPrinted
 end
 
 

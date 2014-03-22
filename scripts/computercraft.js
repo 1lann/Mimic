@@ -62,6 +62,8 @@ var loadAPIs = function() {
 		"http": httpAPI,
 		"os": osAPI,
 		"peripheral": peripheralAPI,
+		"rs": redstoneAPI,
+		"redstone": redstoneAPI,
 		"term": termAPI,
 	};
 
