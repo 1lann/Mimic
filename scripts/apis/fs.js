@@ -176,9 +176,17 @@ filesystem.isDir = function(path) {
 filesystem.read = function(path) {
 	path = filesystem.sanitise(path);
 
-	var contents = null;
-	if (!filesystem.isDir(path)) {
-		contents = fs.readFileSync(path).toString();
+	try {
+		var contents = null;
+		if (!filesystem.isDir(path)) {
+			contents = fs.readFileSync(path).toString();
+		}
+	} catch (e) {
+		if (e.code == "ENOENT") {
+			return null;
+		} else {
+			throw e;
+		}
 	}
 
 	return contents;
@@ -246,11 +254,17 @@ filesystem.makeDir = function(path, mode, position) {
 filesystem.delete = function(path) {
 	path = filesystem.sanitise(path);
 
-	if (path != "/") {
-		if (!filesystem.isDir(path)) {
-			fs.unlinkSync(path);
-		} else {
-			throw new Error("Not implemented");
+	try {
+		if (path != "/") {
+			if (!filesystem.isDir(path)) {
+				fs.unlinkSync(path);
+			} else {
+				throw new Error("Not implemented");
+			}
+		}
+	} catch (e) {
+		if (e.code != "ENOENT") {
+			throw e;
 		}
 	}
 }
@@ -422,7 +436,7 @@ computerFilesystem.delete = function(path) {
 //  -------  File Manipulation
 
 
-filesystem.move = function(from, to) {
+computerFilesystem.move = function(from, to) {
 	from = computerFilesystem.resolve(from);
 	to = computerFilesystem.resolve(to);
 
@@ -440,7 +454,7 @@ filesystem.move = function(from, to) {
 }
 
 
-filesystem.copy = function(from, to) {
+computerFilesystem.copy = function(from, to) {
 	from = computerFilesystem.resolve(from);
 	to = computerFilesystem.resolve(to);
 
