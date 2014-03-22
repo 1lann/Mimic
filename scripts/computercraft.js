@@ -232,7 +232,7 @@ var run = function() {
 	}, 500);
 
 	thread.main = C.lua_newthread(L);
-	C.luaL_loadstring(thread.main, getCode());
+	C.luaL_loadbuffer(thread.main, getCode(), getCode().length, "bios.lua");
 	thread.alive = true;
 
 	startClock = Date.now();
@@ -252,7 +252,7 @@ var boot = function() {
 	loadAPIs();
 
 	thread.main = C.lua_newthread(L);
-	C.luaL_loadstring(thread.main, getCode());
+	C.luaL_loadbuffer(thread.main, getCode(), getCode().length, "bios.lua");
 	thread.alive = true;
 
 	startClock = Date.now();
