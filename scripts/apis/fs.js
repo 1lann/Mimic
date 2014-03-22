@@ -179,7 +179,7 @@ filesystem.list = function(path) {
 }
 
 
-filesystem.listRecursively = function(path) {
+filesystem.listRecursively = function(path, includeEmptyDirectories) {
 	path = filesystem.sanitise(path);
 
 	var files = [];
@@ -187,7 +187,11 @@ filesystem.listRecursively = function(path) {
 	for (var i in inDir) {
 		var filePath = path + "/" + inDir[i];
 		if (filesystem.isDir(filePath)) {
-			var dirFiles = filesystem.listRecursively(filePath);
+			if (includeEmptyDirectories) {
+				files.push(filePath);
+			}
+
+			var dirFiles = filesystem.listRecursively(filePath, includeEmptyDirectories);
 			for (var i in dirFiles) {
 				files.push(dirFiles[i]);
 			}
@@ -642,7 +646,7 @@ fsAPI.delete = function(L) {
 		C.lua_pushstring(L, "Access denied");
 		C.lua_error(L);
 	}
-	
+
 	return 0;
 }
 
