@@ -20,14 +20,16 @@ osAPI.setAlarm = function(L) {
 
 
 osAPI.getComputerID = function(L) {
-	C.lua_pushnumber(L, tempID);
+	var computer = core.getActiveComputer();
+	C.lua_pushnumber(L, computer.id);
 	return 1;
 }
 
 
 osAPI.getComputerLabel = function(L) {
-	if (label) {
-		C.lua_pushstring(L, label);
+	var computer = core.getActiveComputer();
+	if (computer.label) {
+		C.lua_pushstring(L, computer.label);
 		return 1;
 	} else {
 		return 0;
@@ -36,43 +38,53 @@ osAPI.getComputerLabel = function(L) {
 
 
 osAPI.setComputerLabel = function(L) {
+	var computer = core.getActiveComputer();
 	var str = C.luaL_checkstring(L, 1);
-	label = str;
+	computer.label = str;
+
 	return 0;
 }
 
 
 osAPI.clock = function(L) {
-	var diff = Date.now() - startClock;
+	var computer = core.getActiveComputer();
+	var diff = Date.now() - computer.startClock;
 	var retDiff = Math.round(diff * 0.1) / 100;
 	C.lua_pushnumber(L, retDiff);
+
 	return 1;
 }
 
 
 osAPI.time = function(L) {
-	var ticks = (Date.now() - startClock) * 20;
+	var computer = core.getActiveComputer();
+	var ticks = (Date.now() - computer.startClock) * 20;
 	C.lua_pushnumber(L, ticks % 24000 / 1000);
+
 	return 1;
 }
 
 
 osAPI.day = function(L) {
-	var ticks = (Date.now() - startClock) * 20;
+	var computer = core.getActiveComputer();
+	var ticks = (Date.now() - computer.startClock) * 20;
 	C.lua_pushnumber(L, 1 + Math.floor(ticks / 24000));
+
 	return 1;
 }
 
 
 osAPI.startTimer = function(L) {
+	var computer = core.getActiveComputer();
 	var time = C.luaL_checknumber(L, 1);
 	computer.lastTimerID++;
 
 	var timerID = computer.lastTimerID;
 	setTimeout(function() {
 		computer.eventStack.push(["timer", timerID]);
-		resumeThread();
+		computer.resume();
 	}, time * 1000);
+
 	C.lua_pushnumber(L, timerID);
 
 	return 1;
@@ -89,11 +101,7 @@ osAPI.queueEvent = function(L) {
 		if (t == C.LUA_TSTRING) {
 			queueObject.push(C.lua_tostring(L, i));
 		} else if (t == C.LUA_TBOOLEAN) {
-			if (C.lua_toboolean(L, i)) {
-				queueObject.push(true);
-			} else {
-				queueObject.push(false);
-			}
+			queueObject.push(C.lua_toboolean(L, i) ? true : false);
 		} else if (t == C.LUA_TNUMBER) {
 			queueObject.push(C.lua_tonumber(L, i));
 		} else {
@@ -107,13 +115,15 @@ osAPI.queueEvent = function(L) {
 
 
 osAPI.shutdown = function(L) {
-	doShutdown = true;
+	var computer = core.getActiveComputer();
+	computer.shouldShutdown = true;
 	return 0;
 }
 
 
 osAPI.reboot = function(L) {
-	doReboot = true;
+	var computer = core.getActiveComputer();
+	computer.shouldReboot = true;
 	return 0;
 }
 

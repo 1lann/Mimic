@@ -72,6 +72,13 @@
 			<hr>
 			<p><span id="computer-total-storage-field">2</span> MB Total</p>
 			<p><span id="computer-free-storage-field">2</span> MB Free</p>
+
+			<br><br>
+
+			<p>Controls</p>
+			<hr>
+			<p><a class="pointer" onmousedown="triggerShutdown()">Shutdown</a></p>
+			<p><a class="pointer" onmousedown="triggerReboot()">Reboot</a></p>
 		</div>
 
 		<canvas id="canvas" width="620" height="350" style="display: none;"></canvas>
@@ -133,7 +140,9 @@
 <script src="scripts/lib/browserfs.js"></script>
 
 <script src="scripts/properties.js"></script>
-<script src="scripts/computercraft.js"></script>
+<script src="scripts/core.js"></script>
+<script src="scripts/computer.js"></script>
+<script src="scripts/filesystem.js"></script>
 <script src="scripts/render.js"></script>
 <script src="scripts/event.js"></script>
 
@@ -161,6 +170,28 @@ getCanvasLocation = function() {
 }
 
 
+triggerShutdown = function() {
+	var computer = core.getActiveComputer();
+	computer.shouldShutdown = true;
+
+	computer.eventStack.push(["shutdown"]);
+	computer.resume();
+}
+
+
+triggerReboot = function() {
+	var computer = core.getActiveComputer();
+	if (!computer.alive) {
+		computer.turnOn();
+	} else {
+		computer.shouldReboot = true;
+
+		computer.eventStack.push(["reboot"]);
+		computer.resume();
+	}
+}
+
+
 window.onresize = function() {
 	var loc = getCanvasLocation();
 
@@ -170,7 +201,7 @@ window.onresize = function() {
 
 
 $(document).ready(function() {
-	main();
+	core.main();
 });
 
 </script>
