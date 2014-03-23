@@ -83,6 +83,9 @@ render.characterText = function(x, y, text, color, ctx) {
 			imgY += startY;
 
 			var offset = imgW / 2 - globals.characterWidths[loc] / 2 - 1;
+			if (text == "@") {
+				offset -= 1;
+			}
 
 			var textX = (x - 1) * config.cellWidth + config.borderWidth + offset;
 			var textY = (y - 1) * config.cellHeight + config.borderHeight + 1;
