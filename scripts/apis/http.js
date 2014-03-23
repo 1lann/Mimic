@@ -17,7 +17,7 @@ httpAPI.request = function(L) {
 			computer.eventStack.push(["http_failure", url]);
 			resumeThread();
 		}, 10);
-		
+
 		return 0;
 	}
 
@@ -29,28 +29,22 @@ httpAPI.request = function(L) {
 		shouldUsePost = true;
 	}
 
+	onHttpCompletion = function(response) {
+		if (response.status == "200") {
+			computer.eventStack.push(["http_bios_wrapper_success", url, response.html]);
+			computer.resume();
+		} else {
+			computer.eventStack.push(["http_failure", url]);
+			computer.resume();
+		}
+	}
+
 	var request = new xdRequest;
 	if (shouldUsePost) {
 		request.post_body = postData;
-		reqeust.setURL(url).post(function(response) {
-			if (response.status == "200") {
-				computer.eventStack.push(["http_bios_wrapper_success", url, response.html]);
-				computer.resume();
-			} else {
-				computer.eventStack.push(["http_failure", url]);
-				computer.resume();
-			}
-		});
+		reqeust.setURL(url).post(onHttpCompletion);
 	 } else {
-		request.setURL(url).get(function(response) {
-			if (response.status == "200") {
-				computer.eventStack.push(["http_success", url, response.html]);
-				computer.resume();
-			} else {
-				computer.eventStack.push(["http_failure", url]);
-				computer.resume();
-			}
-		});
+		request.setURL(url).get(onHttpCompletion);
 	}
 
 	return 0;
