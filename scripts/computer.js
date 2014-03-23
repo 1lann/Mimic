@@ -211,6 +211,7 @@ Computer.prototype.shutdown = function() {
 	this.coroutineClock = Date.now();
 	if (this.L) {
 		C.lua_close(this.L);
+		this.L = null;
 	}
 
 	this.reset();
@@ -237,7 +238,6 @@ Computer.prototype.turnOn = function() {
 		this.coroutineClock = Date.now();
 		this.L = C.lua_open();
 
-		this.reset();
 		this.installAPIs();
 		this.launch();
 	}
