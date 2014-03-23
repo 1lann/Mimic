@@ -77,6 +77,7 @@
 
 			<p>Controls</p>
 			<hr>
+			<p><a class="pointer" onmousedown="triggerTerminate()">Terminate</a></p>
 			<p><a class="pointer" onmousedown="triggerShutdown()">Shutdown</a></p>
 			<p><a class="pointer" onmousedown="triggerReboot()">Reboot</a></p>
 		</div>
@@ -190,6 +191,12 @@ triggerReboot = function() {
 		computer.eventStack.push(["reboot"]);
 		computer.resume();
 	}
+}
+
+
+triggerTerminate = function() {
+	var computer = core.getActiveComputer();
+	computer.terminate();
 }
 
 

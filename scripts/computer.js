@@ -242,3 +242,11 @@ Computer.prototype.turnOn = function() {
 		this.launch();
 	}
 }
+
+
+Computer.prototype.terminate = function() {
+	if (this.alive && this.L != null) {
+		this.eventStack.push(["terminate"]);
+		this.resume();
+	}
+}

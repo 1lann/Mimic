@@ -16,7 +16,8 @@ httpAPI.request = function(L) {
 		setTimeout(function() {
 			computer.eventStack.push(["http_failure", url]);
 			resumeThread();
-		},10);
+		}, 10);
+		
 		return 0;
 	}
 
@@ -31,31 +32,25 @@ httpAPI.request = function(L) {
 	var request = new xdRequest;
 	if (shouldUsePost) {
 		request.post_body = postData;
-		reqeust.setURL(url).post(
-			function(response) {
-				// Replace the contents of id_of_element_in_page
-				if (response.status == "200") {
-					computer.eventStack.push(["http_bios_wrapper_success", url, response.html]);
-					computer.resume();
-				} else {
-					computer.eventStack.push(["http_failure", url]);
-					computer.resume();
-				}
+		reqeust.setURL(url).post(function(response) {
+			if (response.status == "200") {
+				computer.eventStack.push(["http_bios_wrapper_success", url, response.html]);
+				computer.resume();
+			} else {
+				computer.eventStack.push(["http_failure", url]);
+				computer.resume();
 			}
-		);
+		});
 	 } else {
-		request.setURL(url).get(
-			function(response) {
-				// Replace the contents of id_of_element_in_page
-				if (response.status == "200") {
-					computer.eventStack.push(["http_success", url, response.html]);
-					computer.resume();
-				} else {
-					computer.eventStack.push(["http_failure", url]);
-					computer.resume();
-				}
+		request.setURL(url).get(function(response) {
+			if (response.status == "200") {
+				computer.eventStack.push(["http_success", url, response.html]);
+				computer.resume();
+			} else {
+				computer.eventStack.push(["http_failure", url]);
+				computer.resume();
 			}
-		);
+		});
 	}
 
 	return 0;
