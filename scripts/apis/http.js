@@ -8,8 +8,8 @@
 
 var httpAPI = {};
 
-
 httpAPI.request = function(L) {
+	var computer = core.getActiveComputer();
 	var url = C.luaL_checkstring(L, 1);
 
 	if (!navigator.onLine) {
@@ -35,11 +35,11 @@ httpAPI.request = function(L) {
 			function(response) {
 				// Replace the contents of id_of_element_in_page
 				if (response.status == "200") {
-					computer.eventStack.push(["http_success", url, response.html]);
-					resumeThread();
+					computer.eventStack.push(["http_bios_wrapper_success", url, response.html]);
+					computer.resume();
 				} else {
 					computer.eventStack.push(["http_failure", url]);
-					resumeThread();
+					computer.resume();
 				}
 			}
 		);
@@ -49,10 +49,10 @@ httpAPI.request = function(L) {
 				// Replace the contents of id_of_element_in_page
 				if (response.status == "200") {
 					computer.eventStack.push(["http_success", url, response.html]);
-					resumeThread();
+					computer.resume();
 				} else {
 					computer.eventStack.push(["http_failure", url]);
-					resumeThread();
+					computer.resume();
 				}
 			}
 		);
