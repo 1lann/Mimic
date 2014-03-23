@@ -11,6 +11,8 @@ var gui = {
 	"selected": -1,
 	"files": [],
 	"editor": null,
+
+	"popupOpen": false,
 }
 
 
@@ -240,14 +242,17 @@ gui.setupFileList = function() {
 gui.setupPopups = function() {
 	$("#about-popup-open").on("click", function(e) {
 		$("#about-popup").attr("style", "");
+		gui.popupOpen = true;
 	});
 
 	$("#settings-popup-open").on("click", function(e) {
 		$("#settings-popup").attr("style", "");
+		gui.popupOpen = true;
 	});
 
 	$(".popup-close").on("click", function(e) {
 		$(".popup").attr("style", "display: none;");
+		gui.popupOpen = false;
 	});
 }
 

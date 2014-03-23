@@ -21,7 +21,7 @@ var prevMouseState = {
 
 
 window.onkeydown = function(event) {
-	if (gui.selected != -1) {
+	if (gui.selected != -1 || gui.popupOpen) {
 		return;
 	}
 
@@ -66,7 +66,7 @@ window.onkeyup = function(event) {
 
 
 window.onmousedown = function(event) {
-	if (gui.selected != -1) {
+	if (gui.selected != -1 || gui.popupOpen) {
 		return;
 	}
 
@@ -91,7 +91,7 @@ window.onmouseup = function(event) {
 
 
 window.onmousemove = function(event) {
-	if (gui.selected != -1) {
+	if (gui.selected != -1 || gui.popupOpen) {
 		return;
 	}
 

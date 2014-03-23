@@ -12,11 +12,9 @@
 	border: 5px solid #e7e7e7;
 }
 
-
 .pointer {
 	cursor: pointer;
 }
-
 
 #canvas {
 	position: fixed;
@@ -257,10 +255,21 @@ p {
 }
 
 .popup-header h1 {
+	font-size: 22px;
 	margin: 0;
 }
 
 .popup-body {
 	margin: 0;
 	padding: 10px 20px;
+}
+
+
+#about-popup .popup-inner {
+	height: 294px;
+	margin-top: -147px;
+}
+
+#about-popup .popup-close {
+	margin-top: -132px;
 }
