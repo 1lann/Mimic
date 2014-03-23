@@ -166,7 +166,7 @@ filesystem.getContainingFolder = function(path) {
 
 //  These functions do not resolve the path to a particular computer
 //  They operate on absolute file paths starting from the actual root
-//  No concept of read only is present
+//  No concept of "read only files" is present
 
 
 

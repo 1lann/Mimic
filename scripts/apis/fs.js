@@ -137,6 +137,7 @@ fsAPI.combine = function(L) {
 	var path1 = C.luaL_checkstring(L, 1);
 	var path2 = C.luaL_checkstring(L, 2);
 	var result = filesystem.sanitise(filesystem.format(path1) + "/" + filesystem.format(path2));
+	result = result.substring(1);
 	C.lua_pushstring(L, result);
 	return 1;
 }
