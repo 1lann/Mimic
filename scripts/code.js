@@ -23,6 +23,10 @@ code.prebios = '\n\
 --  I just cleaned up the code a bit\n\
 \n\
 \n\
+console = {}\n\
+console.log = print\n\
+\n\
+\n\
 local debugLib = debug\n\
 collectgarbage = nil\n\
 require = nil\n\
@@ -40,6 +44,7 @@ xpcall = function(_fn, _fnErrorHandler)\n\
 \n\
 	debugLib.sethook(co, function()\n\
 		if os.clock() >= coroutineClock + 2 then\n\
+			console.log("Lua: Too long without yielding")\n\
 			error("Too long without yielding", 2)\n\
 		end\n\
 	end, "", 10000)\n\
@@ -51,6 +56,7 @@ xpcall = function(_fn, _fnErrorHandler)\n\
 		coroutineClock = os.clock()\n\
 		debugLib.sethook(co, function()\n\
 			if os.clock() >= coroutineClock + 2 then\n\
+				console.log("Lua: Too long without yielding")\n\
 				error("Too long without yielding", 2)\n\
 			end\n\
 		end, "", 10000)\n\
@@ -192,7 +198,7 @@ end\n\
 \n\
 local nativeYield = coroutine.yield\n\
 function coroutine.yield(filter)\n\
-	local response = {nativeYield()}\n\
+	local response = {nativeYield(filter)}\n\
 	if response[1] == "http_bios_wrapper_success" then\n\
 		local responseText = response[3]\n\
 		local responseData = {\n\
@@ -221,10 +227,6 @@ code.bios = '\n\
 --  which was written by dan200\n\
 \n\
 --  I just cleaned up the code a bit\n\
-\n\
-\n\
-console = {}\n\
-console.log = print\n\
 \n\
 \n\
 function os.version()\n\
@@ -364,7 +366,7 @@ function read(replaceCharacter, history)\n\
 	end\n\
 	\n\
 	while true do\n\
-		local sEvent, param = coroutine.yield()\n\
+		local sEvent, param = os.pullEvent()\n\
 		if sEvent == "char" then\n\
 			line = string.sub(line, 1, pos) .. param .. string.sub(line, pos + 1)\n\
 			pos = pos + 1\n\

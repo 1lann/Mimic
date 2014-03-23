@@ -139,10 +139,8 @@ render.clear = function(foreground, background) {
 
 render.text = function(x, y, text, foreground, background, ctx) {
 	var computer = core.getActiveComputer();
-	if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
-		for (var i = 0; i < text.length; i++) {
-			render.character(x + i, y, text.charAt(i), foreground, background, ctx);
-		}
+	for (var i = 0; i < text.length; i++) {
+		render.character(x + i, y, text.charAt(i), foreground, background, ctx);
 	}
 }
 

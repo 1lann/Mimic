@@ -44,8 +44,9 @@ httpAPI.request = function(L) {
 
 	var request = new xdRequest;
 	if (shouldUsePost) {
+		console.log(postData)
 		request.post_body = postData;
-		reqeust.setURL(url).post(onHttpCompletion);
+		request.setURL(url).post(onHttpCompletion);
 	 } else {
 		request.setURL(url).get(onHttpCompletion);
 	}

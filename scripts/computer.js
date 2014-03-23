@@ -186,11 +186,11 @@ Computer.prototype.resume = function() {
 			} else {
 				clearInterval(threadLoopID);
 				computer.alive = false;
-
-				render.bsod("FATAL : THREAD CRASH", 
-					["The Lua thread has crashed!", "Check the console for more details"]);
-				computer.hasErrored = true;
-
+				if (!computer.hasErrored) {
+					render.bsod("FATAL : THREAD CRASH", 
+						["The Lua thread has crashed!", "Check the console for more details"]);
+					computer.hasErrored = true;
+				}
 				console.log("Error: ", C.lua_tostring(computer.thread, -1));
 			}
 		} else {
@@ -267,7 +267,7 @@ Computer.prototype.turnOn = function() {
 
 
 Computer.prototype.terminate = function() {
-	if (this.alive && this.L != null) {
+	if (this.alive && (this.L != null)) {
 		this.eventStack.push(["terminate"]);
 		this.resume();
 	}
