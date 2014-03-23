@@ -207,11 +207,6 @@ Computer.prototype.resume = function() {
 
 
 Computer.prototype.shutdown = function() {
-	if (this.hasErrored) {
-		this.shouldShutdown = false;
-		return;
-	}
-
 	render.clear();
 
 	this.cursor.blink = false;
@@ -222,17 +217,12 @@ Computer.prototype.shutdown = function() {
 		C.lua_close(this.L);
 		this.L = null;
 	}
-
+ 
 	this.reset();
 }
 
 
 Computer.prototype.reboot = function() {
-	if (this.hasErrored) {
-		this.shouldReboot = false;
-		return;
-	}
-
 	this.shutdown();
 
 	render.clear();
@@ -246,10 +236,6 @@ Computer.prototype.reboot = function() {
 
 
 Computer.prototype.turnOn = function() {
-	if (this.hasErrored) {
-		return;
-	}
-
 	if (!this.alive || !this.L) {
 		if (this.L) {
 			C.lua_close(this.L);
