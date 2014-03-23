@@ -117,13 +117,22 @@ render.character = function(x, y, text, foreground, background, ctx) {
 //  ------------------------
 
 
+render.clearLine = function(y, foreground, background) {
+	background = background || "0";
+	foreground = foreground || "f";
+
+	var computer = core.getActiveComputer();
+	render.text(1, y, " ".repeat(computer.width), foreground, background);
+}
+
+
 render.clear = function(foreground, background) {
 	background = background || "0";
 	foreground = foreground || "f";
 
 	var computer = core.getActiveComputer();
 	for (var i = 1; i <= computer.height; i++) {
-		render.text(1, i, " ".repeat(computer.width), foreground, background);
+		render.clearLine(i, foreground, background);
 	}
 }
 
@@ -176,9 +185,8 @@ render.bsod = function(title, lines) {
 	computer.cursor.blink = false;
 	render.cursorBlink();
 
-	render.textCentred(5, title, "f", "4");
-
-	console.log(lines);
+	render.clearLine(5, "f", "f");
+	render.textCentred(5, title, "4", "f");
 
 	for (var i in lines) {
 		var line = lines[i];
