@@ -40,6 +40,8 @@ window.onkeydown = function(event) {
 		character = globals.characters.shift[event.keyCode];
 	}
 
+	console.log(event.keyCode);
+
 	var pushedSomething = false;
 
 
