@@ -32,11 +32,14 @@ window.onkeydown = function(event) {
 			return;
 		}
 	}
+
 	var code = globals.keyCodes[event.keyCode];
 	var character = globals.characters.noshift[event.keyCode];
 	if (event.shiftKey) {
 		character = globals.characters.shift[event.keyCode];
 	}
+
+	console.log(event.keyCode);
 
 	var pushedSomething = false;
 
