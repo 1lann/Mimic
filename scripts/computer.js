@@ -254,7 +254,7 @@ Computer.prototype.turnOn = function() {
 
 Computer.prototype.terminate = function() {
 	if (this.alive && (this.L != null)) {
-		this.eventStack.push(["terminate"]);
+		this.eventStack.unshift(["terminate"]);
 		this.resume();
 	}
 }
