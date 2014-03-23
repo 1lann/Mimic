@@ -1,6 +1,5 @@
 
 #Mimic
-=====
 
 A fully featured emulator for the [Minecraft](http://minecraft.net) mod [ComputerCraft](http://computercraft.info) that runs straight in your browser.
 
@@ -9,6 +8,13 @@ Mimic makes use of
 * [Emscripten](https://github.com/kripken/emscripten)
 * [lua5.1.js](https://github.com/logiceditor-com/lua5.1.js/)
 * The default rom files that come with ComputerCraft
+
+
+###Credits
+
+* Made by 1lann and GravityScore
+* ComputerCraft by dan200 (Twitter: [@DanTwoHundred](https://twitter.com/dan200))
+* Alexander Gladysh for lua5.1.js
 
 
 ###License
@@ -23,16 +29,9 @@ You are free to:
 
 Under the following terms:
 * Attribution — You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-* NonCommercial — You may not use the material for commercial purposes.
+* Non Commercial — You may not use the material for commercial purposes.
 
 Note this license does not apply for material used in Mimic that we do not own. 
-
-
-###Credits
-
-* Made by 1lann and GravityScore
-* ComputerCraft by dan200 (Twitter: @DanTwoHundred)
-* Alexander Gladysh for lua5.1.js
 
 
 ###lua5.1.js License
@@ -69,3 +68,5 @@ THE SOFTWARE.
 ###Emscripten License
 
 Emscripten is also licensed under the MIT license, shown above.
+
+Link: [Emscripten](https://github.com/kripken/emscripten)
