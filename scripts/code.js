@@ -23,13 +23,22 @@ code.prebios = '\n\
 --  I just cleaned up the code a bit\n\
 \n\
 \n\
+local debugLib = debug\n\
+collectgarbage = nil\n\
+require = nil\n\
+module = nil\n\
+package = nil\n\
+newproxy = nil\n\
+load = nil\n\
+\n\
+\n\
 xpcall = function(_fn, _fnErrorHandler)\n\
 	assert(type(_fn) == "function", "bad argument #1 to xpcall (function expected, got " .. type(_fn) .. ")")\n\
 \n\
 	local co = coroutine.create(_fn)\n\
 	local coroutineClock = os.clock()\n\
 \n\
-	debug.sethook(co, function()\n\
+	debugLib.sethook(co, function()\n\
 		if os.clock() >= coroutineClock + 2 then\n\
 			error("Too long without yielding", 2)\n\
 		end\n\
@@ -37,17 +46,17 @@ xpcall = function(_fn, _fnErrorHandler)\n\
 \n\
 	local results = {coroutine.resume(co)}\n\
 \n\
-	debug.sethook(co)\n\
+	debugLib.sethook(co)\n\
 	while coroutine.status(co) ~= "dead" do\n\
 		coroutineClock = os.clock()\n\
-		debug.sethook(co, function()\n\
+		debugLib.sethook(co, function()\n\
 			if os.clock() >= coroutineClock + 2 then\n\
 				error("Too long without yielding", 2)\n\
 			end\n\
 		end, "", 10000)\n\
 \n\
 		results = {coroutine.resume(co, coroutine.yield())}\n\
-		debug.sethook(co)\n\
+		debugLib.sethook(co)\n\
 	end\n\
 \n\
 	if results[1] == true then\n\
@@ -179,6 +188,8 @@ function fs.open(path, mode)\n\
 		error("mode not supported")\n\
 	end\n\
 end\n\
+\n\
+\n\
 local nativeYield = coroutine.yield\n\
 function coroutine.yield(filter)\n\
 	local response = {nativeYield()}\n\
@@ -200,6 +211,7 @@ function coroutine.yield(filter)\n\
 	end\n\
 end\n\
 \n\
+\n\
 ';
 
 
@@ -211,7 +223,8 @@ code.bios = '\n\
 --  I just cleaned up the code a bit\n\
 \n\
 \n\
-local jsConsolePrint = print\n\
+console = {}\n\
+console.log = print\n\
 \n\
 \n\
 function os.version()\n\
