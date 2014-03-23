@@ -83,7 +83,7 @@ render.characterText = function(x, y, text, color, ctx) {
 			imgY += startY;
 
 			var offset = imgW / 2 - globals.characterWidths[loc] / 2 - 1;
-			if (text == "@") {
+			if (text == "@" || text == "~") {
 				offset -= 1;
 			}
 
