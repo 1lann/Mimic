@@ -349,10 +349,7 @@ filesystem.move = function(from, to) {
 	from = filesystem.sanitise(from);
 	to = filesystem.sanitise(to);
 
-	filesystem.write(to, filesystem.read(from));
-	filesystem.delete(from);
-
-	//throw new Error("Not implemented");
+	throw new Error("Not implemented");
 }
 
 
@@ -360,9 +357,7 @@ filesystem.copy = function(from, to) {
 	from = filesystem.sanitise(from);
 	to = filesystem.sanitise(to);
 
-	filesystem.write(to, filesystem.read(from));
-
-	//throw new Error("Not implemented");
+	throw new Error("Not implemented");
 }
 
 
@@ -524,13 +519,7 @@ computerFilesystem.move = function(from, to) {
 	from = computerFilesystem.resolve(from);
 	to = computerFilesystem.resolve(to);
 
-	if (!computerFilesystem.isReadOnly(from) && !computerFilesystem.isReadOnly(to)) {
-		filesystem.move(from, to);
-	}
-
-	filesystem.triggerGUIUpdate();
-
-	//throw new Error("Not implemented");
+	throw new Error("Not implemented");
 }
 
 
@@ -538,11 +527,5 @@ computerFilesystem.copy = function(from, to) {
 	from = computerFilesystem.resolve(from);
 	to = computerFilesystem.resolve(to);
 
-	if (!computerFilesystem.isReadOnly(from) && !computerFilesystem.isReadOnly(to)) {
-		filesystem.copy(from, to);
-	}
-
-	filesystem.triggerGUIUpdate();
-
-	//throw new Error("Not implemented");
+	throw new Error("Not implemented");
 }
