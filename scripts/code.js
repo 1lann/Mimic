@@ -6,7 +6,15 @@
 
 
 
-var prebios = '\n\
+var code = {};
+
+
+code.getAll = function() {
+	return code.prebios + "\n" + code.bios;
+}
+
+
+code.prebios = '\n\
 --bios file--\n\
 \n\
 --  Some functions are taken from the ComputerCraft bios.lua, \n\
@@ -175,7 +183,7 @@ end\n\
 ';
 
 
-var bios = '\n\
+code.bios = '\n\
 \n\
 --  Almost all functions are taken from the ComputerCraft bios.lua, \n\
 --  which was written by dan200\n\
@@ -601,7 +609,3 @@ end)\n\
 \n\
 os.shutdown()\n\
 ';
-
-getCode = function() {
-	return prebios + "\n" + bios;
-}

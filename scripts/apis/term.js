@@ -10,6 +10,7 @@ var termAPI = {};
 
 
 termAPI.write = function(L) {
+	var computer = core.getActiveComputer();
 	var str = "";
 
 	var t = C.lua_type(L, 1);
@@ -28,8 +29,9 @@ termAPI.write = function(L) {
 	}
 
 	str.replace("\n", " ");
-	render.text(term.cursorX, term.cursorY, str, term.textColor, term.backgroundColor);
-	term.cursorX += str.length;
+	render.text(computer.cursor.x, computer.cursor.y, str, computer.colors.foreground, computer.colors.background);
+	computer.cursor.x += str.length;
+
 	render.cursorBlink();
 
 	return 0;
@@ -37,26 +39,29 @@ termAPI.write = function(L) {
 
 
 termAPI.clear = function(L) {
-	for (var i = 1; i <= term.height; i++) {
-		render.text(1, i, " ".repeat(term.width), "0", term.backgroundColor);
-	}
+	var computer = core.getActiveComputer();
+	render.clear(computer.colors.foreground, computer.colors.background);
+
 	return 0;
 }
 
 
 termAPI.clearLine = function(L) {
-	render.text(1, term.cursorY, " ".repeat(term.width), "0", term.backgroundColor);
+	var computer = core.getActiveComputer();
+	render.text(1, computer.cursor.y, " ".repeat(computer.width), computer.colors.foreground, computer.colors.background);
+
 	return 0;
 }
 
 
 termAPI.setCursorPos = function(L) {
+	var computer = core.getActiveComputer();
 	var x = C.luaL_checkint(L, 1);
 	var y = C.luaL_checkint(L, 2);
 
-	term.cursorX = x;
-	term.cursorY = y;
-	if (term.cursorFlash) {
+	computer.cursor.x = x;
+	computer.cursor.y = y;
+	if (core.cursorFlash) {
 		render.cursorBlink();
 	}
 
@@ -65,52 +70,61 @@ termAPI.setCursorPos = function(L) {
 
 
 termAPI.getCursorPos = function(L) {
-	C.lua_pushnumber(L, term.cursorX);
-	C.lua_pushnumber(L, term.cursorY);
+	var computer = core.getActiveComputer();
+	C.lua_pushnumber(L, computer.cursor.x);
+	C.lua_pushnumber(L, computer.cursor.y);
 	return 2;
 }
 
 
 termAPI.setCursorBlink = function(L) {
+	var computer = core.getActiveComputer();
+
 	if (C.lua_isboolean(L, 1)){
-		term.cursorBlink = C.lua_toboolean(L, 1);
-		if (!term.cursorBlink) {
+		computer.cursor.blink = C.lua_toboolean(L, 1);
+		if (!computer.cursor.blink) {
 			overlayContext.clearRect(0, 0, overlayContext.width, overlayContext.height);
 		}
 	} else {
 		C.lua_pushstring(L, "Expected boolean");
 		C.lua_error(L);
 	}
+
 	return 0;
 }
 
 
 termAPI.setTextColor = function(L) {
+	var computer = core.getActiveComputer();
 	var color = C.luaL_checkint(L, 1);
 	var hex = 15 - (Math.log(color) / Math.log(2));
-	term.textColor = hex.toString(16);
+
+	computer.colors.foreground = hex.toString(16);
 	return 0;
 }
 
 
 termAPI.setBackgroundColor = function(L) {
+	var computer = core.getActiveComputer();
 	var color = C.luaL_checkint(L, 1);
 	var hex = 15 - (Math.log(color) / Math.log(2));
-	term.backgroundColor = hex.toString(16);
+
+	computer.colors.background = hex.toString(16);
 	return 0;
 }
 
 
 termAPI.isColor = function(L) {
-	// Black and white: Coming soon!
-	C.lua_pushboolean(L, 1);
+	var computer = core.getActiveComputer();
+	C.lua_pushboolean(L, computer.advanced ? 1 : 0);
 	return 1;
 }
 
 
 termAPI.getSize = function(L) {
-	C.lua_pushnumber(L, term.width);
-	C.lua_pushnumber(L, term.height);
+	var computer = core.getActiveComputer();
+	C.lua_pushnumber(L, computer.width);
+	C.lua_pushnumber(L, computer.height);
 	return 2;
 }
 

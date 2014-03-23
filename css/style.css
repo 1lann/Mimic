@@ -13,6 +13,11 @@
 }
 
 
+.pointer {
+	cursor: pointer;
+}
+
+
 #canvas {
 	position: fixed;
 	height: 350px;

@@ -15,10 +15,12 @@ var gui = {
 
 
 
-//  ----------------  Editor  ----------------  //
+//  ------------------------
+//    Editor
+//  ------------------------
 
 
-configureEditor = function() {
+gui.configureEditor = function() {
 	gui.editor = ace.edit("editor");
 	gui.editor.setTheme("ace/theme/tomorrow");
 	gui.editor.getSession().setMode("ace/mode/lua");
@@ -46,10 +48,12 @@ configureEditor = function() {
 
 
 
-//  ----------------  Tabs  ----------------  //
+//  ------------------------
+//    File Tabs
+//  ------------------------
 
 
-reloadTabData = function() {
+gui.reloadTabData = function() {
 	$("#tabs").empty();
 
 	var active = (gui.selected == -1) ? " class='active'" : "";
@@ -65,11 +69,11 @@ reloadTabData = function() {
 		</li>");
 	}
 
-	addTabResponders();
+	gui.addTabResponders();
 }
 
 
-reloadTab = function() {
+gui.reloadTab = function() {
 	filesystem.saveFiles(gui.tabs);
 
 	if (gui.selected != -1) {
@@ -90,9 +94,7 @@ reloadTab = function() {
 }
 
 
-openEditorTab = function(name, path, contents) {
-	filesystem.saveFiles(gui.tabs);
-
+gui.openEditorTab = function(name, path, contents) {
 	gui.tabs.push({
 		"name": name,
 		"path": path,
@@ -101,32 +103,30 @@ openEditorTab = function(name, path, contents) {
 	});
 
 	gui.selected = gui.tabs.length - 1;
-	reloadTabData();
-	reloadTab();
+	gui.reloadTabData();
+	gui.reloadTab();
 }
 
 
-closeEditorTab = function(index) {
-	filesystem.saveFiles(gui.tabs);
-
+gui.closeEditorTab = function(index) {
 	gui.tabs.splice(index, 1);
 	if (gui.selected > index) {
 		gui.selected -= 1;
 	} else if (index == gui.selected) {
 		gui.selected = (gui.tabs.length > 0) ? 0 : -1;
-		reloadTab();
+		gui.reloadTab();
 	}
 
-	reloadTabData();
+	gui.reloadTabData();
 }
 
 
-addTabResponders = function() {
+gui.addTabResponders = function() {
 	$("#computer-computer-tab").on("click", function(e) {
 		if (gui.selected != -1) {
 			gui.selected = -1;
-			reloadTab();
-			reloadTabData();
+			gui.reloadTab();
+			gui.reloadTabData();
 		}
 	});
 
@@ -134,38 +134,42 @@ addTabResponders = function() {
 		var id = parseInt(e.currentTarget.id.replace("computer-tab-", ""));
 		if (gui.selected != id) {
 			gui.selected = id;
-			reloadTab();
-			reloadTabData();
+			gui.reloadTab();
+			gui.reloadTabData();
 		}
 	});
 
 	$(".computer-tab-close").on("click", function(e) {
 		var id = parseInt(e.currentTarget.id.replace("computer-tab-close-", ""));
-		closeEditorTab(id);
+		gui.closeEditorTab(id);
 	});
 }
 
 
-setupTabs = function() {
-	reloadTabData();
-	reloadTab();
+gui.setupTabs = function() {
+	gui.reloadTabData();
+	gui.reloadTab();
 }
 
 
 
-//  ----------------  Computer Tabs  ----------------  //
+//  ------------------------
+//    Computer Tabs
+//  ------------------------
 
 
-setupComputers = function() {
+gui.setupComputers = function() {
 	
 }
 
 
 
-//  ----------------  File List  ----------------  //
+//  ------------------------
+//    File List Sidebar
+//  ------------------------
 
 
-reloadFileList = function() {
+gui.reloadFileList = function() {
 	$("#file-list").empty();
 
 	for (var i in gui.files) {
@@ -189,11 +193,11 @@ reloadFileList = function() {
 		$("#file-list").append(breadcrumb);
 	}
 
-	addFileResponders();
+	gui.addFileResponders();
 }
 
 
-addFileResponders = function() {
+gui.addFileResponders = function() {
 	$(".open-file").on("click", function(e) {
 		var i = parseInt(e.currentTarget.id.replace("open-file-", ""));
 		var file = gui.files[i];
@@ -202,8 +206,8 @@ addFileResponders = function() {
 			var tab = gui.tabs[i];
 			if (tab.path == file.path) {
 				gui.selected = i;
-				reloadTab();
-				reloadTabData();
+				gui.reloadTab();
+				gui.reloadTabData();
 				return;
 			}
 		}
@@ -211,27 +215,29 @@ addFileResponders = function() {
 		var name = file.path.split("/");
 		name = name[name.length - 1];
 
-		openEditorTab(name, file.path, file.contents);
+		gui.openEditorTab(name, file.path, file.contents);
 	});
 }
 
 
-onFilesystemChange = function(files) {
+gui.onFilesystemChange = function(files) {
 	gui.files = files;
-	reloadFileList();
+	gui.reloadFileList();
 }
 
 
-setupFileList = function() {
-	reloadFileList();
+gui.setupFileList = function() {
+	gui.reloadFileList();
 }
 
 
 
-//  ----------------  Popups  ----------------  //
+//  ------------------------
+//    Popups
+//  ------------------------
 
 
-setupPopups = function() {
+gui.setupPopups = function() {
 	$("#about-popup-open").on("click", function(e) {
 		$("#about-popup").attr("style", "");
 	});
@@ -247,14 +253,29 @@ setupPopups = function() {
 
 
 
-//  ----------------  Main  ----------------  //
+//  ------------------------
+//    Computer Sidebar
+//  ------------------------
 
 
-configureEditor();
+gui.updateComputerSidebar = function() {
+	var computer = core.getActiveComputer();
+	$("#computer-id-field").html(computer.id.toString());
+	$("#computer-type-field").html(computer.advanced ? "Advanced" : "Normal");
+}
+
+
+
+//  ------------------------
+//    Main
+//  ------------------------
+
+
+gui.configureEditor();
 
 $(document).ready(function() {
-	setupComputers();
-	setupFileList();
-	setupTabs();
-	setupPopups();
+	gui.setupComputers();
+	gui.setupFileList();
+	gui.setupTabs();
+	gui.setupPopups();
 });
