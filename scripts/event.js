@@ -57,9 +57,7 @@ window.onkeydown = function(event) {
 		computer.resume();
 	}
 
-	if (event.keyCode == 8) {
-		event.preventDefault();
-	}
+	event.preventDefault();
 }
 
 
