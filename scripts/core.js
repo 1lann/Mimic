@@ -71,6 +71,7 @@ core.run = function() {
 
 
 core.unhideHTMLElements = function() {
+	$("#loading").attr("style", "display: none;");
 	$("#canvas").attr("style", "");
 	$("#overlay-canvas").attr("style", "");
 	window.onresize();

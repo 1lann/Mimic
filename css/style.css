@@ -16,6 +16,19 @@
 	cursor: pointer;
 }
 
+#loading {
+	color: #a7a7a7;
+
+	position: fixed;
+	top: 88px;
+	left: 401px;
+	right: 0;
+	bottom: 0;
+
+	text-align: center;
+	padding-top: 100px;
+}
+
 #canvas {
 	position: fixed;
 	height: 350px;
