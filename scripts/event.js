@@ -13,6 +13,8 @@ var prevMouseState = {
 	"button": -1,
 };
 var pasting = false;
+var cmd_timeout;
+var cmd_char;
 
 
 
@@ -40,13 +42,11 @@ window.onkeydown = function(event) {
 		character = globals.characters.shift[event.keyCode];
 	}
 
-	console.log(event.keyCode);
-
 	var pushedSomething = false;
 
 
 	// Somewhat hacky paste capturing
-	if (event.ctrlKey && (character == "v" || character == "V")) {
+	if (event.ctrlKey && character && character.toLowerCase() == "v") { // Paste
 
 		pasting = true;
 
@@ -76,6 +76,36 @@ window.onkeydown = function(event) {
 			pasting = false;
 		}, 5);
 
+	} else if (event.ctrlKey && character && character == "r") { // Reboot
+
+		if (!cmd_timeout) {
+			cmd_timeout = setTimeout(function(){
+				computer.reboot(); 
+				cmd_timeout = null;
+			}, 1000);
+			cmd_char = "r";
+		}
+
+	} else if (event.ctrlKey && character && character == "s") { // Shutdown
+
+		if (!cmd_timeout) {
+			cmd_timeout = setTimeout(function(){
+				computer.shutdown(); 
+				cmd_timeout = null;
+			}, 1000);
+			cmd_char = "s";
+		}
+
+	} else if (event.ctrlKey && character && character == "t") { // Terminate
+
+		if (!cmd_timeout) {
+			cmd_timeout = setTimeout(function(){
+				computer.terminate(); 
+				cmd_timeout = null;
+			}, 1000);
+			cmd_char = "t";
+		}
+
 	} else {
 
 		if (typeof(code) != "undefined") {
@@ -92,14 +122,18 @@ window.onkeydown = function(event) {
 			computer.resume();
 		}
 
-		if (!pasting) event.preventDefault();
 
 	}
+	if (!pasting) event.preventDefault();
 }
 
 
 window.onkeyup = function(event) {
-
+	var character = globals.characters.noshift[event.keyCode];
+	if (cmd_timeout && character == cmd_char) {
+		clearTimeout(cmd_timeout)
+		cmd_timeout = null;
+	};
 }
 
 
