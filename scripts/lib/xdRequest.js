@@ -265,7 +265,7 @@ function xdRequest(inputURL) {
 		xdRequest_callback_array.push(
 			function (response) {
 				globalResponse = response;
-				if(response.query) {
+				if(response.query.results) {
 					// If we got an error back in the results, output it
 					if (response.query.results.error) {
 						callback(response.query.results.error);

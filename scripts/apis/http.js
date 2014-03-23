@@ -15,6 +15,7 @@ httpAPI.request = function(L) {
 
 	if (!navigator.onLine) {
 		setTimeout(function() {
+			console.log("Not online!")
 			computer.eventStack.push(["http_failure", url]);
 			computer.resume();
 		}, 10);
@@ -35,6 +36,7 @@ httpAPI.request = function(L) {
 			computer.eventStack.push(["http_bios_wrapper_success", url, response.html]);
 			computer.resume();
 		} else {
+			console.log("HTTP Failure: ",response)
 			computer.eventStack.push(["http_failure", url]);
 			computer.resume();
 		}

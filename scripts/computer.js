@@ -158,14 +158,16 @@ Computer.prototype.resume = function() {
 			try {
 				result = C.lua_resume(computer.thread, argumentsNumber);
 			} catch (e) {
-				console.log("Javascript error", e);
-
 				clearInterval(threadLoopID);
 				computer.alive = false;
+				if (computer.L) {
+					console.log("Javascript error", e);
 
-				render.bsod("FATAL : JAVASCRIPT ERROR", 
-					["A fatal Javascript error has occured.", 
-					"Check the console for more details."]);
+					render.bsod("FATAL : JAVASCRIPT ERROR", 
+						["A fatal Javascript error has occured.", 
+						"Check the console for more details."]);
+					computer.L = null;
+				}
 				return;
 			}
 
@@ -186,6 +188,7 @@ Computer.prototype.resume = function() {
 
 				render.bsod("FATAL : THREAD CRASH", 
 					["The Lua thread has crashed!", "Check the console for more details"]);
+				computer.L = null;
 
 				console.log("Error: ", C.lua_tostring(computer.thread, -1));
 			}
@@ -221,6 +224,8 @@ Computer.prototype.shutdown = function() {
 Computer.prototype.reboot = function() {
 	this.shutdown();
 
+	render.clear();
+	this.reset();
 	this.coroutineClock = Date.now();
 	this.L = C.lua_open();
 
@@ -235,6 +240,8 @@ Computer.prototype.turnOn = function() {
 			C.lua_close(this.L);
 		}
 
+		render.clear();
+		this.reset();
 		this.coroutineClock = Date.now();
 		this.L = C.lua_open();
 

@@ -92,6 +92,7 @@ osAPI.startTimer = function(L) {
 
 
 osAPI.queueEvent = function(L) {
+	var computer = core.getActiveComputer();
 	var queueObject = [];
 	queueObject.push(C.luaL_checkstring(L, 1));
 
