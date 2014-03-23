@@ -269,7 +269,33 @@ gui.updateComputerSidebar = function() {
 	$("#computer-type-field").html(computer.advanced ? "Advanced" : "Normal");
 }
 
+//  ------------------------
+//    Screenshot
+//  ------------------------
 
+gui.takeScreenshot = function(link) {
+	var mainImage = new Image();
+	var cursorImage = new Image();
+	mainImage.src = canvas.toDataURL("image/png");
+	cursorImage.src = overlayCanvas.toDataURL("image/png");
+	mainImage.onload = function() {
+		overlayContext.beginPath();
+		overlayContext.rect(0, 0, overlayCanvas.width, overlayCanvas.height);
+		overlayContext.fillStyle = "black";
+		overlayContext.fill();
+		overlayContext.stroke();
+		overlayContext.drawImage(mainImage, 0, 0);
+		cursorImage.onload = function() {
+	    	overlayContext.drawImage(cursorImage, 0, 0);
+	    	link.href = overlayCanvas.toDataURL("image/png");
+	    	link.download = "screenshot.png";
+	    	if (!computer.cursor.blink) {
+	    		overlayContext.clearRect(0, 0, canvas.width, canvas.height);
+	    	}
+	    	return;
+	   }
+	};
+}
 
 //  ------------------------
 //    Main
