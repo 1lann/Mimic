@@ -37,6 +37,7 @@ Computer.prototype.reset = function() {
 
 	this.thread = null;
 	this.alive = false;
+	this.hasErrored = false;
 
 	this.cursor = {};
 	this.cursor.x = 1;
@@ -121,6 +122,7 @@ Computer.prototype.launch = function() {
 		thread.alive = false;
 
 		render.bsod("FATAL : BIOS ERROR", ["Error: " + errorCode, "Check the console for more details"]);
+		this.hasErrored = true;
 	}
 }
 
@@ -166,6 +168,8 @@ Computer.prototype.resume = function() {
 				render.bsod("FATAL : JAVASCRIPT ERROR", 
 					["A fatal Javascript error has occured.", 
 					"Check the console for more details."]);
+				computer.hasErrored = true;
+
 				return;
 			}
 
@@ -186,6 +190,7 @@ Computer.prototype.resume = function() {
 
 				render.bsod("FATAL : THREAD CRASH", 
 					["The Lua thread has crashed!", "Check the console for more details"]);
+				computer.hasErrored = true;
 
 				console.log("Error: ", C.lua_tostring(computer.thread, -1));
 			}
@@ -203,6 +208,11 @@ Computer.prototype.resume = function() {
 
 
 Computer.prototype.shutdown = function() {
+	if (this.hasErrored) {
+		this.shouldShutdown = false;
+		return;
+	}
+
 	render.clear();
 
 	this.cursor.blink = false;
@@ -219,6 +229,11 @@ Computer.prototype.shutdown = function() {
 
 
 Computer.prototype.reboot = function() {
+	if (this.hasErrored) {
+		this.shouldReboot = false;
+		return;
+	}
+
 	this.shutdown();
 
 	this.coroutineClock = Date.now();
@@ -230,6 +245,10 @@ Computer.prototype.reboot = function() {
 
 
 Computer.prototype.turnOn = function() {
+	if (this.hasErrored) {
+		return;
+	}
+
 	if (!this.alive || !this.L) {
 		if (this.L) {
 			C.lua_close(this.L);
