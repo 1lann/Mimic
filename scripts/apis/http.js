@@ -15,7 +15,7 @@ httpAPI.request = function(L) {
 	if (!navigator.onLine) {
 		setTimeout(function() {
 			computer.eventStack.push(["http_failure", url]);
-			resumeThread();
+			computer.resume();
 		}, 10);
 
 		return 0;
