@@ -1,49 +1,49 @@
-NOTE: This readme is out of date
 
-Mimic
+#Mimic
 =====
 
-A Soon(tm) to be a full featured implementation of ComputerCraft that works straight in web browsers!
-This project may be ditched at anytime so feel free to fork and finish it!
+A fully featured emulator for the [Minecraft](http://minecraft.net) mod [ComputerCraft](http://computercraft.info) that runs straight in your browser.
 
-File Descriptions
-----
-* lua5.1.5.min.js - Lua implementation in JS. - I do not own this code
-* rom - Taken from ComputerCraft. All of the rom files from ComputerCraft (Not implemented into main code). - I do not own this code
-* minecraftia* - Generated Webfonts of the Minecraftia font (http://www.dafont.com/minecraftia.font). - I do not own this code
-* computercraft.js - Core ComputerCraft functions re-implemented in JS. - I own this code
-* render.js - Rendering management for drawing. - I own this code
-* event.js - Event management. - I own this code
-* index.html - HTML document for displaying the canvas and loading screen. - I own this code
-* package.json - JSON package data for use with Node-Webkit. - I own this code
-* bios.lua - A temporary bios.lua that I will use to intially test Mimic (Not implemented into main code). - I own this code
+Mimic makes use of
+* [asm.js](http://asmjs.org/)
+* [Emscripten](https://github.com/kripken/emscripten)
+* [lua5.1.js](https://github.com/logiceditor-com/lua5.1.js/)
+* The default rom files that come with ComputerCraft
 
 
-License
-----
-* You may redistribute, copy, modify and publish any/all the code I wrote (See file descriptions above).
-* If you use all of my code and re-publish it, it would be nice if you were to credit me.
-* If you use only a portion of my code, or if you made significant modifications to it (Like fixing bugs or adding features) then I'm happy for you to publish it without crediting me.
+###License
 
-All of the other code are to be used by their respective licenses.
+Mimic is licensed under the Creative Commons Attribution-Non Commerical International 4.0 License
 
-COPYRIGHT and Credits
-----
-Dan200 for making ComputerCraft (Twitter: @DanTwoHundred)
+Link: [CC BY-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 
-Andrew Tyler for the Minecraftia font used (http://www.dafont.com/andrew-tyler.d2526)
+You are free to:
+* Share - copy and redistribute the material in any medium or format
+* Adapt - remix, transform, and build upon the material
 
-Alexander Gladysh for making the Lua engine I'm using from https://github.com/logiceditor-com/lua5.1.js/
+Under the following terms:
+* Attribution — You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+* NonCommercial — You may not use the material for commercial purposes.
 
-lua5.1.js License
------------------
+Note this license does not apply for material used in Mimic that we do not own. 
 
-lua5.1.js is licensed under the terms of the MIT license reproduced below.
+
+###Credits
+
+* Made by 1lann and GravityScore
+* ComputerCraft by dan200 (Twitter: @DanTwoHundred)
+* Alexander Gladysh for lua5.1.js
+
+
+###lua5.1.js License
+
+lua5.1.js is licensed under the terms of the MIT license, reproduced below.
 This means that lua5.1.js is free software and can be used for both academic
 and commercial purposes at absolutely no cost.
 
-===============================================================================
+Link: [lua5.1.js](https://github.com/logiceditor-com/lua5.1.js/)
 
+```
 lua5.1.js: Copyright (c) 2013, LogicEditor <info@logiceditor.com>
            Copyright (c) 2013, lua5.1.js authors (see AUTHORS)
 
@@ -64,16 +64,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+```
 
-===============================================================================
+###Emscripten License
 
-Third-party source code, bundled with lua5.1.js:
-
-lib/lua5.1.5: Lua 5.1.5
------------------------
-
-* http://www.lua.org/versions.html#5.1
-* Available under MIT license (http://www.lua.org/license.html)
-* Copyright (c) 1994-2012 Lua.org, PUC-Rio (http://lua.org)
-
-(end of COPYRIGHT)
+Emscripten is also licensed under the MIT license, shown above.
