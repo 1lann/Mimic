@@ -149,7 +149,7 @@ resumeThread = function() {
 			try {
 				resp = C.lua_resume(thread.main, argumentsNumber);
 			} catch (e) {
-				console.log("Javascript error", e);
+				console.log("Javascript error:", e.stack);
 
 				clearInterval(threadLoopID);
 				thread.alive = false;
