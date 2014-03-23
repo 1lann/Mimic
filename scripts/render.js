@@ -190,4 +190,5 @@ render.bsod = function(title, lines) {
 		var line = lines[i];
 		render.textCentred(9 + parseInt(i), line, "f", "4");
 	}
+	render.textCentred(9 + lines.length+1, "Press enter to reboot the computer...", "f", "4");
 }

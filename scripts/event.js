@@ -26,6 +26,12 @@ window.onkeydown = function(event) {
 	}
 
 	var computer = core.getActiveComputer();
+	if (computer.hasErrored) {
+		if (event.keyCode == 13) {
+			computer.reboot();
+			return;
+		}
+	}
 	var code = globals.keyCodes[event.keyCode];
 	var character = globals.characters.noshift[event.keyCode];
 	if (event.shiftKey) {
