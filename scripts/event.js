@@ -12,6 +12,9 @@ var prevMouseState = {
 	"y": -1,
 	"button": -1,
 };
+var pasting = false;
+var cmd_timeout;
+var cmd_char;
 
 
 
@@ -39,32 +42,98 @@ window.onkeydown = function(event) {
 		character = globals.characters.shift[event.keyCode];
 	}
 
-	console.log(event.keyCode);
-
 	var pushedSomething = false;
 
-	if (typeof(code) != "undefined") {
-		computer.eventStack.push(["key", parseInt(code)]);
-		pushedSomething = true;
-	}
 
-	if (typeof(character) != "undefined") {
-		computer.eventStack.push(["char", character]);
-		pushedSomething = true;
-	}
+	// Somewhat hacky paste capturing
+	if (event.ctrlKey && character && character.toLowerCase() == "v") { // Paste
 
-	if (pushedSomething) {
-		computer.resume();
-	}
+		pasting = true;
 
-	if (event.keyCode == 8) {
-		event.preventDefault();
+		var paste_capture = $("#paste-capture"); // an offscreen <textarea> to capture pastes
+		paste_capture.focus();
+
+		setTimeout(function() {
+			var pasted = paste_capture.val();
+			paste_capture.val("");
+
+			// Push all characters in the pasted text
+			for (var i=0; i<pasted.length; i++) {
+				var keyCode = globals.charCodes[pasted[i]];
+				var code 	= globals.keyCodes[keyCode];
+
+				if (typeof(code) != "undefined") {
+					computer.eventStack.push(["key", parseInt(code)]);
+				}
+
+				if (typeof(pasted[i]) != "undefined") {
+					computer.eventStack.push(["char", pasted[i]]);
+				}
+			}
+			
+			if (pasted.length != 0) computer.resume();
+
+			pasting = false;
+		}, 5);
+
+	} else if (event.ctrlKey && character && character == "r") { // Reboot
+
+		if (!cmd_timeout) {
+			cmd_timeout = setTimeout(function(){
+				computer.reboot(); 
+				cmd_timeout = null;
+			}, 1000);
+			cmd_char = "r";
+		}
+
+	} else if (event.ctrlKey && character && character == "s") { // Shutdown
+
+		if (!cmd_timeout) {
+			cmd_timeout = setTimeout(function(){
+				computer.shutdown(); 
+				cmd_timeout = null;
+			}, 1000);
+			cmd_char = "s";
+		}
+
+	} else if (event.ctrlKey && character && character == "t") { // Terminate
+
+		if (!cmd_timeout) {
+			cmd_timeout = setTimeout(function(){
+				computer.terminate(); 
+				cmd_timeout = null;
+			}, 1000);
+			cmd_char = "t";
+		}
+
+	} else {
+
+		if (typeof(code) != "undefined") {
+			computer.eventStack.push(["key", parseInt(code)]);
+			pushedSomething = true;
+		}
+
+		if (typeof(character) != "undefined") {
+			computer.eventStack.push(["char", character]);
+			pushedSomething = true;
+		}
+
+		if (pushedSomething) {
+			computer.resume();
+		}
+
+
 	}
+	if (!pasting) event.preventDefault();
 }
 
 
 window.onkeyup = function(event) {
-
+	var character = globals.characters.noshift[event.keyCode];
+	if (cmd_timeout && character == cmd_char) {
+		clearTimeout(cmd_timeout)
+		cmd_timeout = null;
+	};
 }
 
 
