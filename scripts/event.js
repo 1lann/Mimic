@@ -49,7 +49,7 @@ window.onkeydown = function(event) {
 		character = globals.characters.shift[event.keyCode];
 	}
 
-	if (event.ctrlKey && character && character.toLowerCase() == "v") {
+	if ((event.ctrlKey || event.metaKey) && character && character.toLowerCase() == "v") {
 		events.pasting = true;
 
 		var captureField = $("#paste-capture");
@@ -78,7 +78,7 @@ window.onkeydown = function(event) {
 			}
 
 			events.pasting = false;
-		}, 5);
+		}, 10);
 	} else if (event.ctrlKey && character && character == "r" && !events.triggerKeyTimerID) {
 		events.triggerKeyTimerID = setTimeout(function() {
 			computer.reboot();
