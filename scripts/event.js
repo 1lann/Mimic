@@ -7,7 +7,7 @@
 
 
 var events = {
-	"events.prevMouseState": {
+	"prevMouseState": {
 		"x": -1,
 		"y": -1,
 		"button": -1,
