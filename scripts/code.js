@@ -43,7 +43,7 @@ xpcall = function(_fn, _fnErrorHandler)\n\
 	local coroutineClock = os.clock()\n\
 \n\
 	debugLib.sethook(co, function()\n\
-		if os.clock() >= coroutineClock + 2 then\n\
+		if os.clock() >= coroutineClock + 3.5 then\n\
 			console.log("Lua: Too long without yielding")\n\
 			error("Too long without yielding", 2)\n\
 		end\n\
@@ -53,15 +53,17 @@ xpcall = function(_fn, _fnErrorHandler)\n\
 \n\
 	debugLib.sethook(co)\n\
 	while coroutine.status(co) ~= "dead" do\n\
+		local events = {coroutine.yield()}\n\
+\n\
 		coroutineClock = os.clock()\n\
 		debugLib.sethook(co, function()\n\
-			if os.clock() >= coroutineClock + 2 then\n\
+			if os.clock() >= coroutineClock + 3.5 then\n\
 				console.log("Lua: Too long without yielding")\n\
 				error("Too long without yielding", 2)\n\
 			end\n\
 		end, "", 10000)\n\
 \n\
-		results = {coroutine.resume(co, coroutine.yield())}\n\
+		results = {coroutine.resume(co, unpack(events))}\n\
 		debugLib.sethook(co)\n\
 	end\n\
 \n\
