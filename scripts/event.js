@@ -6,15 +6,18 @@
 
 
 
-var mouseDown = false;
-var prevMouseState = {
-	"x": -1,
-	"y": -1,
-	"button": -1,
+var events = {
+	"events.prevMouseState": {
+		"x": -1,
+		"y": -1,
+		"button": -1,
+	},
+
+	"mouseDown": false,
+	"pasting": false,
+	"triggerKeyTimerID": null,
+	"triggerKey": null,
 };
-var pasting = false;
-var cmd_timeout;
-var cmd_char;
 
 
 
@@ -29,6 +32,7 @@ window.onkeydown = function(event) {
 	}
 
 	var computer = core.getActiveComputer();
+
 	if (computer.hasErrored) {
 		if (event.keyCode == 13) {
 			computer.reboot();
@@ -36,80 +40,68 @@ window.onkeydown = function(event) {
 		}
 	}
 
-	var code = globals.keyCodes[event.keyCode];
+	var code = parseInt(globals.keyCodes[event.keyCode]);
 	var character = globals.characters.noshift[event.keyCode];
 	if (event.shiftKey) {
 		character = globals.characters.shift[event.keyCode];
 	}
 
-	var pushedSomething = false;
+	if (event.ctrlKey && character && character.toLowerCase() == "v") {
+		events.pasting = true;
 
-
-	// Somewhat hacky paste capturing
-	if (event.ctrlKey && character && character.toLowerCase() == "v") { // Paste
-
-		pasting = true;
-
-		var paste_capture = $("#paste-capture"); // an offscreen <textarea> to capture pastes
-		paste_capture.focus();
+		var captureField = $("#paste-capture");
+		captureField.focus();
 
 		setTimeout(function() {
-			var pasted = paste_capture.val();
-			paste_capture.val("");
+			var pasted = captureField.val();
+			captureField.val("");
 
-			// Push all characters in the pasted text
-			for (var i=0; i<pasted.length; i++) {
-				var keyCode = globals.charCodes[pasted[i]];
-				var code 	= globals.keyCodes[keyCode];
+			for (var i = 0; i < pasted.length; i++) {
+				var letter = pasted[i];
+				var keyCode = parseInt(globals.charCodes[letter]);
+				var code = globals.keyCodes[keyCode];
 
 				if (typeof(code) != "undefined") {
-					computer.eventStack.push(["key", parseInt(code)]);
+					computer.eventStack.push(["key", code]);
 				}
 
-				if (typeof(pasted[i]) != "undefined") {
-					computer.eventStack.push(["char", pasted[i]]);
+				if (typeof(letter) != "undefined") {
+					computer.eventStack.push(["char", letter]);
 				}
 			}
 			
-			if (pasted.length != 0) computer.resume();
+			if (pasted.length > 0) {
+				computer.resume();
+			}
 
-			pasting = false;
+			events.pasting = false;
 		}, 5);
+	} else if (event.ctrlKey && character && character == "r" && !events.triggerKeyTimerID) {
+		events.triggerKeyTimerID = setTimeout(function() {
+			computer.reboot();
+			events.triggerKeyTimerID = null;
+		}, 1000);
 
-	} else if (event.ctrlKey && character && character == "r") { // Reboot
+		events.triggerKey = "r";
+	} else if (event.ctrlKey && character && character == "s" && !events.triggerKeyTimerID) {
+		events.triggerKeyTimerID = setTimeout(function() {
+			computer.shutdown();
+			events.triggerKeyTimerID = null;
+		}, 1000);
 
-		if (!cmd_timeout) {
-			cmd_timeout = setTimeout(function(){
-				computer.reboot(); 
-				cmd_timeout = null;
-			}, 1000);
-			cmd_char = "r";
-		}
+		events.triggerKey = "s";
+	} else if (event.ctrlKey && character && character == "t" && !events.triggerKeyTimerID) {
+		events.triggerKeyTimerID = setTimeout(function() {
+			computer.terminate();
+			events.triggerKeyTimerID = null;
+		}, 1000);
 
-	} else if (event.ctrlKey && character && character == "s") { // Shutdown
-
-		if (!cmd_timeout) {
-			cmd_timeout = setTimeout(function(){
-				computer.shutdown(); 
-				cmd_timeout = null;
-			}, 1000);
-			cmd_char = "s";
-		}
-
-	} else if (event.ctrlKey && character && character == "t") { // Terminate
-
-		if (!cmd_timeout) {
-			cmd_timeout = setTimeout(function(){
-				computer.terminate(); 
-				cmd_timeout = null;
-			}, 1000);
-			cmd_char = "t";
-		}
-
-	} else {
+		events.triggerKey = "t";
+	} else if (!events.triggerKeyTimerID) {
+		var pushedSomething = false;
 
 		if (typeof(code) != "undefined") {
-			computer.eventStack.push(["key", parseInt(code)]);
+			computer.eventStack.push(["key", code]);
 			pushedSomething = true;
 		}
 
@@ -121,19 +113,21 @@ window.onkeydown = function(event) {
 		if (pushedSomething) {
 			computer.resume();
 		}
-
-
 	}
-	if (!pasting) event.preventDefault();
+
+	if (!events.pasting) {
+		event.preventDefault();
+	}
 }
 
 
 window.onkeyup = function(event) {
 	var character = globals.characters.noshift[event.keyCode];
-	if (cmd_timeout && character == cmd_char) {
-		clearTimeout(cmd_timeout)
-		cmd_timeout = null;
-	};
+
+	if (events.triggerKeyTimerID && character == events.triggerKey) {
+		clearTimeout(events.triggerKeyTimerID);
+		events.triggerKeyTimerID = null;
+	}
 }
 
 
@@ -148,7 +142,7 @@ window.onmousedown = function(event) {
 		return;
 	}
 
-	mouseDown = true;
+	events.mouseDown = true;
 
 	var computer = core.getActiveComputer();
 
@@ -164,7 +158,7 @@ window.onmousedown = function(event) {
 
 
 window.onmouseup = function(event) {
-	mouseDown = false;
+	events.mouseDown = false;
 }
 
 
@@ -180,14 +174,14 @@ window.onmousemove = function(event) {
 	var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
 	var button = globals.buttons["click " + event.button];
 
-	if (mouseDown && (prevMouseState.button != button || prevMouseState.x != x || prevMouseState.y != y)) {
-		if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
-			computer.eventStack.push(["mouse_drag", button, x, y]);
-			computer.resume();
+	if (events.mouseDown
+			&& (events.prevMouseState.button != button || events.prevMouseState.x != x || events.prevMouseState.y != y)
+			&& (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height)) {
+		computer.eventStack.push(["mouse_drag", button, x, y]);
+		computer.resume();
 
-			prevMouseState.button = button;
-			prevMouseState.y = x;
-			prevMouseState.x = y;
-		}
+		events.prevMouseState.button = button;
+		events.prevMouseState.y = x;
+		events.prevMouseState.x = y;
 	}
 }

@@ -29,6 +29,13 @@
 	padding-top: 100px;
 }
 
+#paste-capture {
+	position: fixed;
+
+	left: -10px;
+	width: 0px;
+}
+
 #canvas {
 	position: fixed;
 	height: 350px;
