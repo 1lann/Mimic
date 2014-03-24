@@ -7,6 +7,7 @@ Mimic makes use of
 * [asm.js](http://asmjs.org/)
 * [Emscripten](https://github.com/kripken/emscripten)
 * [lua5.1.js](https://github.com/logiceditor-com/lua5.1.js/)
+* [Purl](https://github.com/allmarkedup/purl)
 * The default rom files that come with ComputerCraft
 
 
@@ -67,6 +68,12 @@ THE SOFTWARE.
 
 ###Emscripten License
 
-Emscripten is also licensed under the MIT license, shown above.
+Emscripten is licensed under the MIT license, shown above.
 
 Link: [Emscripten](https://github.com/kripken/emscripten)
+
+###Purl License
+
+Purl is licensed under the MIT license, shown above.
+
+Link: [Purl](https://github.com/allmarkedup/purl)
