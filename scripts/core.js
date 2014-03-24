@@ -78,20 +78,58 @@ core.unhideHTMLElements = function() {
 }
 
 
-core.setup = function(callback) {
-	filesystem.setup(function() {
-		render.setup(function() {
-			core.unhideHTMLElements();
+core.loadStartupScript = function(callback) {
+	var pastebinID = $.url().param("pastebin");
+	var urlFile = $.url().param("url");
+	var url = "";
 
-			core.computers = [];
+	if (typeof(pastebinID) != "undefined") {
+		url = "http://pastebin.com/raw.php?i=" + pastebinID;
+	} else if (typeof(urlFile) != "undefined") {
+		url = urlFile;
+	}
 
-			core.cursorFlash = false;
-			setInterval(function() {
-				core.cursorFlash = !core.cursorFlash;
-				render.cursorBlink();
-			}, 500);
+	if (url.length > 0) {
+		var request = new xdRequest();
+		request.setURL(url);
+		request.get(function(response) {
+			if (response.status == "200") {
+				// For use once fs.move works
+				// if (filesystem.exists("/computers/0/startup")) {
+				// 	filesystem.move("/computers/0/startup", "/computers/0/startup_old");
+				// }
+
+				filesystem.write("/computers/0/startup", response.html);
+			} else {
+				console.log("Failed to load startup script");
+				console.log("From URL: ", url);
+				alert("Failed to fetch statup script!");
+			}
 
 			callback();
+		});
+	} else {
+		callback();
+	}
+}
+
+
+core.setup = function(callback) {
+	filesystem.setup(function() {
+		core.loadStartupScript(function() {
+			render.setup(function() {
+				core.unhideHTMLElements();
+
+				core.computers = [];
+
+				core.cursorFlash = false;
+				setInterval(function() {
+					core.cursorFlash = !core.cursorFlash;
+					render.cursorBlink();
+				}, 500);
+
+				callback();
+			});
 		});
 	});
 }

@@ -42,9 +42,8 @@ httpAPI.request = function(L) {
 		}
 	}
 
-	var request = new xdRequest;
+	var request = new xdRequest();
 	if (shouldUsePost) {
-		console.log(postData)
 		request.post_body = postData;
 		request.setURL(url).post(onHttpCompletion);
 	 } else {
