@@ -32,6 +32,9 @@ window.onkeydown = function(event) {
 	}
 
 	var computer = core.getActiveComputer();
+	if (typeof(computer) == "undefined") {
+		return;
+	}
 
 	if (computer.hasErrored) {
 		if (event.keyCode == 13) {
@@ -115,7 +118,7 @@ window.onkeydown = function(event) {
 		}
 	}
 
-	if (!events.pasting) {
+	if (!events.pasting && (event.keyCode == 8 || event.keyCode == 86)) {
 		event.preventDefault();
 	}
 }
