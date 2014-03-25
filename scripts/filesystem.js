@@ -325,7 +325,7 @@ filesystem.makeDir = function(path, mode, position) {
 filesystem.delete = function(path) {
 	path = filesystem.sanitise(path);
 
-	
+
 	if (path != "/") {
 		if (filesystem.isDir(path)) {
 			var fileList = filesystem.listRecursively(path, true);
@@ -344,8 +344,11 @@ filesystem.delete = function(path) {
 			}
 			fs.rmdirSync(path);
 			return true;
-		} else {
+		} else if (filesystem.exists(path)) {
 			fs.unlinkSync(path);
+			return true;
+		} else {
+			console.log("File does not exist, ignoring deletion")
 			return true;
 		}
 	} else {
