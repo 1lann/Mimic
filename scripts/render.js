@@ -27,6 +27,7 @@ var lineYOffset = 2;
 
 
 render.setup = function(callback) {
+	context.imageSmoothingEnabled = false;
 	font = new Image();
 	font.src = "fonts/font.png";
 	font.onload = function() {
