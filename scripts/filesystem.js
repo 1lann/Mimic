@@ -273,7 +273,7 @@ filesystem.write = function(path, contents) {
 			filesystem.makeDir(folder);
 		}
 
-		fs.writeFileSync(path, contents);
+		fs.writeFileSync(path, contents+"\n");
 	}
 }
 
