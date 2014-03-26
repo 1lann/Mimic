@@ -72,6 +72,8 @@ window.onkeydown = function(event) {
 					computer.eventStack.push(["char", letter]);
 				}
 			}
+
+			captureField.blur();
 			
 			if (pasted.length > 0) {
 				computer.resume();
