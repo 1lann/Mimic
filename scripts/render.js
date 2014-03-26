@@ -1,4 +1,3 @@
-
 //  
 //  Mimic
 //  Made by 1lann and GravityScore
@@ -52,9 +51,26 @@ render.characterBackground = function(x, y, color, ctx) {
 	if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
 		var cellX = ((x - 1) * config.cellWidth + config.borderWidth);
 		var cellY = ((y - 1) * config.cellHeight + config.borderHeight);
+		var cellHeight = config.cellHeight;
+		var cellWidth = config.cellWidth;
+		if(x == 1){
+			cellX = 0
+			cellWidth = config.cellWidth + config.borderWidth;
+		}
+		else if(x == computer.width){
+			cellWidth = config.cellWidth + config.borderWidth;
+		}
+		
+		if(y == 1){
+			cellY = 0
+			cellHeight = config.cellHeight + config.borderHeight;
+		}
+		else if(y == computer.height){
+			cellHeight = config.cellHeight + config.borderHeight;
+		}
 
 		ctx.beginPath();
-		ctx.rect(cellX, cellY, config.cellWidth, config.cellHeight);
+		ctx.rect(cellX, cellY, cellWidth, cellHeight);
 		ctx.fillStyle = globals.colors[color];
 		ctx.fill();
 	}
