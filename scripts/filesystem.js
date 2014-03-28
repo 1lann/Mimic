@@ -272,7 +272,7 @@ filesystem.write = function(path, contents) {
 			filesystem.makeDir(folder);
 		}
 
-		fs.writeFileSync(path, contents);
+		fs.writeFileSync(path, contents+"\n");
 	}
 }
 
@@ -324,18 +324,33 @@ filesystem.makeDir = function(path, mode, position) {
 filesystem.delete = function(path) {
 	path = filesystem.sanitise(path);
 
-	try {
-		if (path != "/") {
-			if (!filesystem.isDir(path)) {
-				fs.unlinkSync(path);
-			} else {
-				fs.rmdirSync(path);
+	if (path != "/") {
+		if (filesystem.isDir(path)) {
+			var fileList = filesystem.listRecursively(path, true);
+			var directoryList = [];
+			for (var i in fileList) {
+				if (filesystem.isDir(fileList[i])) {
+					directoryList.push(fileList[i]);
+				} else {
+					fs.unlinkSync(fileList[i]);
+				}
 			}
+			for (var i in directoryList) {
+				if (filesystem.exists(directoryList[i])) {
+					fs.rmdirSync(directoryList[i]);
+				}
+			}
+			fs.rmdirSync(path);
+			return true;
+		} else if (filesystem.exists(path)) {
+			fs.unlinkSync(path);
+			return true;
+		} else {
+			console.log("File does not exist, ignoring deletion")
+			return true;
 		}
-	} catch (e) {
-		if (e.code != "ENOENT") {
-			throw e;
-		}
+	} else {
+		return false;
 	}
 }
 
@@ -343,20 +358,72 @@ filesystem.delete = function(path) {
 
 //  -------  File Manipulation
 
-
-filesystem.move = function(from, to) {
-	from = filesystem.sanitise(from);
-	to = filesystem.sanitise(to);
-
-	throw new Error("Not implemented");
-}
-
-
 filesystem.copy = function(from, to) {
 	from = filesystem.sanitise(from);
 	to = filesystem.sanitise(to);
 
-	throw new Error("Not implemented");
+	if (!filesystem.exists(from)) {
+		return false;
+	}
+
+	if (filesystem.isDir(to)) {
+		// Place it inside
+		if ((to == from) && filesystem.exists(computerFilesystem.resolve("/"+filesystem.getName(from)))) {
+			console.log("File/folder exists in current directory!")
+			return false;
+		} else if (filesystem.isDir(from)) {
+			if (filesystem.exists(to+"/"+filesystem.getName(from))) {
+				console.log("Folder exists")
+				return false;
+			} else if ((to == "/") && filesystem.exists("/"+filesystem.getName(from))) {
+				console.log("Exists in root")
+				return false;
+			}
+			console.log("Placing folder in folder")
+			var fileList = filesystem.listRecursively(from, true);
+			for (var i in fileList) {
+				if (!filesystem.isDir(fileList[i])) {
+					var fileName = filesystem.getName(from)+"/"+fileList[i].substring(from.length);
+					console.log(fileName);
+					filesystem.write(to+"/"+fileName,filesystem.read(fileList[i]));
+				}
+			}
+			return true;
+		} else {
+			console.log("Place file inside directory")
+			if (filesystem.exists(to+"/"+filesystem.getName(from))) {
+				console.log("File already eixsts!")
+				return false;
+			} else {
+				console.log("File placed")
+				filesystem.write(to+"/"+filesystem.getName(from), filesystem.read(from));
+				return true;
+			}
+		}
+	} else if (filesystem.exists(to)) {
+		// A file already exists here
+		console.log("File exists")
+		return false;
+	} else {
+		// Doesn't exist, create it
+		if (filesystem.isDir(from)) {
+			var fileList = filesystem.listRecursively(from, true);
+			console.log("Creating folder")
+			for (var i in fileList) {
+				if (!filesystem.isDir(fileList[i])) {
+					var fileName = fileList[i].substring(from.length);
+					console.log(fileName);
+					filesystem.write(to+"/"+fileName,filesystem.read(fileList[i]));
+				}
+			}
+			return true;
+		} else {
+			console.log("File doesn't exist, pasting")
+			filesystem.write(to, filesystem.read(from));
+			return true;
+		}
+	}
+	console.log("Derp")
 }
 
 
@@ -501,7 +568,7 @@ computerFilesystem.delete = function(path) {
 
 	var success = true;
 	if (!computerFilesystem.isReadOnly(path)) {
-		filesystem.delete(path);
+		success = filesystem.delete(path);
 	} else {
 		success = false;
 	}
@@ -519,7 +586,17 @@ computerFilesystem.move = function(from, to) {
 	from = computerFilesystem.resolve(from);
 	to = computerFilesystem.resolve(to);
 
-	throw new Error("Not implemented");
+	if (filesystem.copy(from, to)) {
+		if(filesystem.delete(from)) {
+			filesystem.triggerGUIUpdate();
+			return true;
+		} else {
+			filesystem.delete(to);
+			return false;
+		}
+	} else {
+		return false;
+	}
 }
 
 
@@ -527,5 +604,10 @@ computerFilesystem.copy = function(from, to) {
 	from = computerFilesystem.resolve(from);
 	to = computerFilesystem.resolve(to);
 
-	throw new Error("Not implemented");
+	if (filesystem.copy(from, to)) {
+		filesystem.triggerGUIUpdate();
+		return true;
+	} else {
+		return false;
+	}
 }

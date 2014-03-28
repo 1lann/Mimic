@@ -304,3 +304,36 @@ body {
 	border-bottom: none;
 	text-align: center;
 }
+
+/* ----------------  Mobile  ---------------- */
+
+#mobile-input {
+	z-index: 5;
+
+	position: fixed;
+	height: 350px;
+	width: 620px;
+
+	cursor: default;
+	background: none;
+
+	left: 400px;
+	top: 150px;
+
+	opacity: 0;
+	color:white;
+}
+@media (max-width: 768px) {
+	#file-list {
+		display: none;
+	}
+
+	.computer-options {
+		display: none;
+	}
+
+	.computer-tab-bar {
+		display: none;
+	}
+}
+

@@ -200,22 +200,24 @@ end\n\
 \n\
 local nativeYield = coroutine.yield\n\
 function coroutine.yield(filter)\n\
-	local response = {nativeYield(filter)}\n\
-	if response[1] == "http_bios_wrapper_success" then\n\
-		local responseText = response[3]\n\
-		local responseData = {\n\
-			["readAll"] = function()\n\
-				return responseText\n\
-			end,\n\
-			["close"] = function()\n\
-			end,\n\
-			["getResponseCode"] = function()\n\
-				return "200"\n\
-			end\n\
-		}\n\
-		return "http_success",response[2],responseData\n\
-	else\n\
-		return unpack(response)\n\
+	while true do\n\
+		local response = {nativeYield(filter)}\n\
+		if response[1] == "http_bios_wrapper_success" then\n\
+			local responseText = response[3]\n\
+			local responseData = {\n\
+				["readAll"] = function()\n\
+					return responseText\n\
+				end,\n\
+				["close"] = function()\n\
+				end,\n\
+				["getResponseCode"] = function()\n\
+					return "200"\n\
+				end\n\
+			}\n\
+			return "http_success",response[2],responseData\n\
+		elseif ((response[1] == filter) or not(filter)) then\n\
+			return unpack(response)\n\
+		end\n\
 	end\n\
 end\n\
 \n\
