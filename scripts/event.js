@@ -171,7 +171,6 @@ window.onmousedown = function(event) {
 		x = Math.floor((event.pageX - config.borderWidth - loc.x) / (config.cellWidth)) + 1;
 		y = Math.floor((event.pageY - config.borderHeight - loc.y) / (config.cellHeight)) + 1;
 	}
-	console.log(x+", "+y)
 	if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
 		computer.eventStack.push(["mouse_click", button, x, y]);
 		computer.resume();
