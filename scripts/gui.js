@@ -203,12 +203,12 @@ sidebar.dataFromFilesystem = function() {
 
 		id += 1;
 
-		var files = filesystem.listHierarchically(base, id).files;
-		id = files[files.length - 1].id + 1;
+		var files = filesystem.listHierarchically(base, id);
+		id = files.id;
 
-		for (var fi in files) {
-			var file = files[fi];
-			data.push(files[fi]);
+		for (var fi in files.files) {
+			var file = files.files[fi];
+			data.push(file);
 		}
 	}
 
