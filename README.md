@@ -26,9 +26,9 @@ Link: [The Q Public License Version (QPL-1.0)](http://opensource.org/licenses/QP
 Mimic by GravityScore and 1lann - Copyright (c) 2014
 
 Summary of the license:
-*You may modify this software and redistrubute it under the conditions...
-*You must retain the copyright and license in any redistrubutions and modifications of this software
-*You may not charge for anything other than the data transfer costs of this software when redistrubuting
+* You may modify this software and redistrubute it under the conditions...
+* You must retain the copyright and license in any redistrubutions and modifications of this software
+* You may not charge for anything other than the data transfer costs of this software when redistrubuting
 
 Note this license does not apply for material used in Mimic that we do not own. 
 
