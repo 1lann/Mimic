@@ -16,45 +16,8 @@
 
 <body>
 
-<<<<<<< HEAD
 	<div class="sidebar-container">
 		<ul class="sidebar-list"></ul>
-=======
-	<nav class="navbar navbar-default" role="navigation">
-			<noscript>
-			<div style="height:50px; padding-top:13px; font-size:16px; padding-left:10px; background:#ffcece; color:#ff3636">
-			You need JavaScript to be enabled in order to view this page!
-			</div>
-			</noscript>
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="#">Mimic</a>
-			</div>
-
-			<div class="collapse navbar-collapse">
-				<ul class="nav navbar-nav">
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							File <b class="caret"></b>
-						</a>
-						<ul class="dropdown-menu">
-							<li><a id="about-popup-open">About</a></li>
-							<!-- <li><a id="settings-popup-open">Settings</a></li> -->
-							<li class="divider"></li>
-							<li class="disabled"><a>New Computer</a></li>
-							<li class="disabled"><a>Close Computer</a></li>
-						</ul>
-					</li>
-					<li class="active"><a href="#">Computer 1</a></li>
-				</ul>
-			</div>
-		</div>
-	</nav>
-
-
-	<div class="file-list" id="file-list">
-
->>>>>>> FETCH_HEAD
 	</div>
 
 
@@ -76,23 +39,7 @@
 			<a href="#" class="btn btn-default pull-right disabled">Delete</a>
 		</div>
 
-<<<<<<< HEAD
 		<div id="editor"></div>
-=======
-		<canvas id="canvas" width="620" height="350" style="display: none;"></canvas>
-		<canvas id="overlay-canvas" width="620" height="350" style="display: none;"><div style="background:#ffcece; color:#ff3636">Your browser does not support canvases!</div></canvas>
-		<form id="mobile-form">
-		<input id="mobile-input" style='-moz-user-select:none; -webkit-user-select:none; -ms-user-select:none; user-select:none;' 
- 			unselectable='on'
- 			onselectstart='return false;'
- 			type='password'></input>
- 		</form>
-	</div>
-
-
-	<div id="loading">
-		<h2>Loading</h2>
->>>>>>> FETCH_HEAD
 	</div>
 
 	<div class="modal fade" id="credits-modal" tabindex="-1">
@@ -144,10 +91,8 @@
 <script src="scripts/lib/jquery.min.js"></script>
 <script src="scripts/lib/bootstrap.min.js"></script>
 <script src="ace/src-min-noconflict/ace.js" charset="utf-8"></script>
-<<<<<<< HEAD
-=======
+
 <script src="scripts/lib/jquery.caret.js"></script>
->>>>>>> FETCH_HEAD
 
 <script src="scripts/gui.js"></script>
 
@@ -172,82 +117,4 @@
 <script src="scripts/apis/redstone.js"></script>
 <script src="scripts/apis/term.js"></script>
 
-<<<<<<< HEAD
-=======
-<script>
-
-var canvasMinX = 401;
-var canvasMinY = 88;
-var ratio =  canvas.height/canvas.width;
-
-getCanvasLocation = function() {
-	var y = canvasMinY + (window.innerHeight - canvasMinY) / 2 - canvas.height / 2;
-	var x = canvasMinX + (window.innerWidth - canvasMinX) / 2 - canvas.width / 2;
-	y = Math.max(y, canvasMinY);
-	x = Math.max(x, canvasMinX);
-	if (canvasMinY == 0) {
-		y = 51;
-	}
-
-	return {"x": x, "y": y};
-}
-
-
-triggerShutdown = function() {
-	var computer = core.getActiveComputer();
-
-	computer.shouldShutdown = true;
-
-	computer.eventStack.push(["shutdown"]);
-	computer.resume();
-}
-
-
-triggerReboot = function() {
-	var computer = core.getActiveComputer();
-
-	if (!computer.alive) {
-		computer.turnOn();
-	} else {
-		computer.shouldReboot = true;
-
-		computer.eventStack.push(["reboot"]);
-		computer.resume();
-	}
-}
-
-
-triggerTerminate = function() {
-	var computer = core.getActiveComputer();
-	computer.terminate();
-}
-
-
-window.onresize = function() {
-	if (window.innerWidth < 768) {
-		canvasMinX = 0;
-		canvasMinY = 0;
-		if (window.innerWidth < 630) {
-			setTimeout(function(){$("#canvas, #overlay-canvas, #mobile-input").width(window.innerWidth);
-			$("#canvas, #overlay-canvas, #mobile-input").height(window.innerWidth*ratio);},10);
-		}
-	} else {
-		canvasMinX = 401;
-		canvasMinY = 88;
-	}
-	var loc = getCanvasLocation();
-
-	$("#canvas").attr("style", "left: " + loc.x + "px; top: " + loc.y + "px;");
-	$("#overlay-canvas").attr("style", "left: " + loc.x + "px; top: " + loc.y + "px;");
-	$("#mobile-input").attr("style", "left: " + loc.x + "px; top: " + loc.y + "px;");
-}
-
-
-$(document).ready(function() {
-	core.main();
-});
-
-</script>
-
->>>>>>> FETCH_HEAD
 </html>
