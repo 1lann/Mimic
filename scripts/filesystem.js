@@ -328,6 +328,7 @@ filesystem.delete = function(path) {
 		if (filesystem.isDir(path)) {
 			var fileList = filesystem.listRecursively(path, true);
 			var directoryList = [];
+
 			for (var i in fileList) {
 				if (filesystem.isDir(fileList[i])) {
 					directoryList.push(fileList[i]);
@@ -335,18 +336,19 @@ filesystem.delete = function(path) {
 					fs.unlinkSync(fileList[i]);
 				}
 			}
+
 			for (var i in directoryList) {
 				if (filesystem.exists(directoryList[i])) {
 					fs.rmdirSync(directoryList[i]);
 				}
 			}
+
 			fs.rmdirSync(path);
 			return true;
 		} else if (filesystem.exists(path)) {
 			fs.unlinkSync(path);
 			return true;
 		} else {
-			console.log("File does not exist, ignoring deletion")
 			return true;
 		}
 	} else {
@@ -358,6 +360,7 @@ filesystem.delete = function(path) {
 
 //  -------  File Manipulation
 
+
 filesystem.copy = function(from, to) {
 	from = filesystem.sanitise(from);
 	to = filesystem.sanitise(to);
@@ -366,64 +369,49 @@ filesystem.copy = function(from, to) {
 		return false;
 	}
 
+	var success = false;
+	
 	if (filesystem.isDir(to)) {
-		// Place it inside
-		if ((to == from) && filesystem.exists(computerFilesystem.resolve("/"+filesystem.getName(from)))) {
-			console.log("File/folder exists in current directory!")
-			return false;
+		if (to == from && filesystem.exists(computerFilesystem.resolve("/" + filesystem.getName(from)))) {
+			
 		} else if (filesystem.isDir(from)) {
-			if (filesystem.exists(to+"/"+filesystem.getName(from))) {
-				console.log("Folder exists")
-				return false;
-			} else if ((to == "/") && filesystem.exists("/"+filesystem.getName(from))) {
-				console.log("Exists in root")
-				return false;
-			}
-			console.log("Placing folder in folder")
-			var fileList = filesystem.listRecursively(from, true);
-			for (var i in fileList) {
-				if (!filesystem.isDir(fileList[i])) {
-					var fileName = filesystem.getName(from)+"/"+fileList[i].substring(from.length);
-					console.log(fileName);
-					filesystem.write(to+"/"+fileName,filesystem.read(fileList[i]));
-				}
-			}
-			return true;
-		} else {
-			console.log("Place file inside directory")
-			if (filesystem.exists(to+"/"+filesystem.getName(from))) {
-				console.log("File already eixsts!")
-				return false;
+			if (filesystem.exists(to + "/" + filesystem.getName(from))) {
+				
+			} else if (to == "/" && filesystem.exists("/" + filesystem.getName(from))) {
+				
 			} else {
-				console.log("File placed")
-				filesystem.write(to+"/"+filesystem.getName(from), filesystem.read(from));
-				return true;
+				var fileList = filesystem.listRecursively(from, true);
+				for (var i in fileList) {
+					if (!filesystem.isDir(fileList[i])) {
+						var fileName = filesystem.getName(from) + "/" + fileList[i].substring(from.length);
+						filesystem.write(to+"/"+fileName, filesystem.read(fileList[i]));
+					}
+				}
+
+				success = true;
 			}
+		} else if (!filesystem.exists(to + "/" + filesystem.getName(from))) {
+			filesystem.write(to + "/" + filesystem.getName(from), filesystem.read(from));
+			success = true;
 		}
-	} else if (filesystem.exists(to)) {
-		// A file already exists here
-		console.log("File exists")
-		return false;
-	} else {
-		// Doesn't exist, create it
+	} else if (!filesystem.exists(to)) {
 		if (filesystem.isDir(from)) {
 			var fileList = filesystem.listRecursively(from, true);
-			console.log("Creating folder")
+
 			for (var i in fileList) {
 				if (!filesystem.isDir(fileList[i])) {
 					var fileName = fileList[i].substring(from.length);
-					console.log(fileName);
-					filesystem.write(to+"/"+fileName,filesystem.read(fileList[i]));
+					filesystem.write(to + "/" + fileName, filesystem.read(fileList[i]));
 				}
 			}
-			return true;
 		} else {
-			console.log("File doesn't exist, pasting")
 			filesystem.write(to, filesystem.read(from));
-			return true;
 		}
+
+		success = true;
 	}
-	console.log("Derp")
+
+	return success;
 }
 
 
@@ -544,6 +532,7 @@ computerFilesystem.append = function(path, contents) {
 		success = false;
 	}
 
+	sidebar.update();
 	return success;
 }
 
@@ -586,17 +575,17 @@ computerFilesystem.move = function(from, to) {
 	from = computerFilesystem.resolve(from);
 	to = computerFilesystem.resolve(to);
 
+	var success = false;
 	if (filesystem.copy(from, to)) {
-		if(filesystem.delete(from)) {
-			filesystem.triggerGUIUpdate();
-			return true;
+		if (filesystem.delete(from)) {
+			success = true;
 		} else {
 			filesystem.delete(to);
-			return false;
 		}
-	} else {
-		return false;
 	}
+	
+	sidebar.update();
+	return success;
 }
 
 
@@ -604,10 +593,8 @@ computerFilesystem.copy = function(from, to) {
 	from = computerFilesystem.resolve(from);
 	to = computerFilesystem.resolve(to);
 
-	if (filesystem.copy(from, to)) {
-		filesystem.triggerGUIUpdate();
-		return true;
-	} else {
-		return false;
-	}
+	var success = filesystem.copy(from, to);
+
+	sidebar.update();
+	return success;
 }
