@@ -157,8 +157,8 @@ window.onmousedown = function(event) {
 		var loc = computer.getLocation();
 		var button = globals.buttons["click " + event.button] + 1;
 		var x, y;
-		var ratio = size.height / size.width;
 		var size = computer.getActualSize();
+		var ratio = size.height / size.width;
 
 		if ((window.innerWidth < size.width) || (window.innerWidth * ratio < size.height)) {
 			x = Math.floor((event.pageX - config.borderWidth - loc.x) / (config.cellWidth * (window.innerWidth / size.width))) + 1;
