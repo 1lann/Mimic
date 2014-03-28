@@ -5,6 +5,8 @@
 
 	<title>Mimic</title>
 
+	<script src="scripts/lib/prefixfree.min.js"></script>
+
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
 	<link rel="stylesheet" href="css/style.css" type="text/css"/>
 
@@ -12,144 +14,90 @@
 
 <body>
 
-	<nav class="navbar navbar-default" role="navigation">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="#">Mimic</a>
-			</div>
-
-			<div class="collapse navbar-collapse">
-				<ul class="nav navbar-nav">
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							File <b class="caret"></b>
-						</a>
-						<ul class="dropdown-menu">
-							<li><a id="about-popup-open">About</a></li>
-							<!-- <li><a id="settings-popup-open">Settings</a></li> -->
-							<li class="divider"></li>
-							<li class="disabled"><a>New Computer</a></li>
-							<li class="disabled"><a>Close Computer</a></li>
-						</ul>
-					</li>
-					<li class="active"><a href="#">Computer 1</a></li>
-				</ul>
-			</div>
-		</div>
-	</nav>
-
-
-	<div class="file-list" id="file-list">
-
+	<div class="sidebar-container">
+		<ul class="sidebar-list"></ul>
 	</div>
 
 
-	<div class="computer-tab-bar">
-		<ul id="tabs">
+	<div class="computer-container">
+		<button id="credits-toggle" data-toggle="modal" data-target="#credits-modal" class="btn btn-default">Credits</button>
+		<button id="fullscreen-toggle" class="btn btn-default pull-right">Enter Fullscreen</button>
 
-		</ul>
+		<canvas id="canvas" class="computer-canvas"></canvas>
+		<canvas id="overlay-canvas" class="computer-canvas"></canvas>
 	</div>
 
 
-	<div id="computer" class="computer">
-		<div class="computer-options">
-			<br>
+	<div class="editor-container" style="display: none;">
+		<div class="editor-header">
+			<h1 id="editor-title"></h1>
+			<p id="editor-file-path"></p>
 
-			<p>Details</p>
-			<hr>
-			<p>ID: <span id="computer-id-field">0</span></p>
-			<p>Type: <span id="computer-type-field">Advanced</span></p>
-
-			<br><br>
-
-			<p>Peripherals</p>
-			<hr>
-			<p>None</p>
-
-			<br><br>
-
-			<p>Storage</p>
-			<hr>
-			<p><span id="computer-total-storage-field">2</span> MB Total</p>
-			<p><span id="computer-free-storage-field">2</span> MB Free</p>
-
-			<br><br>
-
-			<p>Controls</p>
-			<hr>
-			<p><a class="pointer" onmousedown="triggerTerminate()">Terminate</a></p>
-			<p><a class="pointer" onmousedown="triggerShutdown()">Shutdown</a></p>
-			<p><a class="pointer" onmousedown="triggerReboot()">Reboot</a></p>
-			<p><a class="pointer" onmousedown="gui.takeScreenshot(this)">Take Screenshot</a></p>
+			<a href="#" class="btn btn-default pull-right disabled">Download</a>
+			<a href="#" class="btn btn-default pull-right disabled">Delete</a>
 		</div>
 
-		<canvas id="canvas" width="620" height="350" style="display: none;"></canvas>
-		<canvas id="overlay-canvas" width="620" height="350" style="display: none;"></canvas>
+		<div id="editor"></div>
 	</div>
 
+	<div class="modal fade" id="credits-modal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h3 class="modal-title">Credits</h3>
+				</div>
+				<div class="modal-body">
+					<p><strong>Made By</strong></p>
+					<p>GravityScore and 1lann</p>
 
-	<div id="loading">
-		<h2>Loading</h2>
-	</div>
+					<br>
 
+					<p><strong>ComputerCraft By</strong></p>
+					<p>Dan200</p>
 
-	<div id="editor" class="computer" style="display: none;"></div>
+					<br>
 
-
-	<div id="about-popup" class="popup" style="display: none;">
-		<div class="popup-inner">
-			<div class="popup-header">
-				<span class="glyphicon glyphicon-remove popup-close"></span>
-				<h1>About</h1>
-			</div>
-
-			<div class="popup-body" style="text-align: center;">
-				<br>
-				<p><strong>Created By</strong></p>
-				<p>GravityScore and 1lann</p>
-				<br>
-
-				<p><strong>ComputerCraft By</strong></p>
-				<p>dan200</p>
-				<br>
-
-				<p><a href="https://github.com/1lann/WebCC" target="_blank">GitHub Repository</a></p>
-				<p><a href="http://www.computercraft.info/forums2/index.php?/topic/17250-sneak-peek-of-our-upcoming-html5-emulator/" target="_blank">ComputerCraft Forum Thread</a></p>
+					<p><strong>Rom Files Include:</strong></p>
+					<ul>
+						<li>LuaIDE - GravityScore</li>
+						<li>QuickShell - Oeed</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>
 
 
-	<div id="settings-popup" class="popup" style="display: none;">
-		<div class="popup-inner">
-			<div class="popup-header">
-				<span class="glyphicon glyphicon-remove popup-close"></span>
-				<h1>Settings</h1>
+	<div class="loader-container">
+		<div class="loader">
+			<div class="duo duo1">
+				<div class="dot dot-a"></div>
+				<div class="dot dot-b"></div>
 			</div>
-			
-			<div class="popup-body" style="text-align: center;">
-				
+
+			<div class="duo duo2">
+				<div class="dot dot-a"></div>
+				<div class="dot dot-b"></div>
 			</div>
 		</div>
 	</div>
 
 </body>
 
-<textarea id="paste-capture"></textarea>
 
 <script src="scripts/lib/jquery.min.js"></script>
 <script src="scripts/lib/bootstrap.min.js"></script>
 <script src="ace/src-min-noconflict/ace.js" charset="utf-8"></script>
 
-
 <script src="scripts/gui.js"></script>
-<script src="scripts/code.js"></script>
 
 <script src="scripts/lib/purl.js"></script>
 <script src="scripts/lib/lua5.1.5.min.js"></script>
 <script src="scripts/lib/browserfs.js"></script>
 <script src="scripts/lib/xdRequest.js"></script>
 
+<script src="scripts/code.js"></script>
 <script src="scripts/properties.js"></script>
 <script src="scripts/core.js"></script>
 <script src="scripts/computer.js"></script>
@@ -164,65 +112,5 @@
 <script src="scripts/apis/peripheral.js"></script>
 <script src="scripts/apis/redstone.js"></script>
 <script src="scripts/apis/term.js"></script>
-
-<script>
-
-var canvasMinX = 401;
-var canvasMinY = 88;
-
-
-getCanvasLocation = function() {
-	var y = canvasMinY + (window.innerHeight - canvasMinY) / 2 - canvas.height / 2;
-	var x = canvasMinX + (window.innerWidth - canvasMinX) / 2 - canvas.width / 2;
-	y = Math.max(y, canvasMinY);
-	x = Math.max(x, canvasMinX);
-
-	return {"x": x, "y": y};
-}
-
-
-triggerShutdown = function() {
-	var computer = core.getActiveComputer();
-
-	computer.shouldShutdown = true;
-
-	computer.eventStack.push(["shutdown"]);
-	computer.resume();
-}
-
-
-triggerReboot = function() {
-	var computer = core.getActiveComputer();
-
-	if (!computer.alive) {
-		computer.turnOn();
-	} else {
-		computer.shouldReboot = true;
-
-		computer.eventStack.push(["reboot"]);
-		computer.resume();
-	}
-}
-
-
-triggerTerminate = function() {
-	var computer = core.getActiveComputer();
-	computer.terminate();
-}
-
-
-window.onresize = function() {
-	var loc = getCanvasLocation();
-
-	$("#canvas").attr("style", "left: " + loc.x + "px; top: " + loc.y + "px;");
-	$("#overlay-canvas").attr("style", "left: " + loc.x + "px; top: " + loc.y + "px;");
-}
-
-
-$(document).ready(function() {
-	core.main();
-});
-
-</script>
 
 </html>

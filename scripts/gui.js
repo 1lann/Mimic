@@ -7,13 +7,16 @@
 
 
 var gui = {
-	"tabs": [],
-	"selected": -1,
-	"files": [],
-	"editor": null,
+	"cursors": {},
+	"scrolls": {},
+	"computerSelected": true,
+	"isFullscreen": false,
+};
 
-	"popupOpen": false,
-}
+var sidebar = {
+	"selected": 0,
+	"data": [],
+};
 
 
 
@@ -28,245 +31,203 @@ gui.configureEditor = function() {
 	gui.editor.getSession().setMode("ace/mode/lua");
 	gui.editor.getSession().setTabSize(4);
 	gui.editor.setShowPrintMargin(false);
-	gui.editor.setHighlightActiveLine(true);
+	gui.editor.setHighlightActiveLine(false);
 	gui.editor.getSession().setUseWrapMode(false);
 	gui.editor.getSession().setUseSoftTabs(false);
 
-	gui.editor.getSession().on("change", function(e) {
-		gui.tabs[gui.selected].contents = gui.editor.getValue();
-
-		for (var i in gui.files) {
-			var file = gui.files[i];
-			if (file.path == gui.tabs[gui.selected].path) {
-				file.contents = gui.tabs[gui.selected].contents;
-			}
-		}
-	});
-
 	gui.editor.getSession().selection.on("changeCursor", function(e) {
-		gui.tabs[gui.selected].cursor = gui.editor.getSession().selection.getCursor();
+		var file = sidebar.itemFromID(sidebar.selected);
+		if (typeof(file.path) != "undefined") {
+			gui.cursors[file.path] = gui.editor.getSession().selection.getCursor();
+		}
+	});
+
+	gui.editor.getSession().on("changeScrollTop", function(e) {
+		var file = sidebar.itemFromID(sidebar.selected);
+		if (typeof(file.path) != "undefined") {
+			gui.scrolls[file.path] = gui.editor.getSession().getScrollTop();
+		}
 	});
 }
 
 
 
 //  ------------------------
-//    File Tabs
+//    Sidebar
 //  ------------------------
 
 
-gui.reloadTabData = function() {
-	$("#tabs").empty();
+sidebar.populate = function(data, level) {
+	var sidebarList = $(".sidebar-list");
 
-	var active = (gui.selected == -1) ? " class='active'" : "";
-	$("#tabs").append("<li" + active + " id='computer-computer-tab'> \
-		<a href='#'>Computer</span></a> \
-	</li>");
+	for (var i in data) {
+		var item = data[i];
 
-	for (var i in gui.tabs) {
-		var tab = gui.tabs[i];
-		var active = (gui.selected == i) ? " class='active computer-tab'" : " class='computer-tab'";
-		$("#tabs").append("<li" + active + " id='computer-tab-" + i + "'> \
-			<a href='#''>" + tab.name + " <span id='computer-tab-close-" + i + "' class='glyphicon glyphicon-remove pull-right computer-tab-close'></span></a> \
-		</li>");
+		var isSelected = "";
+		if (item.id == sidebar.selected) {
+			isSelected = " selected";
+		}
+
+		if (item.type == "folder") {
+			sidebarList.append('\
+			<li class="sidebar-item' + isSelected + '" fileid="' + item.id + '" style="padding-left: ' + (level * 20 + 25) + 'px;">\n\
+				' + item.name + '\n\
+				<span class="glyphicon glyphicon-chevron-down"></span>\n\
+			</li>\n\
+			');
+
+			sidebar.populate(item.children, level + 1);
+		} else if (item.style == "large") {
+			sidebarList.append('\
+			<li class="sidebar-item large' + isSelected + '" fileid="' + item.id + '">\n\
+				' + item.name + '\n\
+				<span class="glyphicon glyphicon-chevron-right pull-right"></span>\n\
+			</li>\n\
+			');
+		} else {
+			sidebarList.append('\
+			<li class="sidebar-item' + isSelected + '" fileid="' + item.id + '" style="padding-left: ' + (level * 20 + 25) + 'px;">\n\
+				' + item.name + '\n\
+			</li>\n\
+			');
+		}
 	}
-
-	gui.addTabResponders();
 }
 
 
-gui.reloadTab = function() {
-	filesystem.saveFiles(gui.tabs);
+sidebar.reload = function(data) {
+	sidebar.data = data || sidebar.data;
 
-	if (gui.selected != -1) {
-		var cursor = gui.tabs[gui.selected].cursor;
-		gui.editor.setValue(gui.tabs[gui.selected].contents);
-		gui.editor.getSession().selection.clearSelection();
+	$(".sidebar-list").empty();
+	sidebar.populate(sidebar.data, 0);
 
-		$("#editor").attr("style", "")
-		$("#computer").attr("style", "display: none;");
-		gui.editor.focus();
+	$(".sidebar-item").click(function(evt) {
+		sidebar.select($(evt.target).attr("fileid"));
+	});
+}
 
-		gui.tabs[gui.selected].cursor = cursor;
+
+sidebar.itemFromID = function(id, data) {
+	data = data || sidebar.data;
+
+	var found = undefined;
+	for (var i in data) {
+		var item = data[i];
+
+		if (item.id == id) {
+			found = item;
+		} else if (item.type == "folder") {
+			found = sidebar.itemFromID(id, item.children);
+		}
+
+		if (found) {
+			break;
+		}
+	}
+
+	return found;
+}
+
+
+sidebar.displayFile = function(file) {
+	$(".editor-container").css("display", "block");
+	$(".computer-container").css("display", "none");
+
+	var cursor = gui.cursors[file.path];
+	var scroll = gui.scrolls[file.path];
+
+	var path = file.path;
+	path = path.substring(1);
+	path = path.substring(path.indexOf("/") + 1);
+	path = path.substring(path.indexOf("/"));
+
+	var contents = filesystem.read(file.path);
+	gui.editor.getSession().setValue(contents);
+	$("#editor-title").html(file.name);
+	$("#editor-file-path").html(path);
+
+	if (typeof(cursor) != "undefined") {
 		gui.editor.getSession().selection.moveCursorToPosition(cursor);
+	}
+
+	if (typeof(scroll) != "undefined") {
+		gui.editor.getSession().setScrollTop(scroll);
+	}
+
+	gui.editor.focus();
+}
+
+
+sidebar.select = function(id) {
+	var item = sidebar.itemFromID(id);
+	if (typeof(item) == "undefined" || item.type == "folder" || id == sidebar.selected) {
+		return;
+	}
+
+	sidebar.selected = id;
+
+	if (item.type == "file") {
+		sidebar.displayFile(item);
+	} else if (item.type == "folder") {
+		
+	} else if (item.type == "computer") {
+		$(".editor-container").css("display", "none");
+		$(".computer-container").css("display", "block");
+		$("#canvas").click();
+	}
+
+	if (item.type == "computer") {
+		gui.computerSelected = true;
 	} else {
-		$("#editor").attr("style", "display: none;");
-		$("#computer").attr("style", "");
+		gui.computerSelected = false;
+	}
+
+	sidebar.reload();
+}
+
+
+sidebar.dataFromFilesystem = function() {
+	var data = [];
+
+	var id = 0;
+	for (var i in core.computers) {
+		var computer = core.computers[i];
+		var base = "/computers/" + computer.id;
+
+		data.push({
+			"id": id,
+			"name": "Computer " + computer.id,
+			"style": "large",
+			"type": "computer",
+		});
+
+		id += 1;
+
+		var files = filesystem.listHierarchically(base, id).files;
+		id = files[files.length - 1].id + 1;
+
+		for (var fi in files) {
+			var file = files[fi];
+			data.push(files[fi]);
+		}
+	}
+
+	return data;
+}
+
+
+sidebar.saveOpenFile = function() {
+	var item = sidebar.itemFromID(gui.selected);
+
+	if (typeof(item) != "undefined") {
+		var contents = editor.getSession().getValue();
+		filesystem.write(item.path, contents);
 	}
 }
 
 
-gui.openEditorTab = function(name, path, contents) {
-	gui.tabs.push({
-		"name": name,
-		"path": path,
-		"contents": contents,
-		"cursor": {"row": 0, "column": 0},
-	});
-
-	gui.selected = gui.tabs.length - 1;
-	gui.reloadTabData();
-	gui.reloadTab();
-}
-
-
-gui.closeEditorTab = function(index) {
-	gui.tabs.splice(index, 1);
-	if (gui.selected > index) {
-		gui.selected -= 1;
-	} else if (index == gui.selected) {
-		gui.selected = (gui.tabs.length > 0) ? 0 : -1;
-		gui.reloadTab();
-	}
-
-	gui.reloadTabData();
-}
-
-
-gui.addTabResponders = function() {
-	$("#computer-computer-tab").on("click", function(e) {
-		if (gui.selected != -1) {
-			gui.selected = -1;
-			gui.reloadTab();
-			gui.reloadTabData();
-		}
-	});
-
-	$(".computer-tab").on("click", function(e) {
-		var id = parseInt(e.currentTarget.id.replace("computer-tab-", ""));
-		if (gui.selected != id) {
-			gui.selected = id;
-			gui.reloadTab();
-			gui.reloadTabData();
-		}
-	});
-
-	$(".computer-tab-close").on("click", function(e) {
-		var id = parseInt(e.currentTarget.id.replace("computer-tab-close-", ""));
-		gui.closeEditorTab(id);
-	});
-}
-
-
-gui.setupTabs = function() {
-	gui.reloadTabData();
-	gui.reloadTab();
-}
-
-
-
-//  ------------------------
-//    Computer Tabs
-//  ------------------------
-
-
-gui.setupComputers = function() {
-	
-}
-
-
-
-//  ------------------------
-//    File List Sidebar
-//  ------------------------
-
-
-gui.reloadFileList = function() {
-	$("#file-list").empty();
-
-	for (var i in gui.files) {
-		var file = gui.files[i];
-		if (file.path.substring(0, 1) == "/") {
-			file.path = file.path.substring(1);
-		}
-
-		var breadcrumb = "<ol class='breadcrumb'>";
-		var parts = file.path.split("/");
-		for (var ii in parts) {
-			var part = parts[ii];
-			if (ii == parts.length - 1) {
-				breadcrumb += "<li><a class='open-file' id='open-file-" + i + "' style='margin-right: 15px'>" + part + "</a></li>";
-			} else {
-				breadcrumb += "<li>" + part + "</li>";
-			}
-		}
-		breadcrumb += "</ol>";
-
-		$("#file-list").append(breadcrumb);
-	}
-
-	gui.addFileResponders();
-}
-
-
-gui.addFileResponders = function() {
-	$(".open-file").on("click", function(e) {
-		var i = parseInt(e.currentTarget.id.replace("open-file-", ""));
-		var file = gui.files[i];
-
-		for (var i in gui.tabs) {
-			var tab = gui.tabs[i];
-			if (tab.path == file.path) {
-				gui.selected = i;
-				gui.reloadTab();
-				gui.reloadTabData();
-				return;
-			}
-		}
-
-		var name = file.path.split("/");
-		name = name[name.length - 1];
-
-		gui.openEditorTab(name, file.path, file.contents);
-	});
-}
-
-
-gui.onFilesystemChange = function(files) {
-	gui.files = files;
-	gui.reloadFileList();
-}
-
-
-gui.setupFileList = function() {
-	gui.reloadFileList();
-}
-
-
-
-//  ------------------------
-//    Popups
-//  ------------------------
-
-
-gui.setupPopups = function() {
-	$("#about-popup-open").on("click", function(e) {
-		$("#about-popup").attr("style", "");
-		gui.popupOpen = true;
-	});
-
-	$("#settings-popup-open").on("click", function(e) {
-		$("#settings-popup").attr("style", "");
-		gui.popupOpen = true;
-	});
-
-	$(".popup-close").on("click", function(e) {
-		$(".popup").attr("style", "display: none;");
-		gui.popupOpen = false;
-	});
-}
-
-
-
-//  ------------------------
-//    Computer Sidebar
-//  ------------------------
-
-
-gui.updateComputerSidebar = function() {
-	var computer = core.getActiveComputer();
-	$("#computer-id-field").html(computer.id.toString());
-	$("#computer-type-field").html(computer.advanced ? "Advanced" : "Normal");
+sidebar.update = function() {
+	sidebar.reload(sidebar.dataFromFilesystem());
 }
 
 
@@ -277,6 +238,7 @@ gui.updateComputerSidebar = function() {
 
 
 gui.takeScreenshot = function(link) {
+	var computer = core.getActiveComputer();
 	var mainImage = new Image();
 	var cursorImage = new Image();
 	mainImage.src = canvas.toDataURL("image/png");
@@ -307,15 +269,104 @@ gui.takeScreenshot = function(link) {
 
 
 //  ------------------------
+//    Fullscreen
+//  ------------------------
+
+
+gui.toggleFullscreen = function() {
+	gui.isFullscreen = !gui.isFullscreen;
+	if (gui.isFullscreen) {
+		$(".sidebar-container").hide(500);
+		$("#credits-toggle").fadeOut(500);
+		$("#fullscreen-toggle").html("Exit").blur();
+
+		window.onresize();
+	} else {
+		$(".sidebar-container").show(500);
+		$("#credits-toggle").fadeIn(500);
+		$("#fullscreen-toggle").html("Enter Fullscreen").blur();
+
+		window.onresize();
+	}
+}
+
+
+
+//  ------------------------
+//    Loading
+//  ------------------------
+
+
+gui.beforeLoad = function() {
+	$("#fullscreen-toggle").click(function() {
+		gui.toggleFullscreen();
+	});
+
+	window.onresize();
+}
+
+
+gui.onLoad = function() {
+
+}
+
+
+gui.onRun = function() {
+	$(".loader-container").fadeOut(500);
+
+	var computer = core.getActiveComputer();
+	var size = computer.getActualSize();
+	canvas.width = size.width;
+	canvas.height = size.height;
+	overlayCanvas.width = size.width;
+	overlayCanvas.height = size.height;
+
+	sidebar.update();
+
+	context.beginPath();
+	context.rect(0, 0, canvas.width, canvas.height);
+	context.fillStyle = globals.colors["0"];
+	context.fill();
+
+	window.onresize();
+}
+
+
+gui.setupBrowserIndependence = function() {
+	var isWebkit = 'WebkitAppearance' in document.documentElement.style;
+	if (isWebkit) {
+		$("#editor").addClass("editor-webkit");
+	}
+}
+
+
+
+//  ------------------------
 //    Main
 //  ------------------------
 
 
+window.onresize = function() {
+	$(".loader").css("margin-top", (window.innerHeight / 2 + 100) + "px");
+
+	if (typeof(core) != "undefined") {
+		var computer = core.getActiveComputer();
+		if (typeof(computer) != "undefined") {
+			var location = computer.getLocation();
+			$(".computer-canvas").css({"left": location.x + "px", "top": location.y + "px"});
+		}
+	}
+}
+
+
+gui.setupBrowserIndependence();
+window.onresize();
 gui.configureEditor();
 
 $(document).ready(function() {
-	gui.setupComputers();
-	gui.setupFileList();
-	gui.setupTabs();
-	gui.setupPopups();
+	gui.beforeLoad();
+	core.main({
+		"onLoad": gui.onLoad,
+		"onRun": gui.onRun,
+	});
 });

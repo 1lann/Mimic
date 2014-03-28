@@ -27,7 +27,7 @@ var events = {
 
 
 window.onkeydown = function(event) {
-	if (gui.selected != -1 || gui.popupOpen) {
+	if (!gui.computerSelected || gui.popupOpen) {
 		return;
 	}
 
@@ -36,11 +36,9 @@ window.onkeydown = function(event) {
 		return;
 	}
 
-	if (computer.hasErrored) {
-		if (event.keyCode == 13) {
-			computer.reboot();
-			return;
-		}
+	if (computer.hasErrored && event.keyCode == 13) {
+		computer.reboot();
+		return;
 	}
 
 	var code = parseInt(globals.keyCodes[event.keyCode]);
@@ -118,7 +116,7 @@ window.onkeydown = function(event) {
 		}
 	}
 
-	if (!events.pasting && (event.keyCode == 8 || event.keyCode == 86)) {
+	if (!events.pasting && (event.keyCode == 8 || event.keyCode == 86 || event.keyCode == 9)) {
 		event.preventDefault();
 	}
 }
@@ -141,7 +139,7 @@ window.onkeyup = function(event) {
 
 
 window.onmousedown = function(event) {
-	if (gui.selected != -1 || gui.popupOpen) {
+	if (!gui.computerSelected || gui.popupOpen) {
 		return;
 	}
 
@@ -149,13 +147,15 @@ window.onmousedown = function(event) {
 
 	var computer = core.getActiveComputer();
 
-	var loc = getCanvasLocation();
-	var button = globals.buttons["click " + event.button] + 1;
-	var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
-	var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
-	if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
-		computer.eventStack.push(["mouse_click", button, x, y]);
-		computer.resume();
+	if (typeof(computer) != "undefined") {
+		var loc = computer.getLocation();
+		var button = globals.buttons["click " + event.button] + 1;
+		var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
+		var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
+		if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
+			computer.eventStack.push(["mouse_click", button, x, y]);
+			computer.resume();
+		}
 	}
 }
 
@@ -166,25 +166,27 @@ window.onmouseup = function(event) {
 
 
 window.onmousemove = function(event) {
-	if (gui.selected != -1 || gui.popupOpen) {
+	if (!gui.computerSelected || gui.popupOpen) {
 		return;
 	}
 
 	var computer = core.getActiveComputer();
 
-	var loc = getCanvasLocation();
-	var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
-	var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
-	var button = globals.buttons["click " + event.button];
+	if (typeof(computer) != "undefined") {
+		var loc = computer.getLocation();
+		var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
+		var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
+		var button = globals.buttons["click " + event.button];
 
-	if (events.mouseDown
-			&& (events.prevMouseState.button != button || events.prevMouseState.x != x || events.prevMouseState.y != y)
-			&& (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height)) {
-		computer.eventStack.push(["mouse_drag", button, x, y]);
-		computer.resume();
+		if (events.mouseDown
+				&& (events.prevMouseState.button != button || events.prevMouseState.x != x || events.prevMouseState.y != y)
+				&& (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height)) {
+			computer.eventStack.push(["mouse_drag", button, x, y]);
+			computer.resume();
 
-		events.prevMouseState.button = button;
-		events.prevMouseState.y = x;
-		events.prevMouseState.x = y;
+			events.prevMouseState.button = button;
+			events.prevMouseState.y = x;
+			events.prevMouseState.x = y;
+		}
 	}
 }

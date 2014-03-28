@@ -120,12 +120,37 @@ render.character = function(x, y, text, foreground, background, ctx) {
 //  ------------------------
 
 
+render.border = function(color) {
+	color = color || "0";
+
+	context.fillStyle = globals.colors[color];
+
+	context.beginPath();
+	context.rect(0, 0, config.borderWidth, canvas.height);
+	context.fill();
+
+	context.beginPath();
+	context.rect(canvas.width - config.borderWidth, 0, config.borderWidth, canvas.height);
+	context.fill();
+
+	context.beginPath();
+	context.rect(0, 0, canvas.width, config.borderHeight);
+	context.fill();
+
+	context.beginPath();
+	context.rect(0, canvas.height - config.borderHeight, canvas.width, config.borderHeight);
+	context.fill();
+}
+
+
 render.clearLine = function(y, foreground, background) {
 	background = background || "0";
 	foreground = foreground || "f";
 
 	var computer = core.getActiveComputer();
 	render.text(1, y, " ".repeat(computer.width), foreground, background);
+
+	render.border();
 }
 
 
@@ -137,6 +162,8 @@ render.clear = function(foreground, background) {
 	for (var i = 1; i <= computer.height; i++) {
 		render.clearLine(i, foreground, background);
 	}
+
+	render.border();
 }
 
 

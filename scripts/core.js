@@ -47,8 +47,12 @@ core.createComputer = function(id, advanced) {
 	var computer = new Computer(id, advanced);
 	core.computers.push(computer);
 
-	gui.updateComputerSidebar();
-	filesystem.triggerGUIUpdate();
+	sidebar.update();
+
+	if (core.onRunCallback) {
+		core.onRunCallback();
+		core.onRunCallback = undefined;
+	}
 
 	computer.launch();
 }
@@ -70,14 +74,6 @@ core.run = function() {
 }
 
 
-core.unhideHTMLElements = function() {
-	$("#loading").attr("style", "display: none;");
-	$("#canvas").attr("style", "");
-	$("#overlay-canvas").attr("style", "");
-	window.onresize();
-}
-
-
 core.loadStartupScript = function(callback) {
 	var pastebinID = $.url().param("pastebin");
 	var urlFile = $.url().param("url");
@@ -94,10 +90,9 @@ core.loadStartupScript = function(callback) {
 		request.setURL(url);
 		request.get(function(response) {
 			if (response.status == "200") {
-				// For use once fs.move works
-				// if (filesystem.exists("/computers/0/startup")) {
-				// 	filesystem.move("/computers/0/startup", "/computers/0/startup_old");
-				// }
+				if (filesystem.exists("/computers/0/startup")) {
+					filesystem.move("/computers/0/startup", "/computers/0/startup_old");
+				}
 
 				filesystem.write("/computers/0/startup", response.html);
 			} else {
@@ -114,11 +109,11 @@ core.loadStartupScript = function(callback) {
 }
 
 
-core.setup = function(callback) {
+core.setup = function(onLoadCallback, completeCallback) {
 	filesystem.setup(function() {
 		core.loadStartupScript(function() {
 			render.setup(function() {
-				core.unhideHTMLElements();
+				onLoadCallback();
 
 				core.computers = [];
 
@@ -128,15 +123,18 @@ core.setup = function(callback) {
 					render.cursorBlink();
 				}, 500);
 
-				callback();
+				completeCallback();
 			});
 		});
 	});
 }
 
 
-core.main = function() {
-	core.setup(function() {
+core.main = function(options) {
+	var onLoadCallback = options.onLoad || function() {};
+	core.onRunCallback = options.onRun || function() {};
+
+	core.setup(onLoadCallback, function() {
 		core.run();
 	});
 }
