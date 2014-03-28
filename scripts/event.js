@@ -5,7 +5,7 @@
 //  
 
 var isTouchDevice = function() {
-  return true;
+  return !!('ontouchstart' in window);
 }
 
 $("#mobile-input").val(">");
