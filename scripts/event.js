@@ -51,7 +51,6 @@ window.onkeydown = function(event) {
 	if (isTouchDevice()) {
 		return;
 	}
-	console.log("key")
 
 	var code = parseInt(globals.keyCodes[event.keyCode]);
 	var character = globals.characters.noshift[event.keyCode];
@@ -163,8 +162,16 @@ window.onmousedown = function(event) {
 
 	var loc = getCanvasLocation();
 	var button = globals.buttons["click " + event.button] + 1;
-	var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
-	var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
+	var x; 
+	var y;
+	if ((window.innerWidth < 620) || (window.innerWidth*ratio < 350)) {
+		x = Math.floor((event.pageX - config.borderWidth - loc.x) / (config.cellWidth*(window.innerWidth/620))) + 1;
+		y = Math.floor((event.pageY - config.borderHeight - loc.y) / (config.cellHeight*(window.innerWidth*ratio/350))) + 1;
+	} else {
+		x = Math.floor((event.pageX - config.borderWidth - loc.x) / (config.cellWidth)) + 1;
+		y = Math.floor((event.pageY - config.borderHeight - loc.y) / (config.cellHeight)) + 1;
+	}
+	console.log(x+", "+y)
 	if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
 		computer.eventStack.push(["mouse_click", button, x, y]);
 		computer.resume();
@@ -238,10 +245,12 @@ $("#mobile-input").bind("input", function() {
 });
 
 $("#mobile-form").submit(function(event) { 
-	var computer = core.getActiveComputer();
-	var mobileInput = $("#mobile-input")
-	mobileInput.val(">");
-	mobileInput.caret(-1);
-	computer.eventStack.push(["key", 28]);
+	if (isTouchDevice()) {
+		var computer = core.getActiveComputer();
+		var mobileInput = $("#mobile-input")
+		mobileInput.val(">");
+		mobileInput.caret(-1);
+		computer.eventStack.push(["key", 28]);
+	}
 	event.preventDefault();
 });
