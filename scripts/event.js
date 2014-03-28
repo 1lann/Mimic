@@ -4,7 +4,12 @@
 //  Made by 1lann and GravityScore
 //  
 
+var isTouchDevice = function() {
+  return true;
+}
 
+$("#mobile-input").val(">");
+$("#mobile-input").caret(-1);
 
 var events = {
 	"prevMouseState": {
@@ -42,6 +47,11 @@ window.onkeydown = function(event) {
 			return;
 		}
 	}
+
+	if (isTouchDevice()) {
+		return;
+	}
+	console.log("key")
 
 	var code = parseInt(globals.keyCodes[event.keyCode]);
 	var character = globals.characters.noshift[event.keyCode];
@@ -190,3 +200,48 @@ window.onmousemove = function(event) {
 		events.prevMouseState.x = y;
 	}
 }
+
+$("#mobile-input").bind("input", function() { 
+	if (isTouchDevice()) {
+		var computer = core.getActiveComputer();
+		var mobileInput = $(this)
+    	if (mobileInput.val().length < 1) {
+	    	mobileInput.val(">");
+			mobileInput.caret(0);
+				setTimeout(function(){
+				mobileInput.caret(-1);
+	    		computer.eventStack.push(["key", 14]);
+	    		computer.resume();
+    		}, 5)
+    	} else if ($(this).val() != ">") {
+    		var textInput = mobileInput.val().substring(1);
+    		mobileInput.val(">");
+			mobileInput.caret(0);
+    		setTimeout(function(){
+				mobileInput.caret(-1);
+				for (var i = 0; i < textInput.length; i++) {
+					var letter =  textInput[i];
+					var keyCode = parseInt(globals.charCodes[letter]);
+					var code = globals.keyCodes[keyCode];
+					if (typeof(code) != "undefined") {
+						computer.eventStack.push(["key", code]);
+					}
+
+					if (typeof(letter) != "undefined") {
+						computer.eventStack.push(["char", letter]);
+					}
+				}
+				computer.resume();
+			}, 5)
+    	}
+    }
+});
+
+$("#mobile-form").submit(function(event) { 
+	var computer = core.getActiveComputer();
+	var mobileInput = $("#mobile-input")
+	mobileInput.val(">");
+	mobileInput.caret(-1);
+	computer.eventStack.push(["key", 28]);
+	event.preventDefault();
+});
