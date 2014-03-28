@@ -1,4 +1,3 @@
-
 #Mimic
 
 A fully featured emulator for the [Minecraft](http://minecraft.net) mod [ComputerCraft](http://computercraft.info) that runs straight in your browser.
@@ -20,17 +19,16 @@ Mimic makes use of
 
 ###License
 
-Mimic is licensed under the Creative Commons Attribution-Non Commerical International 4.0 License
+Mimic is licensed under the Reciprocal The Q Public License Version (QPL-1.0)
 
-Link: [CC BY-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
+Link: [The Q Public License Version (QPL-1.0)](http://opensource.org/licenses/QPL-1.0)
 
-You are free to:
-* Share - copy and redistribute the material in any medium or format
-* Adapt - remix, transform, and build upon the material
+Mimic by GravityScore and 1lann - Copyright (c) 2014
 
-Under the following terms:
-* Attribution — You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-* Non Commercial — You may not use the material for commercial purposes.
+Summary of the license:
+*You may modify this software and redistrubute it under the conditions...
+*You must retain the copyright and license in any redistrubutions and modifications of this software
+*You may not charge for anything other than the data transfer costs of this software when redistrubuting
 
 Note this license does not apply for material used in Mimic that we do not own. 
 
