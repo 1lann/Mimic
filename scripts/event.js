@@ -4,7 +4,12 @@
 //  Made by 1lann and GravityScore
 //  
 
+var isTouchDevice = function() {
+  return !!('ontouchstart' in window);
+}
 
+$("#mobile-input").val(">");
+$("#mobile-input").caret(-1);
 
 var events = {
 	"prevMouseState": {
@@ -27,7 +32,7 @@ var events = {
 
 
 window.onkeydown = function(event) {
-	if (!gui.computerSelected || gui.popupOpen) {
+	if (gui.selected != -1 || gui.popupOpen) {
 		return;
 	}
 
@@ -36,9 +41,11 @@ window.onkeydown = function(event) {
 		return;
 	}
 
-	if (computer.hasErrored && event.keyCode == 13) {
-		computer.reboot();
-		return;
+	if (computer.hasErrored) {
+		if (event.keyCode == 13) {
+			computer.reboot();
+			return;
+		}
 	}
 
 	if (isTouchDevice()) {
@@ -76,7 +83,7 @@ window.onkeydown = function(event) {
 			}
 
 			captureField.blur();
-
+			
 			if (pasted.length > 0) {
 				computer.resume();
 			}
@@ -122,7 +129,7 @@ window.onkeydown = function(event) {
 		}
 	}
 
-	if (!events.pasting && (event.keyCode == 8 || event.keyCode == 86 || event.keyCode == 9)) {
+	if (!events.pasting && (event.keyCode == 8 || event.keyCode == 86)) {
 		event.preventDefault();
 	}
 }
@@ -145,7 +152,7 @@ window.onkeyup = function(event) {
 
 
 window.onmousedown = function(event) {
-	if (!gui.computerSelected || gui.popupOpen) {
+	if (gui.selected != -1 || gui.popupOpen) {
 		return;
 	}
 
@@ -182,102 +189,70 @@ window.onmouseup = function(event) {
 
 
 window.onmousemove = function(event) {
-	if (!gui.computerSelected || gui.popupOpen) {
+	if (gui.selected != -1 || gui.popupOpen) {
 		return;
 	}
 
 	var computer = core.getActiveComputer();
 
-	if (typeof(computer) != "undefined") {
-		var loc = computer.getLocation();
-		var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
-		var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
-		var button = globals.buttons["click " + event.button];
+	var loc = getCanvasLocation();
+	var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
+	var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
+	var button = globals.buttons["click " + event.button];
 
-		if (events.mouseDown
-				&& (events.prevMouseState.button != button || events.prevMouseState.x != x || events.prevMouseState.y != y)
-				&& (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height)) {
-			computer.eventStack.push(["mouse_drag", button, x, y]);
-			computer.resume();
+	if (events.mouseDown
+			&& (events.prevMouseState.button != button || events.prevMouseState.x != x || events.prevMouseState.y != y)
+			&& (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height)) {
+		computer.eventStack.push(["mouse_drag", button, x, y]);
+		computer.resume();
 
-			events.prevMouseState.button = button;
-			events.prevMouseState.y = x;
-			events.prevMouseState.x = y;
-		}
+		events.prevMouseState.button = button;
+		events.prevMouseState.y = x;
+		events.prevMouseState.x = y;
 	}
 }
 
-
-
-//  ------------------------
-//    Mobile Input
-//  ------------------------
-
-
-$("#mobile-input").val(">");
-$("#mobile-input").caret(-1);
-
-
-isTouchDevice = function() {
-	return !!('ontouchstart' in window);
-}
-
-
-$("#mobile-input").bind("input", function() {
-	if (!isTouchDevice()) {
-		return;
-	}
-
-	var computer = core.getActiveComputer();
-	var mobileInput = $(this);
-
-	if (mobileInput.val().length < 1) {
-    	mobileInput.val(">");
-		mobileInput.caret(0);
-
-		setTimeout(function() {
+$("#mobile-input").bind("input", function() { 
+	if (isTouchDevice()) {
+		var computer = core.getActiveComputer();
+		var mobileInput = $(this)
+    	if (mobileInput.val().length < 1) {
+	    	mobileInput.val(">");
 			mobileInput.caret(-1);
-    		computer.eventStack.push(["key", 14]);
-    		computer.resume();
-		}, 5);
-	} else if ($(this).val() != ">") {
-		var textInput = mobileInput.val().substring(1);
-		mobileInput.val(">");
-		mobileInput.caret(0);
-
-		setTimeout(function() {
+				setTimeout(function(){
+	    		computer.eventStack.push(["key", 14]);
+	    		computer.resume();
+    		}, 5)
+    	} else if ($(this).val() != ">") {
+    		var textInput = mobileInput.val().substring(1);
+    		mobileInput.val(">");
 			mobileInput.caret(-1);
-			for (var i = 0; i < textInput.length; i++) {
-				var letter = textInput[i];
-				var keyCode = parseInt(globals.charCodes[letter]);
-				var code = globals.keyCodes[keyCode];
+    		setTimeout(function(){
+				for (var i = 0; i < textInput.length; i++) {
+					var letter =  textInput[i];
+					var keyCode = parseInt(globals.charCodes[letter]);
+					var code = globals.keyCodes[keyCode];
+					if (typeof(code) != "undefined") {
+						computer.eventStack.push(["key", code]);
+					}
 
-				if (typeof(code) != "undefined") {
-					computer.eventStack.push(["key", code]);
+					if (typeof(letter) != "undefined") {
+						computer.eventStack.push(["char", letter]);
+					}
 				}
-
-				if (typeof(letter) != "undefined") {
-					computer.eventStack.push(["char", letter]);
-				}
-			}
-
-			computer.resume();
-		}, 5);
-	}
+				computer.resume();
+			}, 5)
+    	}
+    }
 });
 
-
-$("#mobile-form").submit(function(event) {
-	event.preventDefault();
-	if (!isTouchDevice()) {
-		return;
+$("#mobile-form").submit(function(event) { 
+	if (isTouchDevice()) {
+		var computer = core.getActiveComputer();
+		var mobileInput = $("#mobile-input")
+		mobileInput.val(">");
+		mobileInput.caret(-1);
+		computer.eventStack.push(["key", 28]);
 	}
-
-	var computer = core.getActiveComputer();
-	var mobileInput = $("#mobile-input");
-
-	mobileInput.val(">");
-	mobileInput.caret(-1);
-
-	computer.eventStack.push(["key", 28]);
+	event.preventDefault();
 });
