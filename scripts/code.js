@@ -159,7 +159,7 @@ function fs.open(path, mode)\n\
 				if not nextLine then\n\
 					nextLine = f._contents:len()\n\
 				end\n\
-				local line = f._contents:sub(f._cursor, nextLine - 1)\n\
+				local line = f._contents:sub(f._cursor, nextLine)\n\
 				f._cursor = nextLine + 1\n\
 				return line\n\
 			end,\n\
