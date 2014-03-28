@@ -305,7 +305,10 @@ body {
 	text-align: center;
 }
 
+
+
 /* ----------------  Mobile  ---------------- */
+
 
 #mobile-input {
 	z-index: 5;
@@ -321,8 +324,14 @@ body {
 	top: 150px;
 
 	opacity: 0;
-	color:white;
+	color: white;
+
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
+
 @media (max-width: 768px) {
 	#file-list {
 		display: none;

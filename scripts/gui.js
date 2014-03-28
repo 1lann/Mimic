@@ -276,13 +276,13 @@ gui.takeScreenshot = function(link) {
 gui.toggleFullscreen = function() {
 	gui.isFullscreen = !gui.isFullscreen;
 	if (gui.isFullscreen) {
-		$(".sidebar-container").hide(500);
+		$(".sidebar-container").fadeOut(500);
 		$("#credits-toggle").fadeOut(500);
 		$("#fullscreen-toggle").html("Exit").blur();
 
 		window.onresize();
 	} else {
-		$(".sidebar-container").show(500);
+		$(".sidebar-container").fadeIn(500);
 		$("#credits-toggle").fadeIn(500);
 		$("#fullscreen-toggle").html("Enter Fullscreen").blur();
 
@@ -312,7 +312,7 @@ gui.onLoad = function() {
 
 
 gui.onRun = function() {
-	$(".loader-container").fadeOut(500);
+	$(".loader-container").fadeOut(1000);
 
 	var computer = core.getActiveComputer();
 	var size = computer.getActualSize();
