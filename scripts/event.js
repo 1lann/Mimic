@@ -213,18 +213,16 @@ $("#mobile-input").bind("input", function() {
 		var mobileInput = $(this)
     	if (mobileInput.val().length < 1) {
 	    	mobileInput.val(">");
-			mobileInput.caret(0);
+			mobileInput.caret(-1);
 				setTimeout(function(){
-				mobileInput.caret(-1);
 	    		computer.eventStack.push(["key", 14]);
 	    		computer.resume();
     		}, 5)
     	} else if ($(this).val() != ">") {
     		var textInput = mobileInput.val().substring(1);
     		mobileInput.val(">");
-			mobileInput.caret(0);
+			mobileInput.caret(-1);
     		setTimeout(function(){
-				mobileInput.caret(-1);
 				for (var i = 0; i < textInput.length; i++) {
 					var letter =  textInput[i];
 					var keyCode = parseInt(globals.charCodes[letter]);
