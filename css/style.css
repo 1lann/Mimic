@@ -22,6 +22,28 @@ body {
 
 
 
+/* ----------------  No Script  ---------------- */
+
+
+.noscript-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	background-color: #ffffff;
+	color: #444444;
+	text-align: center;
+
+	padding-top: 100px;
+}
+
+.noscript-container h3 {
+	margin-bottom: 30px;
+}
+
+
 /* ----------------  Custom Scrollbar  ---------------- */
 
 
