@@ -17,6 +17,7 @@ var Computer = function(id, advanced) {
 
 	this.id = id;
 	this.advanced = advanced;
+	this.label = null;
 
 	this.L = C.lua_open();
 

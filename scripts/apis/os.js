@@ -40,7 +40,7 @@ osAPI.getComputerLabel = function(L) {
 osAPI.setComputerLabel = function(L) {
 	var computer = core.getActiveComputer();
 	var str = C.luaL_checkstring(L, 1);
-	computer.label = str;
+	computer.label = str.trim();
 
 	return 0;
 }
