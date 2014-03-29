@@ -14,8 +14,7 @@ code.getAll = function() {
 }
 
 
-code.prebios = '\n\
---bios file--\n\
+code.prebios = '\
 \n\
 --  Some functions are taken from the ComputerCraft bios.lua, \n\
 --  which was written by dan200\n\
