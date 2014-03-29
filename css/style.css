@@ -342,6 +342,12 @@ body {
 	text-align: left !important;
 }
 
+.ace_gutter-tooltip {
+	background-image: none !important;
+	box-shadow: none !important;
+	border: 1px solid #cbcbcb !important;
+}
+
 
 
 /* ----------------  Modals  ---------------- */

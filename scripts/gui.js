@@ -164,6 +164,7 @@ sidebar.select = function(id) {
 		return;
 	}
 
+	sidebar.saveOpenFile();
 	sidebar.selected = id;
 
 	if (item.type == "file") {
@@ -217,10 +218,10 @@ sidebar.dataFromFilesystem = function() {
 
 
 sidebar.saveOpenFile = function() {
-	var item = sidebar.itemFromID(gui.selected);
+	var item = sidebar.itemFromID(sidebar.selected);
 
-	if (typeof(item) != "undefined") {
-		var contents = editor.getSession().getValue();
+	if (typeof(item) != "undefined" && item.type == "file") {
+		var contents = gui.editor.getSession().getValue();
 		filesystem.write(item.path, contents);
 	}
 }
@@ -295,6 +296,11 @@ gui.toggleFullscreen = function() {
 //  ------------------------
 //    Loading
 //  ------------------------
+
+
+$(window).unload(function() {
+	sidebar.saveOpenFile();
+});
 
 
 gui.beforeLoad = function() {

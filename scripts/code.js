@@ -147,20 +147,23 @@ function fs.open(path, mode)\n\
 			["_contents"] = contents,\n\
 			["readAll"] = function()\n\
 				local contents = f._contents:sub(f._cursor)\n\
-				f._cursor = f._contents:len() + 1\n\
+				f._cursor = f._contents:len()\n\
 				return contents\n\
 			end,\n\
 			["readLine"] = function()\n\
-				if f._cursor == f._contents:len() + 1 then\n\
+				if f._cursor >= f._contents:len() then\n\
 					return nil\n\
 				end\n\
 \n\
 				local nextLine = f._contents:find("\\n", f._cursor, true)\n\
 				if not nextLine then\n\
 					nextLine = f._contents:len()\n\
+				else\n\
+					nextLine = nextLine - 1\n\
 				end\n\
+\n\
 				local line = f._contents:sub(f._cursor, nextLine)\n\
-				f._cursor = nextLine + 1\n\
+				f._cursor = nextLine + 2\n\
 				return line\n\
 			end,\n\
 			["close"] = function() end,\n\
