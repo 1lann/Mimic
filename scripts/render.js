@@ -54,7 +54,7 @@ render.characterBackground = function(x, y, color, ctx) {
 		var cellY = ((y - 1) * config.cellHeight + config.borderHeight);
 
 		ctx.beginPath();
-		ctx.rect(cellX, cellY, config.cellWidth + 0.25, config.cellHeight + 0.25);
+		ctx.rect(cellX, cellY, config.cellWidth + 0.25, config.cellHeight);
 		ctx.fillStyle = globals.colors[color];
 		ctx.fill();
 	}
