@@ -19,7 +19,7 @@ Mimic makes use of
 
 ###License
 
-Mimic is licensed under the Reciprocal The Q Public License Version (QPL-1.0)
+Mimic is licensed under The Q Public License Version (QPL-1.0)
 
 Link: [The Q Public License Version (QPL-1.0)](http://opensource.org/licenses/QPL-1.0)
 
