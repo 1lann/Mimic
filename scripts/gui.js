@@ -11,6 +11,7 @@ var gui = {
 	"scrolls": {},
 	"computerSelected": true,
 	"isFullscreen": false,
+	"narrow": false,
 };
 
 var sidebar = {
@@ -354,6 +355,20 @@ gui.setupBrowserIndependence = function() {
 
 window.onresize = function() {
 	$(".loader").css("margin-top", (window.innerHeight / 2 + 100) + "px");
+
+	if (window.innerWidth < 900) {
+		$(".sidebar-container").hide();
+		$("#credits-toggle").hide();
+		$("#fullscreen-toggle").hide();
+		narrow = true;
+		gui.isFullscreen = true;
+	} else if (narrow) {
+		$(".sidebar-container").show();
+		$("#credits-toggle").show();
+		$("#fullscreen-toggle").show();
+		narrow = false;
+		gui.isFullscreen = false;
+	}
 
 	if (typeof(core) != "undefined") {
 		var computer = core.getActiveComputer();

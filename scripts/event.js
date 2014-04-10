@@ -234,36 +234,30 @@ $("#mobile-input").bind("input", function() {
 
 	if (mobileInput.val().length < 1) {
     	mobileInput.val(">");
-		mobileInput.caret(0);
+		mobileInput.caret(-1);
 
-		setTimeout(function() {
-			mobileInput.caret(-1);
-    		computer.eventStack.push(["key", 14]);
-    		computer.resume();
-		}, 5);
+		computer.eventStack.push(["key", 14]);
+		computer.resume();
 	} else if ($(this).val() != ">") {
 		var textInput = mobileInput.val().substring(1);
 		mobileInput.val(">");
-		mobileInput.caret(0);
+		mobileInput.caret(-1);
 
-		setTimeout(function() {
-			mobileInput.caret(-1);
-			for (var i = 0; i < textInput.length; i++) {
-				var letter = textInput[i];
-				var keyCode = parseInt(globals.charCodes[letter]);
-				var code = globals.keyCodes[keyCode];
+		for (var i = 0; i < textInput.length; i++) {
+			var letter = textInput[i];
+			var keyCode = parseInt(globals.charCodes[letter]);
+			var code = globals.keyCodes[keyCode];
 
-				if (typeof(code) != "undefined") {
-					computer.eventStack.push(["key", code]);
-				}
-
-				if (typeof(letter) != "undefined") {
-					computer.eventStack.push(["char", letter]);
-				}
+			if (typeof(code) != "undefined") {
+				computer.eventStack.push(["key", code]);
 			}
 
-			computer.resume();
-		}, 5);
+			if (typeof(letter) != "undefined") {
+				computer.eventStack.push(["char", letter]);
+			}
+		}
+
+		computer.resume();
 	}
 });
 
