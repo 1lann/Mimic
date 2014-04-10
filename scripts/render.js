@@ -28,7 +28,11 @@ var lineYOffset = 2;
 
 render.setup = function(callback) {
 	context.imageSmoothingEnabled = false;
+	context.webkitImageSmoothingEnabled = false;
+	context.mozIageSmoothingEnabled = false;
 	overlayContext.imageSmoothingEnabled = false;
+	overlayContext.webkitImageSmoothingEnabled = false;
+	overlayContext.mozImageSmoothingEnabled = false;
 	font = new Image();
 	font.src = "fonts/font.png";
 	font.onload = function() {
@@ -54,7 +58,7 @@ render.characterBackground = function(x, y, color, ctx) {
 		var cellY = ((y - 1) * config.cellHeight + config.borderHeight);
 
 		ctx.beginPath();
-		ctx.rect(cellX, cellY, config.cellWidth + 0.25, config.cellHeight);
+		ctx.rect(cellX, cellY, config.cellWidth, config.cellHeight);
 		ctx.fillStyle = globals.colors[color];
 		ctx.fill();
 	}

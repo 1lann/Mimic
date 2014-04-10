@@ -54,12 +54,13 @@ window.onkeydown = function(event) {
 	if ((event.ctrlKey || event.metaKey) && character && character.toLowerCase() == "v") {
 		events.pasting = true;
 
-		var captureField = $("#paste-capture");
+		var captureField = $("#mobile-input");
+		captureField.val("");
 		captureField.focus();
 
 		setTimeout(function() {
 			var pasted = captureField.val();
-			captureField.val("");
+			captureField.val(">");
 
 			for (var i = 0; i < pasted.length; i++) {
 				var letter = pasted[i];
@@ -82,7 +83,7 @@ window.onkeydown = function(event) {
 			}
 
 			events.pasting = false;
-		}, 10);
+		}, 5);
 	} else if (event.ctrlKey && character && character == "r" && !events.triggerKeyTimerID) {
 		events.triggerKeyTimerID = setTimeout(function() {
 			computer.reboot();

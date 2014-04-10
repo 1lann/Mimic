@@ -414,6 +414,19 @@ filesystem.copy = function(from, to) {
 	return success;
 }
 
+filesystem.move = function(from, to) {
+	if (filesystem.copy(from, to)) {
+		if (filesystem.delete(from)) {
+			sidebar.update();
+			return true
+		} else {
+			filesystem.delete(to);
+			return false;
+		}
+	} else {
+		return false;
+	}
+}
 
 
 
@@ -575,17 +588,7 @@ computerFilesystem.move = function(from, to) {
 	from = computerFilesystem.resolve(from);
 	to = computerFilesystem.resolve(to);
 
-	var success = false;
-	if (filesystem.copy(from, to)) {
-		if (filesystem.delete(from)) {
-			success = true;
-		} else {
-			filesystem.delete(to);
-		}
-	}
-	
-	sidebar.update();
-	return success;
+	return filesystem.move(from, to)
 }
 
 

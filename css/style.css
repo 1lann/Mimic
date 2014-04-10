@@ -242,6 +242,13 @@ body {
 
 
 #canvas, #overlay-canvas {
+	image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: -o-crisp-edges;
+    image-rendering: optimize-contrast;
+    -ms-interpolation-mode: nearest-neighbor;
+
 	position: fixed;
 	top: 0;
 	left: 275px;
@@ -404,7 +411,7 @@ body {
 	left: 400px;
 	top: 150px;
 
-	opacity: 0;
+	opacity: 1;
 	color: white;
 
 	-moz-user-select: none;
