@@ -226,7 +226,7 @@ isTouchDevice = function() {
 
 $("#mobile-input").bind("input", function() {
 	var mobileInput = $(this);
-	
+
 	if (!isTouchDevice()) {
 		mobileInput.val(">");
 		return;
@@ -278,3 +278,31 @@ $("#mobile-form").submit(function(event) {
 
 	computer.eventStack.push(["key", 28]);
 });
+
+
+// ------------------------
+//   Scrolling
+// ------------------------
+
+var compoundScroll = 0
+
+window.onmousewheel = function(event) {
+	var computer = core.getActiveComputer();
+
+	compoundScroll += event.wheelDelta;
+
+	if (compoundScroll < 0) {
+		//for (var i = 0; i <= Math.ceil(compoundScroll/200); i++) {
+			computer.eventStack.push(["mouse_scroll", Math.ceil(compoundScroll/200), events.prevMouseState.x, events.prevMouseState.x]);
+		//};
+	} else {
+		//for (var i = 0; i <= Math.abs(Math.ceil(compoundScroll/200)); i++) {
+			computer.eventStack.push(["mouse_scroll", Math.ceil(compoundScroll/200), events.prevMouseState.x, events.prevMouseState.x]);
+		//};
+	}
+	console.log(Math.ceil(compoundScroll/200))
+	compoundScroll = compoundScroll%200;
+	event.preventDefault();
+}
+
+
