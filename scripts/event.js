@@ -226,6 +226,7 @@ isTouchDevice = function() {
 
 $("#mobile-input").bind("input", function() {
 	if (!isTouchDevice()) {
+		mobileInput.val(">");
 		return;
 	}
 
