@@ -1,8 +1,8 @@
 
-//  
+//
 //  Mimic
 //  Made by 1lann and GravityScore
-//  
+//
 
 
 
@@ -83,7 +83,7 @@ window.onkeydown = function(event) {
 			}
 
 			events.pasting = false;
-		}, 5);
+		}, 20);
 	} else if (event.ctrlKey && character && character == "r" && !events.triggerKeyTimerID) {
 		events.triggerKeyTimerID = setTimeout(function() {
 			computer.reboot();

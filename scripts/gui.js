@@ -360,13 +360,13 @@ window.onresize = function() {
 		$(".sidebar-container").hide();
 		$("#credits-toggle").hide();
 		$("#fullscreen-toggle").hide();
-		narrow = true;
+		gui.narrow = true;
 		gui.isFullscreen = true;
-	} else if (narrow) {
+	} else if (gui.narrow) {
 		$(".sidebar-container").show();
 		$("#credits-toggle").show();
 		$("#fullscreen-toggle").show();
-		narrow = false;
+		gui.narrow = false;
 		gui.isFullscreen = false;
 	}
 
