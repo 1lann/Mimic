@@ -287,16 +287,21 @@ $("#mobile-form").submit(function(event) {
 
 var compoundScroll = 0
 
-window.onmousewheel = function(event) {
+onmousewheel = function(e) {
+	var e = window.event || e; // old IE support
+	var delta = e.wheelDelta || -e.detail*10
+
+	if (!delta) return true;
+
 	var computer = core.getActiveComputer();
 
 	if (computer) {
 		var loc = computer.getLocation();
-		var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
-		var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
+		var x = Math.floor((e.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
+		var y = Math.floor((e.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
 
 		if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
-			compoundScroll += event.wheelDelta;
+			compoundScroll += delta;
 
 			if (Math.abs(Math.round(compoundScroll/100)) != 0) {
 				if (Math.ceil(compoundScroll/100) < 0) {
@@ -311,11 +316,21 @@ window.onmousewheel = function(event) {
 			}
 
 			compoundScroll = compoundScroll%100;
-			
+
 			computer.resume();
-			event.preventDefault();
+			e.preventDefault();
 		}
 	}
 }
+
+
+if (window.addEventListener) {
+	// IE9, Chrome, Safari, Opera
+	window.addEventListener("mousewheel", onmousewheel, false);
+	// Firefox
+	window.addEventListener("DOMMouseScroll", onmousewheel, false);
+}
+// IE 6/7/8
+else window.attachEvent("onmousewheel", onmousewheel);
 
 
