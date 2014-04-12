@@ -202,8 +202,8 @@ window.onmousemove = function(event) {
 			computer.resume();
 
 			events.prevMouseState.button = button;
-			events.prevMouseState.y = x;
-			events.prevMouseState.x = y;
+			events.prevMouseState.x = x;
+			events.prevMouseState.y = y;
 		}
 	}
 }
@@ -277,6 +277,7 @@ $("#mobile-form").submit(function(event) {
 	mobileInput.caret(-1);
 
 	computer.eventStack.push(["key", 28]);
+	computer.resume();
 });
 
 
@@ -289,20 +290,32 @@ var compoundScroll = 0
 window.onmousewheel = function(event) {
 	var computer = core.getActiveComputer();
 
-	compoundScroll += event.wheelDelta;
+	if (computer) {
+		var loc = computer.getLocation();
+		var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
+		var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
 
-	if (compoundScroll < 0) {
-		//for (var i = 0; i <= Math.ceil(compoundScroll/200); i++) {
-			computer.eventStack.push(["mouse_scroll", Math.ceil(compoundScroll/200), events.prevMouseState.x, events.prevMouseState.x]);
-		//};
-	} else {
-		//for (var i = 0; i <= Math.abs(Math.ceil(compoundScroll/200)); i++) {
-			computer.eventStack.push(["mouse_scroll", Math.ceil(compoundScroll/200), events.prevMouseState.x, events.prevMouseState.x]);
-		//};
+		if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
+			compoundScroll += event.wheelDelta;
+
+			if (Math.abs(Math.round(compoundScroll/100)) != 0) {
+				if (Math.ceil(compoundScroll/100) < 0) {
+					for (var i = 0; i <= Math.abs(Math.round(compoundScroll/100)); i++) {
+						computer.eventStack.push(["mouse_scroll", 1, x, y]);
+					}
+				} else {
+					for (var i = 0; i <= Math.round(compoundScroll/100); i++) {
+						computer.eventStack.push(["mouse_scroll", -1, x, y]);
+					}
+				}
+			}
+
+			compoundScroll = compoundScroll%100;
+			
+			computer.resume();
+			event.preventDefault();
+		}
 	}
-	console.log(Math.ceil(compoundScroll/200))
-	compoundScroll = compoundScroll%200;
-	event.preventDefault();
 }
 
 
