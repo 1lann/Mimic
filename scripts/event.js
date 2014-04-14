@@ -228,7 +228,6 @@ $("#mobile-input").bind("input", function() {
 	var mobileInput = $(this);
 
 	if (!isTouchDevice()) {
-		mobileInput.val(">");
 		return;
 	}
 
