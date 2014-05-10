@@ -1,0 +1,60 @@
+
+//
+//  Ace Extension
+//  Mimic
+//
+
+
+
+.ace_search.right {
+	background-color: rgba(0, 0, 0, 0);
+	border: none;
+	border-radius: 0 !important;
+	right: 50px !important;
+	top: 20px;
+	width: 320px !important;
+	max-width: 320px !important;
+}
+
+.ace_searchbtn_close {
+	display: none !important;
+}
+
+.ace_replace_form, .ace_search_form {
+	border: none !important;
+	width: 320px !important;
+}
+
+.ace_search_field {
+	border: 1px solid #cbcbcb !important;
+	border-right: none !important;
+	border-top-left-radius: 3px !important;
+	border-bottom-left-radius: 3px !important;
+}
+
+.ace_replacebtn:last-child, .ace_searchbtn:last-child {
+	border-top-right-radius: 3px !important;
+	border-bottom-right-radius: 3px !important;
+
+	border-left: none !important;
+}
+
+.ace_replacebtn, .ace_searchbtn {
+	border: 1px solid #cbcbcb !important;
+	padding-left: 5px !important;
+	padding-right: 5px !important;
+}
+
+.ace_replacebtn {
+	margin-bottom: 3px !important;
+}
+
+.ace_search_options {
+	text-align: left !important;
+}
+
+.ace_gutter-tooltip {
+	background-image: none !important;
+	box-shadow: none !important;
+	border: 1px solid #cbcbcb !important;
+}

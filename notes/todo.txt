@@ -13,7 +13,6 @@ To Refactor
 To Do
 - Add GUI buttons for fullscreen, screenshot, etc.
 - Add more ROM programs
-- Add Sass instead of actual CSS
 - Add support for http.post
 - Add simulated restone API
 - Add file deletion from Ace editor

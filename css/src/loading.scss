@@ -1,0 +1,99 @@
+
+//
+//  Loading Animation
+//  Mimic
+//
+
+
+
+$loading-animation-duration: 1.0s;
+$loading-animation-background: #ffffff;
+$loading-animation-foreground: #444444;
+
+
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	50% { transform: rotate(180deg); }
+	100% { transform: rotate(180deg); }
+}
+
+@keyframes onOff {
+	0% { opacity: 0; }
+	49% { opacity: 0; }
+	50% { opacity: 1; }
+	100% { opacity: 1; }
+}
+
+
+.loader-container {
+	position: fixed;
+	top: -100px;
+	left: 0;
+	bottom: 0;
+	right: 0;
+
+	background-color: $loading-animation-background;
+}
+
+.loader {
+	position: relative;
+	width: 80px;
+	margin: 0 auto;
+}
+
+.duo {
+	height: 20px;
+	width: 50px;
+	background: hsla(0, 0%, 0%, 0.0);
+	position: absolute;
+}
+
+.duo, .dot {
+	animation-duration: $loading-animation-duration;
+	animation-timing-function: ease-in-out;
+	animation-iteration-count: infinite;
+}
+
+.duo1 {
+	left: 0;
+}
+
+.duo2 {
+	left: 30px;
+}
+
+.dot {
+	width: 20px;
+	height: 20px;
+	border-radius: 10px;
+	background: $loading-animation-foreground;
+	position: absolute;
+}
+
+.dot-a {
+	left: 0px;
+}
+
+.dot-b {
+	right: 0px;
+}
+
+.duo1 {
+	animation-name: spin;
+}
+
+.duo2 {
+	animation-name: spin;
+	animation-direction: reverse;
+}
+
+.duo2 .dot-b {
+	animation-name: onOff;
+}
+
+.duo1 .dot-a {
+	opacity: 0;
+	animation-name: onOff;
+	animation-direction: reverse;
+}

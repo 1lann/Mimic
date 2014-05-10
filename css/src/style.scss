@@ -1,0 +1,59 @@
+
+//
+//  Main
+//  Mimic
+//
+
+
+// Use to compile:
+// sass css/src/style.scss css/style.css
+
+
+@import "sidebar";
+@import "loading";
+@import "ace";
+@import "modals";
+@import "mobile";
+@import "editor";
+@import "computer";
+
+
+$text-color: #444444;
+
+
+body {
+	color: $text-color;
+}
+
+.btn {
+	margin-left: 20px;
+}
+
+.btn:hover {
+	background-color: #f8f8f8;
+}
+
+
+
+//  ------------------------
+//    No Script
+//  ------------------------
+
+
+.noscript-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	background-color: #ffffff;
+	color: #444444;
+	text-align: center;
+
+	padding-top: 100px;
+}
+
+.noscript-container h3 {
+	margin-bottom: 30px;
+}

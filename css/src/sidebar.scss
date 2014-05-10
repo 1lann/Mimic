@@ -1,0 +1,66 @@
+
+//
+//  Sidebar
+//  Mimic
+//
+
+
+
+$sidebar-text: #ffffff;
+$sidebar-text-selected: #f2f3f3;
+
+$sidebar-background: #475f77;
+$sidebar-background-selected: #354b5e;
+$sidebar-width: 300px;
+
+
+
+.sidebar-container {
+	position: fixed;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: $sidebar-width;
+	overflow: auto;
+
+	background-color: $sidebar-background;
+	color: $sidebar-text;
+}
+
+
+.sidebar-list {
+	list-style: none;
+	padding: 0;
+}
+
+
+.sidebar-item {
+	font-size: 16px;
+	padding: 10px 20px;
+	cursor: default;
+	color: $sidebar-text-selected;
+
+	&.large {
+		font-size: 20px;
+		padding: 12px 15px;
+	}
+
+	&.selected {
+		position: relative;
+
+		background-color: #354B5E;
+		color: #ffffff;
+	}
+
+	.glyphicon {
+		margin-top: 3px;
+
+		font-size: 14px;
+		float: right;
+	}
+
+	&.large .glyphicon {
+		font-size: 14px;
+		margin-top: 5px;
+	}
+}

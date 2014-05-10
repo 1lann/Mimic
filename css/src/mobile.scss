@@ -1,0 +1,48 @@
+
+//
+//  Mobile
+//  Mimic
+//
+
+
+
+$mobile-min-width: 768px;
+
+
+
+#mobile-input {
+	z-index: 5;
+
+	position: fixed;
+	height: 350px;
+	width: 620px;
+
+	cursor: default;
+	background: none;
+
+	left: 400px;
+	top: 150px;
+
+	opacity: 0;
+	color: white;
+
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+
+@media (max-width: $mobile-min-width) {
+	#file-list {
+		display: none;
+	}
+
+	.computer-options {
+		display: none;
+	}
+
+	.computer-tab-bar {
+		display: none;
+	}
+}
