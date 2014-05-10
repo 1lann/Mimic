@@ -29,8 +29,79 @@ var events = {
 //  ------------------------
 
 
+events.paste = function(computer) {
+	var triggerDuration = 1000;
+	var triggers = {
+		"r": computer.reboot,
+		"s": computer.shutdown,
+		"t": computer.terminate,
+	};
+
+	events.pasting = true;
+
+	var captureField = $("#mobile-input");
+	captureField.val("");
+	captureField.focus();
+
+	setTimeout(function() {
+		var pasted = captureField.val();
+		captureField.val(">");
+
+		for (var i = 0; i < pasted.length; i++) {
+			var letter = pasted[i];
+			var keyCode = parseInt(globals.charCodes[letter]);
+			var code = globals.keyCodes[keyCode];
+
+			if (typeof(code) != "undefined") {
+				computer.eventStack.push(["key", code]);
+			}
+
+			if (typeof(letter) != "undefined") {
+				computer.eventStack.push(["char", letter]);
+			}
+		}
+
+		captureField.blur();
+
+		if (pasted.length > 0) {
+			computer.resume();
+		}
+
+		events.pasting = false;
+	}, 20);
+}
+
+
+events.activateTrigger = function(character) {
+	for (var triggerKey in triggers) {
+		if (character == triggerKey) {
+			var func = triggers[triggerKey];
+
+			events.triggerKey = character;
+			events.triggerKeyTimerID = setTimeout(function() {
+				func();
+				events.triggerKeyTimerID = null;
+			}, triggerDuration);
+		}
+	}
+}
+
+
+events.pushKey = function(computer, character, code) {
+	if (typeof(code) != "undefined") {
+		computer.eventStack.push(["key", code]);
+	} if (typeof(character) != "undefined") {
+		computer.eventStack.push(["char", character]);
+	}
+
+	if (computer.eventStack.length > 0) {
+		computer.resume();
+	}
+}
+
+
 window.onkeydown = function(event) {
-	if (!gui.computerSelected || gui.popupOpen) {
+	if (!gui.computerSelected || gui.popupOpen || isTouchDevice()) {
 		return;
 	}
 
@@ -44,89 +115,32 @@ window.onkeydown = function(event) {
 		return;
 	}
 
-	if (isTouchDevice()) {
-		return;
-	}
-
 	var code = parseInt(globals.keyCodes[event.keyCode]);
 	var character = globals.characters.noshift[event.keyCode];
 	if (event.shiftKey) {
 		character = globals.characters.shift[event.keyCode];
 	}
 
-	if ((event.ctrlKey || event.metaKey) && character && character.toLowerCase() == "v") {
-		events.pasting = true;
+	var shouldActivateTrigger = event.ctrlKey && character && !events.triggerKeyTimerID;
+	var shouldPaste =
+		(event.ctrlKey || event.metaKey) &&
+		character &&
+		character.toLowerCase() == "v";
 
-		var captureField = $("#mobile-input");
-		captureField.val("");
-		captureField.focus();
-
-		setTimeout(function() {
-			var pasted = captureField.val();
-			captureField.val(">");
-
-			for (var i = 0; i < pasted.length; i++) {
-				var letter = pasted[i];
-				var keyCode = parseInt(globals.charCodes[letter]);
-				var code = globals.keyCodes[keyCode];
-
-				if (typeof(code) != "undefined") {
-					computer.eventStack.push(["key", code]);
-				}
-
-				if (typeof(letter) != "undefined") {
-					computer.eventStack.push(["char", letter]);
-				}
-			}
-
-			captureField.blur();
-
-			if (pasted.length > 0) {
-				computer.resume();
-			}
-
-			events.pasting = false;
-		}, 20);
-	} else if (event.ctrlKey && character && character == "r" && !events.triggerKeyTimerID) {
-		events.triggerKeyTimerID = setTimeout(function() {
-			computer.reboot();
-			events.triggerKeyTimerID = null;
-		}, 1000);
-
-		events.triggerKey = "r";
-	} else if (event.ctrlKey && character && character == "s" && !events.triggerKeyTimerID) {
-		events.triggerKeyTimerID = setTimeout(function() {
-			computer.shutdown();
-			events.triggerKeyTimerID = null;
-		}, 1000);
-
-		events.triggerKey = "s";
-	} else if (event.ctrlKey && character && character == "t" && !events.triggerKeyTimerID) {
-		events.triggerKeyTimerID = setTimeout(function() {
-			computer.terminate();
-			events.triggerKeyTimerID = null;
-		}, 1000);
-
-		events.triggerKey = "t";
+	if (shouldPaste) {
+		events.paste(computer);
+	} else if (shouldActivateTrigger) {
+		events.activateTrigger(character);
 	} else if (!events.triggerKeyTimerID) {
-		var pushedSomething = false;
-
-		if (typeof(code) != "undefined") {
-			computer.eventStack.push(["key", code]);
-			pushedSomething = true;
-		}
-
-		if (typeof(character) != "undefined") {
-			computer.eventStack.push(["char", character]);
-			pushedSomething = true;
-		}
-
-		if (pushedSomething) {
-			computer.resume();
-		}
+		events.pushKey(computer, character, code);
 	}
 
-	if (!events.pasting && (event.keyCode == 8 || event.keyCode == 86 || event.keyCode == 9)) {
+	var shouldCancelKey =
+		event.keyCode == 8 ||
+		event.keyCode == 86 ||
+		event.keyCode == 9;
+
+	if (!events.pasting && shouldCancelKey) {
 		event.preventDefault();
 	}
 }
@@ -164,12 +178,19 @@ window.onmousedown = function(event) {
 		var size = computer.getActualSize();
 		var ratio = size.height / size.width;
 
+		var localised = {
+			"x": (event.pageX - config.borderWidth - loc.x),
+			"y": (event.pageY - config.borderHeight - loc.y),
+			"w": (config.cellWidth * (window.innerWidth / size.width)),
+			"h": (config.cellHeight * (window.innerWidth * ratio / size.height)),
+		}
+
 		if ((window.innerWidth < size.width) || (window.innerWidth * ratio < size.height)) {
-			x = Math.floor((event.pageX - config.borderWidth - loc.x) / (config.cellWidth * (window.innerWidth / size.width))) + 1;
-			y = Math.floor((event.pageY - config.borderHeight - loc.y) / (config.cellHeight * (window.innerWidth * ratio / size.height))) + 1;
+			x = Math.floor(localised.x / localised.w) + 1;
+			y = Math.floor(localised.y / localised.h) + 1;
 		} else {
-			x = Math.floor((event.pageX - config.borderWidth - loc.x) / (config.cellWidth)) + 1;
-			y = Math.floor((event.pageY - config.borderHeight - loc.y) / (config.cellHeight)) + 1;
+			x = Math.floor(localised.x / (config.cellWidth)) + 1;
+			y = Math.floor(localised.y / (config.cellHeight)) + 1;
 		}
 
 		if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
@@ -194,13 +215,23 @@ window.onmousemove = function(event) {
 
 	if (typeof(computer) != "undefined") {
 		var loc = computer.getLocation();
-		var x = Math.floor((event.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
-		var y = Math.floor((event.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
+
+		var localised = {
+			"x": (event.pageX - config.borderWidth - loc.x),
+			"y": (event.pageY - config.borderHeight - loc.y),
+		}
+
+		var x = Math.floor(localised.x / config.cellWidth) + 1;
+		var y = Math.floor(localised.y / config.cellHeight) + 1;
 		var button = globals.buttons["click " + event.button];
 
-		if (events.mouseDown
-				&& (events.prevMouseState.button != button || events.prevMouseState.x != x || events.prevMouseState.y != y)
-				&& (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height)) {
+		var withinBounds = (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height);
+		var differentFromPrevious =
+			events.prevMouseState.button != button ||
+			events.prevMouseState.x != x ||
+			events.prevMouseState.y != y;
+
+		if (events.mouseDown && differentFromPrevious && withinBounds) {
 			computer.eventStack.push(["mouse_drag", button, x, y]);
 			computer.resume();
 
@@ -292,7 +323,7 @@ $("#mobile-form").submit(function(event) {
 var compoundScroll = 0;
 
 
-onmousewheel = function(e) {
+events.onmousewheel = function(e) {
 	var e = window.event || e;
 	var delta = e.wheelDelta || -e.detail * 10
 
@@ -301,39 +332,41 @@ onmousewheel = function(e) {
 	}
 
 	var computer = core.getActiveComputer();
+	if (!computer) {
+		return;
+	}
 
-	if (computer) {
-		var loc = computer.getLocation();
-		var x = Math.floor((e.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
-		var y = Math.floor((e.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
+	var loc = computer.getLocation();
+	var x = Math.floor((e.pageX - config.borderWidth - loc.x) / config.cellWidth) + 1;
+	var y = Math.floor((e.pageY - config.borderHeight - loc.y) / config.cellHeight) + 1;
 
-		if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
-			compoundScroll += delta;
+	if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
+		compoundScroll += delta;
 
-			if (Math.abs(Math.round(compoundScroll / 100)) != 0) {
-				if (Math.ceil(compoundScroll / 100) < 0) {
-					for (var i = 0; i <= Math.abs(Math.round(compoundScroll / 100)); i++) {
-						computer.eventStack.push(["mouse_scroll", 1, x, y]);
-					}
-				} else {
-					for (var i = 0; i <= Math.round(compoundScroll / 100); i++) {
-						computer.eventStack.push(["mouse_scroll", -1, x, y]);
-					}
+		var amount = Math.abs(Math.round(compoundScroll / 100));
+		if (amount != 0) {
+			if (Math.ceil(compoundScroll / 100) < 0) {
+				for (var i = 0; i <= amount; i++) {
+					computer.eventStack.push(["mouse_scroll", 1, x, y]);
+				}
+			} else {
+				for (var i = 0; i <= Math.round(compoundScroll / 100); i++) {
+					computer.eventStack.push(["mouse_scroll", -1, x, y]);
 				}
 			}
-
-			compoundScroll = compoundScroll % 100;
-			computer.resume();
-
-			e.preventDefault();
 		}
+
+		compoundScroll = compoundScroll % 100;
+		computer.resume();
+
+		e.preventDefault();
 	}
 }
 
 
 if (window.addEventListener) {
-	window.addEventListener("mousewheel", onmousewheel, false);
-	window.addEventListener("DOMMouseScroll", onmousewheel, false);
+	window.addEventListener("mousewheel", events.onmousewheel, false);
+	window.addEventListener("DOMMouseScroll", events.onmousewheel, false);
 } else {
-	window.attachEvent("onmousewheel", onmousewheel);
+	window.attachEvent("onmousewheel", events.onmousewheel);
 }

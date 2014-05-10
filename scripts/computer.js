@@ -133,84 +133,99 @@ Computer.prototype.launch = function() {
 }
 
 
-Computer.prototype.resume = function() {
-	var computer = this;
+Computer.prototype.pushEventStackToThread = function() {
+	for (var i in this.eventStack[0]) {
+		var argument = this.eventStack[0][i];
 
-	var threadLoopID = setInterval(function() {
-		var stackRuns = 0;
-		for (i = 1; i <= computer.eventStack.length; i++) {
-			stackRuns++;
-			if (stackRuns > 256) {
+		if (typeof(argument) == "string") {
+			C.lua_pushstring(this.thread, argument);
+		} else if (typeof(argument) == "number") {
+			C.lua_pushnumber(this.thread, argument);
+		} else if (typeof(argument) == "boolean") {
+			C.lua_pushboolean(this.thread, argument ? 1 : 0);
+		} else if (typeof(argument) == "object") {
+			C.lua_pushstring(this.thread, core.serializeTable(argument));
+		} else {
+			C.lua_pushstring(this.thread, argument.toString());
+		}
+	}
+}
+
+
+Computer.prototype.handleResumeResult = function(result, threadLoopID) {
+	if (result == C.LUA_YIELD) {
+		if (this.shouldShutdown) {
+			this.shutdown();
+		} else if (this.shouldReboot) {
+			this.reboot();
+		}
+	} else if (result == 0) {
+		clearInterval(threadLoopID);
+		this.alive = false;
+
+		console.log("Program ended");
+	} else {
+		clearInterval(threadLoopID);
+		this.alive = false;
+
+		if (!this.hasErrored) {
+			render.bsod("FATAL : THREAD CRASH",
+				["The Lua thread has crashed!",
+				"Check the console for more details"]);
+			this.hasErrored = true;
+		}
+
+		console.log("Error: ", C.lua_tostring(this.thread, -1));
+	}
+}
+
+
+Computer.prototype.pushEventStack = function(threadLoopID) {
+	var stackRuns = 0;
+
+	for (var i = 1; i <= this.eventStack.length; i++) {
+		stackRuns++;
+		if (stackRuns > 256 || !this.alive) {
+			return;
+		}
+
+		if (this.eventStack.length == 0) {
+			clearInterval(threadLoopID);
+			continue;
+		}
+
+		var argumentCount = this.eventStack[0].length;
+		this.pushEventStackToThread();
+
+		this.eventStack.splice(0, 1);
+		this.coroutineClock = Date.now();
+
+		var result;
+		try {
+			result = C.lua_resume(this.thread, argumentCount);
+		} catch (e) {
+			clearInterval(threadLoopID);
+			this.alive = false;
+
+			if (!this.hasErrored) {
+				console.log("Javascript error", e);
+				render.bsod("FATAL : JAVASCRIPT ERROR",
+					["A fatal Javascript error has occured.",
+					"Check the console for more details."]);
+				this.hasErrored = true;
 				return;
-			}
-
-			if (!computer.alive) {
-				return;
-			}
-
-			if (computer.eventStack.length > 0) {
-				var argumentsNumber = computer.eventStack[0].length;
-
-				for (var index in computer.eventStack[0]) {
-					var argument = computer.eventStack[0][index];
-					if (typeof(argument) == "string") {
-						C.lua_pushstring(computer.thread, argument);
-					} else if (typeof(argument) == "number") {
-						C.lua_pushnumber(computer.thread, argument);
-					} else if (typeof(argument) == "boolean") {
-						C.lua_pushboolean(computer.thread, argument ? 1 : 0);
-					} else if (typeof(argument) == "object") {
-						C.lua_pushstring(computer.thread, core.serializeTable(argument));
-					} else {
-						C.lua_pushstring(computer.thread, argument.toString());
-					}
-				}
-
-				computer.eventStack.splice(0, 1);
-				computer.coroutineClock = Date.now();
-
-				var result;
-				try {
-					result = C.lua_resume(computer.thread, argumentsNumber);
-				} catch (e) {
-					clearInterval(threadLoopID);
-					computer.alive = false;
-
-					if (!computer.hasErrored) {
-						console.log("Javascript error", e);
-						render.bsod("FATAL : JAVASCRIPT ERROR",
-							["A fatal Javascript error has occured.",
-							"Check the console for more details."]);
-						computer.hasErrored = true;
-						return;
-					}
-				}
-
-				if (result == C.LUA_YIELD) {
-					if (computer.shouldShutdown) {
-						computer.shutdown();
-					} else if (computer.shouldReboot) {
-						computer.reboot();
-					}
-				} else if (result == 0) {
-					clearInterval(threadLoopID);
-					computer.alive = false;
-
-					console.log("Program ended");
-				} else {
-					clearInterval(threadLoopID);
-					computer.alive = false;
-					if (!computer.hasErrored) {
-						render.bsod("FATAL : THREAD CRASH",
-							["The Lua thread has crashed!", "Check the console for more details"]);
-						computer.hasErrored = true;
-					}
-					console.log("Error: ", C.lua_tostring(computer.thread, -1));
-				}
-			} else {
-				clearInterval(threadLoopID);
 			}
 		}
+
+		this.handleResumeResult(result, threadLoopID);
+	}
+}
+
+
+Computer.prototype.resume = function() {
+	var _this = this;
+	var threadLoopID = setInterval(function() {
+		_this.pushEventStack.call(_this, threadLoopID);
 	}, 10);
 }
 

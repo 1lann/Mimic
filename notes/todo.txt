@@ -3,15 +3,11 @@ To Refactor
 - filesystem.copy
 - gui.js
 - code.js
-- computer.resume
 - core.loadStartupScript
-- event.onkeydown
-- event.mobileinput
 - http.request
 - core.main/setup combined with GUI
-- paths (ie res/fonts/...) into globals.js
-- Rename properties to globals
-- #file-input and #mobile-input into CSS classes
+- paths (ie fonts/...) into globals.js
+- #file-input into CSS class
 
 
 To Do

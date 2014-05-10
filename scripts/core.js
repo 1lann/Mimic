@@ -1,10 +1,10 @@
 
 //
 //  core.js
-//  Contains functions managing computers and setup
+//  Functions to manage computers and setup
 //
 //  Mimic
-//  By 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 
