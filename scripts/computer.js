@@ -297,8 +297,10 @@ Computer.prototype.terminate = function() {
 
 
 Computer.prototype.getActualSize = function() {
-	var width = this.width * config.cellWidth + 2 * config.borderWidth;
-	var height = this.height * config.cellHeight + 2 * config.borderHeight;
+	var actualWidth = config.cellWidth * config.terminalScale;
+	var actualHeight = config.cellHeight * config.terminalScale;
+	var width = this.width * actualWidth + 2 * config.borderWidth;
+	var height = this.height * actualHeight + 2 * config.borderHeight;
 
 	return {"width": width, "height": height};
 }

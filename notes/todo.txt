@@ -12,7 +12,6 @@ To Refactor
 
 To Do
 - Add GUI buttons for fullscreen, screenshot, etc.
-- Add terminal scale, default it to 1.2 (or something)
 - Add more ROM programs
 - Add Sass instead of actual CSS
 - Add support for http.post

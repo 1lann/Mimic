@@ -62,11 +62,13 @@ render.characterBackground = function(x, y, color, ctx) {
 
 	var computer = core.getActiveComputer();
 	if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
-		var cellX = ((x - 1) * config.cellWidth + config.borderWidth);
-		var cellY = ((y - 1) * config.cellHeight + config.borderHeight);
+		var actualWidth = config.cellWidth * config.terminalScale;
+		var actualHeight = config.cellHeight * config.terminalScale;
+		var cellX = ((x - 1) * actualWidth + config.borderWidth);
+		var cellY = ((y - 1) * actualHeight + config.borderHeight);
 
 		ctx.beginPath();
-		ctx.rect(cellX, cellY, config.cellWidth, config.cellHeight);
+		ctx.rect(cellX, cellY, actualWidth, actualHeight);
 		ctx.fillStyle = globals.colors[color];
 		ctx.fill();
 	}
@@ -101,10 +103,16 @@ render.characterText = function(x, y, text, color, ctx) {
 				offset -= 1;
 			}
 
-			var textX = (x - 1) * config.cellWidth + config.borderWidth + offset;
-			var textY = (y - 1) * config.cellHeight + config.borderHeight + 1;
+			var actualWidth = config.cellWidth * config.terminalScale;
+			var actualHeight = config.cellHeight * config.terminalScale;
+			var textX = (x - 1) * actualWidth + config.borderWidth + offset;
+			var textY = (y - 1) * actualHeight + config.borderHeight + 1;
 
-			ctx.drawImage(font, imgX, imgY, imgW, imgH, textX, textY, imgW, imgH);
+			var scaledImgWidth = imgW * config.terminalScale;
+			var scaledImgHeight = imgH * config.terminalScale;
+
+			ctx.drawImage(font, imgX, imgY, imgW, imgH, textX, textY,
+				scaledImgWidth, scaledImgHeight);
 		}
 	}
 }
