@@ -30,13 +30,6 @@ var events = {
 
 
 events.paste = function(computer) {
-	var triggerDuration = 1000;
-	var triggers = {
-		"r": computer.reboot,
-		"s": computer.shutdown,
-		"t": computer.terminate,
-	};
-
 	events.pasting = true;
 
 	var captureField = $("#mobile-input");
@@ -72,14 +65,21 @@ events.paste = function(computer) {
 }
 
 
-events.activateTrigger = function(character) {
+events.activateTrigger = function(computer, character) {
+	var triggerDuration = 1000;
+	var triggers = {
+		"r": computer.reboot,
+		"s": computer.shutdown,
+		"t": computer.terminate,
+	};
+
 	for (var triggerKey in triggers) {
 		if (character == triggerKey) {
 			var func = triggers[triggerKey];
 
 			events.triggerKey = character;
 			events.triggerKeyTimerID = setTimeout(function() {
-				func();
+				func.call(computer);
 				events.triggerKeyTimerID = null;
 			}, triggerDuration);
 		}
@@ -130,7 +130,7 @@ window.onkeydown = function(event) {
 	if (shouldPaste) {
 		events.paste(computer);
 	} else if (shouldActivateTrigger) {
-		events.activateTrigger(character);
+		events.activateTrigger(computer, character);
 	} else if (!events.triggerKeyTimerID) {
 		events.pushKey(computer, character, code);
 	}

@@ -7,7 +7,6 @@ To Refactor
 - http.request
 - core.main/setup combined with GUI
 - paths (ie fonts/...) into globals.js
-- #file-input into CSS class
 
 
 To Do

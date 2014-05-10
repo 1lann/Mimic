@@ -16,7 +16,7 @@ var config = {
 	"cellWidth": 12,
 	"cellHeight": 18,
 
-	"terminalScale": 1.1,
+	"terminalScale": 1.0,
 
 	"borderWidth": 4,
 	"borderHeight": 4,
