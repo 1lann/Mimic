@@ -1,17 +1,13 @@
 
-//  
+//
 //  Mimic
 //  Made by 1lann and GravityScore
-//  
+//
 
 
 
 var osAPI = {};
 
-
-osAPI.triggerBiosCrash = function(L) {
-	throw new Error("BIOS Crash");
-}
 
 
 osAPI.setAlarm = function(L) {

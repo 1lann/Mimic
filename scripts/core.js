@@ -1,14 +1,18 @@
 
-//  
+//
+//  core.js
+//  Contains functions managing computers and setup
+//
 //  Mimic
-//  Made by 1lann and GravityScore
-//  
+//  By 1lann and GravityScore
+//
 
 
 
 var core = {
 	"computers": [],
 };
+
 
 var C = Lua5_1.C;
 
@@ -29,7 +33,8 @@ core.serializeTable = function(arr) {
 	for (var index in arr) {
 		var name = arr[index].replace("\"", "\\\"");
 		var correctIndex = parseInt(index) + 1;
-		construct = construct + "[" + correctIndex.toString() + "]=\"" + name + "\",";
+		construct = construct + "[" + correctIndex.toString() +
+			"]=\"" + name + "\",";
 	}
 	construct = construct + "}";
 

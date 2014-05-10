@@ -1,8 +1,9 @@
 
-//  
+//
 //  Mimic
 //  Made by 1lann and GravityScore
-//  
+//
+
 
 
 var fs;
@@ -130,7 +131,7 @@ filesystem.getContainingFolder = function(path) {
 
 
 
-//  -------  Query
+//    Query
 
 
 filesystem.list = function(path) {
@@ -240,7 +241,7 @@ filesystem.isDir = function(path) {
 
 
 
-//  -------  Modification
+//    Modification
 
 
 filesystem.read = function(path) {
@@ -324,6 +325,8 @@ filesystem.makeDir = function(path, mode, position) {
 filesystem.delete = function(path) {
 	path = filesystem.sanitise(path);
 
+	var success = false;
+
 	if (path != "/") {
 		if (filesystem.isDir(path)) {
 			var fileList = filesystem.listRecursively(path, true);
@@ -344,21 +347,19 @@ filesystem.delete = function(path) {
 			}
 
 			fs.rmdirSync(path);
-			return true;
 		} else if (filesystem.exists(path)) {
 			fs.unlinkSync(path);
-			return true;
-		} else {
-			return true;
 		}
-	} else {
-		return false;
+
+		success = true;
 	}
+
+	return success;
 }
 
 
 
-//  -------  File Manipulation
+//    File Manipulation
 
 
 filesystem.copy = function(from, to) {
@@ -370,21 +371,22 @@ filesystem.copy = function(from, to) {
 	}
 
 	var success = false;
-	
+
 	if (filesystem.isDir(to)) {
-		if (to == from && filesystem.exists(computerFilesystem.resolve("/" + filesystem.getName(from)))) {
-			
+		var locallyResolved = computerFilesystem.resolve("/" + filesystem.getName(from));
+		if (to == from && filesystem.exists(locallyResolved)) {
+
 		} else if (filesystem.isDir(from)) {
 			if (filesystem.exists(to + "/" + filesystem.getName(from))) {
-				
+
 			} else if (to == "/" && filesystem.exists("/" + filesystem.getName(from))) {
-				
+
 			} else {
 				var fileList = filesystem.listRecursively(from, true);
 				for (var i in fileList) {
 					if (!filesystem.isDir(fileList[i])) {
 						var fileName = filesystem.getName(from) + "/" + fileList[i].substring(from.length);
-						filesystem.write(to+"/"+fileName, filesystem.read(fileList[i]));
+						filesystem.write(to + "/" + fileName, filesystem.read(fileList[i]));
 					}
 				}
 
@@ -414,18 +416,20 @@ filesystem.copy = function(from, to) {
 	return success;
 }
 
+
 filesystem.move = function(from, to) {
+	var success = false;
+
 	if (filesystem.copy(from, to)) {
 		if (filesystem.delete(from)) {
 			sidebar.update();
-			return true
+			success = true;
 		} else {
 			filesystem.delete(to);
-			return false;
 		}
-	} else {
-		return false;
 	}
+
+	return success;
 }
 
 
@@ -440,7 +444,7 @@ filesystem.move = function(from, to) {
 //  - Checks for read only
 
 
-//  -------  Utilities
+//    Utilities
 
 
 computerFilesystem.resolve = function(path, computerID) {
@@ -483,7 +487,7 @@ computerFilesystem.createRoot = function() {
 
 
 
-//  -------  Query
+//    Query
 
 
 computerFilesystem.list = function(path) {
@@ -511,7 +515,7 @@ computerFilesystem.isDir = function(path) {
 
 
 
-//  -------  Modification
+//    Modification
 
 
 computerFilesystem.read = function(path) {
@@ -581,7 +585,7 @@ computerFilesystem.delete = function(path) {
 
 
 
-//  -------  File Manipulation
+//    File Manipulation
 
 
 computerFilesystem.move = function(from, to) {

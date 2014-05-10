@@ -1,8 +1,8 @@
 
-//  
+//
 //  Mimic
 //  Made by 1lann and GravityScore
-//  
+//
 
 
 
@@ -21,7 +21,7 @@ var sides = [
 redstoneAPI.getSides = function(L) {
 	C.lua_newtable(L);
 	for (var i in sides) {
-		C.lua_pushnumber(L, i + 1);
+		C.lua_pushnumber(L, parseInt(i) + 1);
 		C.lua_pushstring(L, sides[i].toString());
 		C.lua_rawset(L, -3);
 	}

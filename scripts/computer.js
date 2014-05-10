@@ -1,13 +1,13 @@
 
-//  
+//
 //  Mimic
 //  Made by 1lann and GravityScore
-//  
+//
 
 
 
 //  ------------------------
-//    Initialization
+//    Setup
 //  ------------------------
 
 
@@ -122,7 +122,9 @@ Computer.prototype.launch = function() {
 		console.log("Thread closed");
 		thread.alive = false;
 
-		render.bsod("FATAL : BIOS ERROR", ["Error: " + errorCode, "Check the console for more details"]);
+		render.bsod(
+			"FATAL : BIOS ERROR",
+			["Error: " + errorCode, "Check the console for more details"]);
 		this.hasErrored = true;
 	}
 }
@@ -138,6 +140,7 @@ Computer.prototype.resume = function() {
 			if (stackRuns > 256) {
 				return;
 			}
+
 			if (!computer.alive) {
 				return;
 			}
@@ -169,10 +172,11 @@ Computer.prototype.resume = function() {
 				} catch (e) {
 					clearInterval(threadLoopID);
 					computer.alive = false;
+
 					if (!computer.hasErrored) {
 						console.log("Javascript error", e);
-						render.bsod("FATAL : JAVASCRIPT ERROR", 
-							["A fatal Javascript error has occured.", 
+						render.bsod("FATAL : JAVASCRIPT ERROR",
+							["A fatal Javascript error has occured.",
 							"Check the console for more details."]);
 						computer.hasErrored = true;
 						return;
@@ -194,7 +198,7 @@ Computer.prototype.resume = function() {
 					clearInterval(threadLoopID);
 					computer.alive = false;
 					if (!computer.hasErrored) {
-						render.bsod("FATAL : THREAD CRASH", 
+						render.bsod("FATAL : THREAD CRASH",
 							["The Lua thread has crashed!", "Check the console for more details"]);
 						computer.hasErrored = true;
 					}
@@ -225,7 +229,7 @@ Computer.prototype.shutdown = function() {
 		C.lua_close(this.L);
 		this.L = null;
 	}
- 
+
 	this.reset();
 }
 
@@ -270,7 +274,7 @@ Computer.prototype.terminate = function() {
 
 
 //  ------------------------
-//    GUI
+//    Display Properties
 //  ------------------------
 
 
@@ -283,7 +287,7 @@ Computer.prototype.getActualSize = function() {
 
 
 Computer.prototype.getLocation = function() {
-	var minX = 275;
+	var minX = 300;
 	var minY = 0;
 
 	if (gui.isFullscreen) {

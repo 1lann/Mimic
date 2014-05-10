@@ -280,17 +280,22 @@ $("#mobile-form").submit(function(event) {
 });
 
 
+
 // ------------------------
 //   Scrolling
 // ------------------------
 
-var compoundScroll = 0
+
+var compoundScroll = 0;
+
 
 onmousewheel = function(e) {
-	var e = window.event || e; // old IE support
-	var delta = e.wheelDelta || -e.detail*10
+	var e = window.event || e;
+	var delta = e.wheelDelta || -e.detail * 10
 
-	if (!delta) return true;
+	if (!delta) {
+		return true;
+	}
 
 	var computer = core.getActiveComputer();
 
@@ -302,21 +307,21 @@ onmousewheel = function(e) {
 		if (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height) {
 			compoundScroll += delta;
 
-			if (Math.abs(Math.round(compoundScroll/100)) != 0) {
-				if (Math.ceil(compoundScroll/100) < 0) {
-					for (var i = 0; i <= Math.abs(Math.round(compoundScroll/100)); i++) {
+			if (Math.abs(Math.round(compoundScroll / 100)) != 0) {
+				if (Math.ceil(compoundScroll / 100) < 0) {
+					for (var i = 0; i <= Math.abs(Math.round(compoundScroll / 100)); i++) {
 						computer.eventStack.push(["mouse_scroll", 1, x, y]);
 					}
 				} else {
-					for (var i = 0; i <= Math.round(compoundScroll/100); i++) {
+					for (var i = 0; i <= Math.round(compoundScroll / 100); i++) {
 						computer.eventStack.push(["mouse_scroll", -1, x, y]);
 					}
 				}
 			}
 
-			compoundScroll = compoundScroll%100;
-
+			compoundScroll = compoundScroll % 100;
 			computer.resume();
+
 			e.preventDefault();
 		}
 	}
@@ -324,12 +329,8 @@ onmousewheel = function(e) {
 
 
 if (window.addEventListener) {
-	// IE9, Chrome, Safari, Opera
 	window.addEventListener("mousewheel", onmousewheel, false);
-	// Firefox
 	window.addEventListener("DOMMouseScroll", onmousewheel, false);
+} else {
+	window.attachEvent("onmousewheel", onmousewheel);
 }
-// IE 6/7/8
-else window.attachEvent("onmousewheel", onmousewheel);
-
-

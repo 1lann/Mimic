@@ -31,7 +31,7 @@ You may modify this software and redistrubute it under the conditions:
 * You must retain the copyright and license in any redistrubutions and modifications of this software.
 * You may not charge for anything other than the data transfer costs of this software when redistrubuting.
 
-Note this license does not apply for material used in Mimic that we do not own. 
+Note this license does not apply for material used in Mimic that we do not own.
 
 
 ###lua5.1.js License

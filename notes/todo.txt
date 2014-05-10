@@ -1,0 +1,32 @@
+
+To Refactor
+- filesystem.copy
+- gui.js
+- code.js
+- computer.resume
+- core.loadStartupScript
+- event.onkeydown
+- event.mobileinput
+- http.request
+- core.main/setup combined with GUI
+- paths (ie res/fonts/...) into globals.js
+- Rename properties to globals
+- #file-input and #mobile-input into CSS classes
+
+
+To Do
+- Add GUI buttons for fullscreen, screenshot, etc.
+- Add terminal scale
+- Add more ROM programs
+- Add Sass instead of actual CSS
+- Add support for http.post
+- Add simulated restone API
+- Add file deletion from Ace editor
+- Add file downloading from Ace editor
+- Add popup error dialogues in place of console errors
+
+- Fix creating filenames with spaces
+- Fix files destroying newlines at EOF
+
+- Update to CC 1.63
+- Update forum post

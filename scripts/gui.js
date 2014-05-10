@@ -1,8 +1,8 @@
 
-//  
+//
 //  Mimic
 //  Made by 1lann and GravityScore
-//  
+//
 
 
 
@@ -71,7 +71,7 @@ sidebar.populate = function(data, level) {
 
 		if (item.type == "folder") {
 			sidebarList.append('\
-			<li class="sidebar-item' + isSelected + '" fileid="' + item.id + '" style="padding-left: ' + (level * 20 + 25) + 'px;">\n\
+			<li class="sidebar-item' + isSelected + '" folder="true" fileid="' + item.id + '" style="padding-left: ' + (level * 20 + 25) + 'px;">\n\
 				' + item.name + '\n\
 				<span class="glyphicon glyphicon-chevron-down"></span>\n\
 			</li>\n\
@@ -92,6 +92,8 @@ sidebar.populate = function(data, level) {
 			</li>\n\
 			');
 		}
+
+		data[i].domElement = $(".sidebar-list li").last();
 	}
 }
 
@@ -103,8 +105,35 @@ sidebar.reload = function(data) {
 	sidebar.populate(sidebar.data, 0);
 
 	$(".sidebar-item").click(function(evt) {
-		sidebar.select($(evt.target).attr("fileid"));
+		sidebar.select($(evt.target).attr("fileid"), $(evt.target));
 	});
+}
+
+
+sidebar.setSelected = function(newID) {
+	var current = sidebar.itemFromID(sidebar.selected);
+	current.domElement.removeClass("selected");
+
+	sidebar.selected = newID;
+	var newItem = sidebar.itemFromID(sidebar.selected);
+	newItem.domElement.addClass("selected");
+}
+
+
+sidebar.reloadCollapsed = function(id, child) {
+	if (child.attr("folder") == "true") {
+		var item = sidebar.itemFromID(child.attr("fileid"));
+
+		for (var i in item.children) {
+			var itemChild = item.children[i];
+
+			if (child.attr("collapsed") == "true") {
+				itemChild.domElement.css("display", "none");
+			} else {
+				itemChild.domElement.css("display", "block");
+			}
+		}
+	}
 }
 
 
@@ -159,32 +188,37 @@ sidebar.displayFile = function(file) {
 }
 
 
-sidebar.select = function(id) {
+sidebar.select = function(id, obj) {
 	var item = sidebar.itemFromID(id);
-	if (typeof(item) == "undefined" || item.type == "folder" || id == sidebar.selected) {
+	if (typeof(item) == "undefined" || id == sidebar.selected) {
 		return;
 	}
 
-	sidebar.saveOpenFile();
-	sidebar.selected = id;
+	if (item.type == "folder") {
+		var collapsed = obj.attr("collapsed");
 
-	if (item.type == "file") {
-		sidebar.displayFile(item);
-	} else if (item.type == "folder") {
-		
-	} else if (item.type == "computer") {
-		$(".editor-container").css("display", "none");
-		$(".computer-container").css("display", "block");
-		$("#canvas").click();
-	}
+		if (collapsed == "true") {
+			obj.attr("collapsed", "false");
+		} else {
+			obj.attr("collapsed", "true");
+		}
 
-	if (item.type == "computer") {
-		gui.computerSelected = true;
+		sidebar.reloadCollapsed(id, obj);
 	} else {
-		gui.computerSelected = false;
-	}
+		sidebar.saveOpenFile();
+		sidebar.setSelected(id);
 
-	sidebar.reload();
+		if (item.type == "file") {
+			sidebar.displayFile(item);
+			gui.computerSelected = false;
+		} else if (item.type == "computer") {
+			$(".editor-container").css("display", "none");
+			$(".computer-container").css("display", "block");
+			$("#canvas").click();
+
+			gui.computerSelected = true;
+		}
+	}
 }
 
 
@@ -258,7 +292,7 @@ gui.takeScreenshot = function(link) {
 	    	overlayContext.drawImage(cursorImage, 0, 0);
 	    	link.href = overlayCanvas.toDataURL("image/png");
 	    	link.download = "screenshot.png";
-	    	
+
 	    	if (!computer.cursor.blink) {
 	    		overlayContext.clearRect(0, 0, canvas.width, canvas.height);
 	    	}

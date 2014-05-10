@@ -14,6 +14,7 @@
 
 </head>
 
+
 <body>
 
 	<div class="sidebar-container">
@@ -22,9 +23,6 @@
 
 
 	<div class="computer-container">
-		<button id="credits-toggle" data-toggle="modal" data-target="#credits-modal" class="btn btn-default">Credits</button>
-		<button id="fullscreen-toggle" class="btn btn-default pull-right">Enter Fullscreen</button>
-
 		<canvas id="canvas" class="computer-canvas"></canvas>
 		<canvas id="overlay-canvas" class="computer-canvas"></canvas>
 		<form id="mobile-form">
@@ -44,6 +42,7 @@
 
 		<div id="editor"></div>
 	</div>
+
 
 	<div class="modal fade" id="credits-modal" tabindex="-1">
 		<div class="modal-dialog">
@@ -95,7 +94,7 @@
 			<h3>Javascript Disabled!</h3>
 			<p>You need Javascript to use Mimic!</p>
 			<p>Please enable it, or download a better browser.</p>
-			<a href="http://www.google.com/chrome">Get Chrome</a>
+			<a href="http://www.google.com/chrome">Get Google Chrome</a>
 		</div>
 	</noscript>
 
@@ -104,8 +103,7 @@
 
 <script src="scripts/lib/jquery.min.js"></script>
 <script src="scripts/lib/bootstrap.min.js"></script>
-<script src="ace/src-min-noconflict/ace.js" charset="utf-8"></script>
-
+<script src="scripts/lib/ace/src-min-noconflict/ace.js" charset="utf-8"></script>
 <script src="scripts/lib/jquery.caret.js"></script>
 
 <script src="scripts/gui.js"></script>
@@ -116,7 +114,7 @@
 <script src="scripts/lib/xdRequest.js"></script>
 
 <script src="scripts/code.js"></script>
-<script src="scripts/properties.js"></script>
+<script src="scripts/globals.js"></script>
 <script src="scripts/core.js"></script>
 <script src="scripts/computer.js"></script>
 <script src="scripts/filesystem.js"></script>

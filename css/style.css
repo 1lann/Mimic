@@ -1,7 +1,7 @@
 
 /*
-*   Mimic CSS
-*/
+ *   Mimic CSS
+ */
 
 
 
@@ -41,34 +41,6 @@ body {
 
 .noscript-container h3 {
 	margin-bottom: 30px;
-}
-
-
-/* ----------------  Custom Scrollbar  ---------------- */
-
-
-::-webkit-scrollbar {
-    height: 15px;
-    width: 15px;
-}
-
-::-webkit-scrollbar-button {
-    height: 0;
-    width: 0;
-}
-
-::-webkit-scrollbar-thumb {
-    background-clip: padding-box;
-    background-color: rgba(0,0,0,.3);
-    border-right: 11px solid transparent;
-    min-height: 20px;
-    min-width: 20px;
-    height: 5px;
-    width: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover, ::-webkit-scrollbar-thumb:active {
-    background-color: rgba(0,0,0,.4);
 }
 
 
@@ -171,8 +143,11 @@ body {
 	left: 0;
 	top: 0;
 	bottom: 0;
-	width: 275px;
+	width: 300px;
 	overflow: auto;
+
+	background-color: #475F77;
+	color: #ffffff;
 }
 
 .sidebar-list {
@@ -181,41 +156,29 @@ body {
 }
 
 .sidebar-item {
+	font-size: 16px;
 	padding: 10px 20px;
 	cursor: default;
-	color: #777777;
-
-	border-bottom: solid 1px #f9f9f9;
-}
-
-.sidebar-item:hover {
-	color: #444444;
+	color: #f2f3f3;
 }
 
 .sidebar-item.large {
-	font-size: 17px;
+	font-size: 20px;
 	padding: 12px 15px;
 }
 
 .sidebar-item.selected {
 	position: relative;
-	top: -1px;
 
-	background-color: #f2f2f2;
-	border-color: #f2f2f2;
-	color: #444444;
+	background-color: #354B5E;
+	color: #ffffff;
 }
 
 .sidebar-item .glyphicon {
 	margin-top: 3px;
-	color: #777777;
 
-	font-size: 10px;
-	margin-left: 5px;
-}
-
-.sidebar-item:hover .glyphicon {
-	color: #444444;
+	font-size: 14px;
+	float: right;
 }
 
 .sidebar-item.large .glyphicon {
@@ -231,27 +194,23 @@ body {
 .computer-container {
 	position: fixed;
 	top: 0;
-	left: 275px;
+	left: 300px;
 	bottom: 0;
 	right: 0;
-
-	padding: 10px;
-	padding-left: 0;
-	margin-left: -10px;
 }
 
 
 #canvas, #overlay-canvas {
 	image-rendering: optimizeSpeed;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: -o-crisp-edges;
-    image-rendering: optimize-contrast;
-    -ms-interpolation-mode: nearest-neighbor;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: -o-crisp-edges;
+	image-rendering: optimize-contrast;
+	-ms-interpolation-mode: nearest-neighbor;
 
 	position: fixed;
 	top: 0;
-	left: 275px;
+	left: 300px;
 }
 
 
@@ -262,7 +221,7 @@ body {
 .editor-container {
 	position: fixed;
 	top: 0;
-	left: 275px;
+	left: 300px;
 	bottom: 0;
 	right: 0;
 
@@ -272,7 +231,7 @@ body {
 .editor-header {
 	position: fixed;
 	top: 0;
-	left: 275px;
+	left: 300px;
 	right: 0;
 
 	height: 47px;
@@ -282,15 +241,17 @@ body {
 }
 
 .editor-header h1 {
-	font-size: 20px;
+	font-size: 24px;
 	margin: 0;
 	padding: 0;
 	display: inline-block;
+
+	margin-top: 1px;
 }
 
 .editor-header p {
 	display: inline-block;
-	font-size: 12px;
+	font-size: 15px;
 
 	margin-left: 30px;
 	color: #666666;
@@ -308,7 +269,7 @@ body {
 
 #editor {
 	position: absolute;
-	top: 47px;
+	top: 56px;
 	left: 0;
 	right: 0;
 	bottom: 0;
