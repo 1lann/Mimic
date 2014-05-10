@@ -1,7 +1,11 @@
 
 //
+//  code.js
+//  Contains pre-bios and bios lua code
+//  So an HTTP request doesn't have to be made to fetch the code
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

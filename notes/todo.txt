@@ -16,7 +16,7 @@ To Refactor
 
 To Do
 - Add GUI buttons for fullscreen, screenshot, etc.
-- Add terminal scale
+- Add terminal scale, default it to 1.2 (or something)
 - Add more ROM programs
 - Add Sass instead of actual CSS
 - Add support for http.post
@@ -24,6 +24,8 @@ To Do
 - Add file deletion from Ace editor
 - Add file downloading from Ace editor
 - Add popup error dialogues in place of console errors
+- Add grey border around computer
+- Add a favicon.ico
 
 - Fix creating filenames with spaces
 - Fix files destroying newlines at EOF

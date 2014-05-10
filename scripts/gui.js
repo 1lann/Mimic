@@ -1,7 +1,10 @@
 
 //
+//  gui.js
+//  Manipulation of the GUI through Jquery
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

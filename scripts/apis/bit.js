@@ -1,7 +1,10 @@
 
 //
+//  bit.js
+//  Lua API for the ComputerCraft bit library
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

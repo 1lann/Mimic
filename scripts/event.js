@@ -1,7 +1,10 @@
 
 //
+//  event.js
+//  Event handling functions that are passed to the current computer
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

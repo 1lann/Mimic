@@ -1,7 +1,10 @@
 
 //
+//  fs.js
+//  Lua API wrapper around the computer's filesyste
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

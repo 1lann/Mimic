@@ -1,7 +1,10 @@
 
 //
+//  render.js
+//  Functions to render to the emulated computer's screen
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

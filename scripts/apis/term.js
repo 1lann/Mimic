@@ -1,7 +1,10 @@
 
 //
+//  term.js
+//  Lua API providing functions to write to the screen
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

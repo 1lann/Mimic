@@ -1,7 +1,10 @@
 
 //
+//  filesystem.js
+//  Raw filesystem access functions
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

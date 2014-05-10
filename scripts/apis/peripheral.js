@@ -1,7 +1,10 @@
 
 //
+//  peripheral.js
+//  Lua API for ComputerCraft peripherals
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

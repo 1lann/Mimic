@@ -1,7 +1,10 @@
 
 //
+//  redstone.js
+//  Lua API for simulated restone
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

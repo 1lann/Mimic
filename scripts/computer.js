@@ -1,7 +1,10 @@
 
 //
+//  computer.js
+//  Class for emulated computers
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

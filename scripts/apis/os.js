@@ -1,7 +1,10 @@
 
 //
+//  os.js
+//  Lua API providing computer information and functions
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 

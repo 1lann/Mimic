@@ -1,7 +1,10 @@
 
 //
+//  http.js
+//  Lua API for HTTP requests
+//
 //  Mimic
-//  Made by 1lann and GravityScore
+//  1lann and GravityScore
 //
 
 
