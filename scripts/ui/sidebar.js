@@ -21,7 +21,7 @@ sidebar.createFolderElement = function(piece) {
 	});
 
 	var glyphicon = $("<span></span>", {
-		"class": "glyphicon glyphicon-chevron-up",
+		"class": "glyphicon glyphicon-chevron-down",
 	});
 	glyphicon.appendTo(element);
 
@@ -130,12 +130,12 @@ sidebar.onFolderClick = function(element) {
 		list.css({"display": "block"});
 		list.removeAttr("hidden");
 		triangle.toggleClass("glyphicon-chevron-down");
-		triangle.toggleClass("glyphicon-chevron-up");
+		triangle.toggleClass("glyphicon-chevron-right");
 	} else {
 		list.css({"display": "none"});
 		list.attr("hidden", "");
 		triangle.toggleClass("glyphicon-chevron-down");
-		triangle.toggleClass("glyphicon-chevron-up");
+		triangle.toggleClass("glyphicon-chevron-right");
 	}
 }
 
