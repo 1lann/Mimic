@@ -1,10 +1,7 @@
 
 //
 //  globals.js
-//  Global constants used throughout Mimic, for easy access
-//
-//  Mimic
-//  1lann and GravityScore
+//  GravityScore and 1lann
 //
 
 

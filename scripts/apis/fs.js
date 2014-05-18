@@ -1,22 +1,17 @@
 
 //
 //  fs.js
-//  Lua API wrapper around the computer's filesyste
-//
-//  Mimic
-//  1lann and GravityScore
+//  GravityScore and 1lann
 //
 
+
+//  Purpose:
+//  - Parse arguments from Lua runtime
+//  - Format return values for the Lua runtime
 
 
 var fsAPI = {};
 
-
-
-//  ----------------  Lua Wrappers  ----------------  //
-//  These functions interface with the Lua runtime
-//  - Parse arguments from Lua runtime
-//  - Format return values for the Lua runtime
 
 
 //    Query

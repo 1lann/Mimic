@@ -1,17 +1,14 @@
 
 //
 //  computer.js
-//  Class for emulated computers
-//
-//  Mimic
-//  1lann and GravityScore
+//  GravityScore and 1lann
 //
 
 
 
-//  ------------------------
+//
 //    Setup
-//  ------------------------
+//
 
 
 var Computer = function(id, advanced) {
@@ -58,9 +55,9 @@ Computer.prototype.reset = function() {
 
 
 
-//  ------------------------
+//
 //    APIs
-//  ------------------------
+//
 
 
 Computer.prototype.installAPIs = function() {
@@ -99,9 +96,9 @@ Computer.prototype.installAPIs = function() {
 
 
 
-//  ------------------------
+//
 //    Lua Thread
-//  ------------------------
+//
 
 
 Computer.prototype.launch = function() {
@@ -231,9 +228,9 @@ Computer.prototype.resume = function() {
 
 
 
-//  ------------------------
+//
 //    Termination
-//  ------------------------
+//
 
 
 Computer.prototype.shutdown = function() {
@@ -291,9 +288,9 @@ Computer.prototype.terminate = function() {
 
 
 
-//  ------------------------
+//
 //    Display Properties
-//  ------------------------
+//
 
 
 Computer.prototype.getActualSize = function() {
@@ -310,7 +307,7 @@ Computer.prototype.getLocation = function() {
 	var minX = 300;
 	var minY = 0;
 
-	if (gui.isFullscreen) {
+	if (ui.isFullscreen) {
 		minX = 0;
 	}
 

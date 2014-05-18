@@ -18,7 +18,7 @@
 <body>
 
 	<div class="sidebar-container">
-		<ul class="sidebar-list"></ul>
+		<ul class="sidebar"></ul>
 	</div>
 
 
@@ -91,7 +91,7 @@
 
 	<noscript>
 		<div class="noscript-container">
-			<h3>Javascript Disabled!</h3>
+			<h3>Javascript is Disabled!</h3>
 			<p>You need Javascript to use Mimic!</p>
 			<p>Please enable it, or download a better browser.</p>
 			<a href="http://www.google.com/chrome">Get Google Chrome</a>
@@ -106,7 +106,8 @@
 <script src="scripts/lib/ace/src-min-noconflict/ace.js" charset="utf-8"></script>
 <script src="scripts/lib/jquery.caret.js"></script>
 
-<script src="scripts/gui.js"></script>
+<script src="scripts/ui/sidebar.js"></script>
+<script src="scripts/ui/ui.js"></script>
 
 <script src="scripts/lib/purl.js"></script>
 <script src="scripts/lib/lua5.1.5.min.js"></script>
@@ -128,5 +129,24 @@
 <script src="scripts/apis/peripheral.js"></script>
 <script src="scripts/apis/redstone.js"></script>
 <script src="scripts/apis/term.js"></script>
+
+
+<script>
+
+
+//
+//    Main Entry Point
+//
+
+
+window.onresize();
+ui.editor.configure();
+
+$(document).ready(function() {
+	core.run();
+});
+
+
+</script>
 
 </html>

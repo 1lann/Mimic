@@ -1,10 +1,7 @@
 
 //
 //  render.js
-//  Functions to render to the emulated computer's screen
-//
-//  Mimic
-//  1lann and GravityScore
+//  GravityScore and 1lann
 //
 
 
@@ -24,13 +21,13 @@ var characters =
 	"OPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
 var CHARACTERS_PER_LINE = 16;
-var LINE_Y_OFFSET       = 2;
+var LINE_Y_OFFSET = 2;
 
 
 
-//  ------------------------
+//
 //    Setup
-//  ------------------------
+//
 
 
 render.setup = function(callback) {
@@ -50,9 +47,9 @@ render.setup = function(callback) {
 
 
 
-//  ------------------------
+//
 //    Individual Cells
-//  ------------------------
+//
 
 
 render.characterBackground = function(x, y, color, ctx) {
@@ -137,9 +134,9 @@ render.character = function(x, y, text, foreground, background, ctx) {
 
 
 
-//  ------------------------
+//
 //    Multiple Cells
-//  ------------------------
+//
 
 
 render.border = function(color) {
@@ -205,9 +202,9 @@ render.centredText = function(y, text, foreground, background, ctx) {
 
 
 
-//  ------------------------
+//
 //    Cursor
-//  ------------------------
+//
 
 
 render.cursorBlink = function() {
@@ -228,9 +225,9 @@ render.cursorBlink = function() {
 
 
 
-//  ------------------------
+//
 //    Blue Screen of Death
-//  ------------------------
+//
 
 
 render.bsod = function(title, lines) {

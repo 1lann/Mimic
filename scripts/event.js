@@ -1,10 +1,7 @@
 
 //
 //  event.js
-//  Event handling functions that are passed to the current computer
-//
-//  Mimic
-//  1lann and GravityScore
+//  GravityScore and 1lann
 //
 
 
@@ -24,9 +21,9 @@ var events = {
 
 
 
-//  ------------------------
+//
 //    Key Events
-//  ------------------------
+//
 
 
 events.paste = function(computer) {
@@ -101,7 +98,7 @@ events.pushKey = function(computer, character, code) {
 
 
 window.onkeydown = function(event) {
-	if (!gui.computerSelected || gui.popupOpen || isTouchDevice()) {
+	if (sidebar.typeOfSelected() != "computer" || isTouchDevice()) {
 		return;
 	}
 
@@ -157,13 +154,13 @@ window.onkeyup = function(event) {
 
 
 
-//  ------------------------
+//
 //    Mouse Events
-//  ------------------------
+//
 
 
 window.onmousedown = function(event) {
-	if (!gui.computerSelected || gui.popupOpen) {
+	if (sidebar.typeOfSelected() != "computer") {
 		return;
 	}
 
@@ -207,7 +204,7 @@ window.onmouseup = function(event) {
 
 
 window.onmousemove = function(event) {
-	if (!gui.computerSelected || gui.popupOpen) {
+	if (sidebar.typeOfSelected() != "computer") {
 		return;
 	}
 
@@ -244,9 +241,9 @@ window.onmousemove = function(event) {
 
 
 
-//  ------------------------
+//
 //    Mobile Input
-//  ------------------------
+//
 
 
 $("#mobile-input").val(">");
@@ -315,9 +312,9 @@ $("#mobile-form").submit(function(event) {
 
 
 
-// ------------------------
+//
 //   Scrolling
-// ------------------------
+//
 
 
 var compoundScroll = 0;

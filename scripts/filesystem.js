@@ -1,10 +1,7 @@
 
 //
 //  filesystem.js
-//  Raw filesystem access functions
-//
-//  Mimic
-//  1lann and GravityScore
+//  GravityScore and 1lann
 //
 
 
@@ -16,9 +13,9 @@ var computerFilesystem = {};
 
 
 
-//  ------------------------
+//
 //    Setup
-//  ------------------------
+//
 
 
 filesystem.setup = function(callback) {
@@ -51,9 +48,9 @@ filesystem.setup = function(callback) {
 
 
 
-//  ------------------------
+//
 //    Basic Utilities
-//  ------------------------
+//
 
 
 filesystem.format = function(path) {
@@ -124,9 +121,9 @@ filesystem.getContainingFolder = function(path) {
 
 
 
-//  ------------------------
+//
 //    Raw Filesystem
-//  ------------------------
+//
 
 //  These functions do not resolve the path to a particular computer
 //  They operate on absolute file paths starting from the actual root
@@ -178,44 +175,6 @@ filesystem.listRecursively = function(path, includeDirectories) {
 	}
 
 	return files;
-}
-
-
-filesystem.listHierarchically = function(path, id) {
-	id = typeof(id) == "undefined" ? 0 : id;
-	path = filesystem.sanitise(path);
-
-	var files = [];
-	var contents = filesystem.list(path);
-	for (var i in contents) {
-		var filePath = path + "/" + contents[i];
-		if (filePath.substring(0, 2) == "//") {
-			filePath = filePath.substring(1);
-		}
-
-		if (filesystem.isDir(filePath)) {
-			var children = filesystem.listHierarchically(filePath, id);
-			id = children.id;
-			files.push({
-				"id": id,
-				"name": contents[i],
-				"path": filePath,
-				"type": "folder",
-				"children": children.files,
-			});
-		} else {
-			files.push({
-				"id": id,
-				"name": contents[i],
-				"path": filePath,
-				"type": "file",
-			});
-		}
-
-		id += 1;
-	}
-
-	return {"files": files, "id": id};
 }
 
 
@@ -425,7 +384,7 @@ filesystem.move = function(from, to) {
 
 	if (filesystem.copy(from, to)) {
 		if (filesystem.delete(from)) {
-			sidebar.update();
+			//sidebar.update();
 			success = true;
 		} else {
 			filesystem.delete(to);
@@ -437,14 +396,14 @@ filesystem.move = function(from, to) {
 
 
 
-//  ------------------------
+//
 //    Computer Specific Filesystem
-//  ------------------------
+//
 
 //  These functions use the current computer ID to resolve paths for
 //  a particular computer
-//  - Mounts the rom folder
-//  - Checks for read only
+// Mounts the rom folder
+// Checks for read only
 
 
 //    Utilities
@@ -537,7 +496,7 @@ computerFilesystem.write = function(path, contents) {
 		success = false;
 	}
 
-	sidebar.update();
+	//sidebar.update();
 	return success;
 }
 
@@ -552,7 +511,7 @@ computerFilesystem.append = function(path, contents) {
 		success = false;
 	}
 
-	sidebar.update();
+	//sidebar.update();
 	return success;
 }
 
@@ -567,7 +526,7 @@ computerFilesystem.makeDir = function(path) {
 		success = false;
 	}
 
-	sidebar.update();
+	//sidebar.update();
 	return success;
 }
 
@@ -582,7 +541,7 @@ computerFilesystem.delete = function(path) {
 		success = false;
 	}
 
-	sidebar.update();
+	//sidebar.update();
 	return success;
 }
 
@@ -605,6 +564,6 @@ computerFilesystem.copy = function(from, to) {
 
 	var success = filesystem.copy(from, to);
 
-	sidebar.update();
+	//sidebar.update();
 	return success;
 }

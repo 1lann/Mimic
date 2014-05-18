@@ -5,8 +5,8 @@ To Refactor
 - code.js
 - core.loadStartupScript
 - http.request
-- core.main/setup combined with GUI
 - paths (ie fonts/...) into globals.js
+- "large" in sidebar.js to "computer"
 
 
 To Do

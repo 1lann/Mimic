@@ -1,42 +1,53 @@
 
 //
 //  term.js
-//  Lua API providing functions to write to the screen
-//
-//  Mimic
-//  1lann and GravityScore
+//  GravityScore and 1lann
 //
 
 
 
+var termHelpers = {};
 var termAPI = {};
 
 
-termAPI.write = function(L) {
-	var computer = core.getActiveComputer();
-	var str = "";
 
-	var t = C.lua_type(L, 1);
-	if (t == C.LUA_TSTRING) {
+//
+//    Writing
+//
+
+
+termHelpers.luaValueToString = function(L) {
+	var type = C.lua_type(L, 1);
+	var str;
+
+	if (type == C.LUA_TSTRING) {
 		str = C.lua_tostring(L, 1);
-	} else if (t == C.LUA_TBOOLEAN) {
+	} else if (type == C.LUA_TBOOLEAN) {
 		if (C.lua_toboolean(L, 1)) {
 			str = "true";
 		} else {
 			str = "false";
 		}
-	} else if (t == C.LUA_TNUMBER) {
+	} else if (type == C.LUA_TNUMBER) {
 		str = C.lua_tonumber(L, 1) + "";
 	} else {
 		str = "";
 	}
 
-	str.replace("\n", " ");
+	str = str.replace("\n", " ");
+	return str;
+}
+
+
+termAPI.write = function(L) {
+	var computer = core.getActiveComputer();
+	var str = termHelpers.luaValueToString(L);
 
 	var x = computer.cursor.x;
 	var y = computer.cursor.y;
 	var fg = computer.colors.foreground;
 	var bg = computer.colors.background;
+
 	render.text(x, y, str, fg, bg);
 
 	computer.cursor.x += str.length;
@@ -62,6 +73,12 @@ termAPI.clearLine = function(L) {
 
 	return 0;
 }
+
+
+
+//
+//    Cursor
+//
 
 
 termAPI.setCursorPos = function(L) {
@@ -104,6 +121,12 @@ termAPI.setCursorBlink = function(L) {
 }
 
 
+
+//
+//    Colors
+//
+
+
 termAPI.setTextColor = function(L) {
 	var computer = core.getActiveComputer();
 	var color = C.luaL_checkint(L, 1);
@@ -132,6 +155,17 @@ termAPI.isColor = function(L) {
 }
 
 
+termAPI.isColour = termAPI.isColor;
+termAPI.setTextColour = termAPI.setTextColor;
+termAPI.setBackgroundColour = termAPI.setBackgroundColor;
+
+
+
+//
+//    Information
+//
+
+
 termAPI.getSize = function(L) {
 	var computer = core.getActiveComputer();
 	C.lua_pushnumber(L, computer.width);
@@ -139,6 +173,12 @@ termAPI.getSize = function(L) {
 
 	return 2;
 }
+
+
+
+//
+//    Scrolling
+//
 
 
 termAPI.scroll = function(L) {
@@ -173,8 +213,3 @@ termAPI.scroll = function(L) {
 
 	return 0;
 }
-
-
-termAPI["isColour"] = termAPI["isColor"];
-termAPI["setTextColour"] = termAPI["setTextColor"];
-termAPI["setBackgroundColour"] = termAPI["setBackgroundColor"];
