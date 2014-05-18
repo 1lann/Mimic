@@ -7,6 +7,7 @@ To Refactor
 - http.request
 - paths (ie fonts/...) into globals.js
 - "large" in sidebar.js to "computer"
+- Clicking off screen and dragging onto computer registers mouse button as 0 instead of 1
 
 
 To Do

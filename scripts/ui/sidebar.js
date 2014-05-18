@@ -171,6 +171,8 @@ sidebar.onComputerClick = function(element) {
 
 
 sidebar.select = function(element) {
+	ui.saveOpenFile();
+
 	if (sidebar.selected) {
 		var text = sidebar.selected.children("p");
 		text.removeClass("selected");

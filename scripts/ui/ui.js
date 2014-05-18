@@ -15,10 +15,10 @@ var ui = {};
 //
 
 
-ui.editor = {};
+ui = {};
 
 
-ui.editor.onCursorChange = function(event) {
+ui.onCursorChange = function(event) {
 	var type = sidebar.typeOfSelected();
 	if (type == "file") {
 		var path = sidebar.pathOfSelected();
@@ -29,7 +29,7 @@ ui.editor.onCursorChange = function(event) {
 }
 
 
-ui.editor.onScrollChange = function(event) {
+ui.onScrollChange = function(event) {
 	var type = sidebar.typeOfSelected();
 	if (type == "file") {
 		var path = sidebar.pathOfSelected();
@@ -40,7 +40,7 @@ ui.editor.onScrollChange = function(event) {
 }
 
 
-ui.editor.configure = function() {
+ui.configureEditor = function() {
 	ui.editor = ace.edit("editor");
 	ui.editor.setTheme("ace/theme/tomorrow");
 	ui.editor.getSession().setMode("ace/mode/lua");
@@ -55,9 +55,9 @@ ui.editor.configure = function() {
 	ui.scrollLocations = {};
 
 	ui.editor.getSession().selection.on("changeCursor",
-		ui.editor.onCursorChange);
+		ui.onCursorChange);
 	ui.editor.getSession().on("changeScrollTop",
-		ui.editor.onScrollChange);
+		ui.onScrollChange);
 }
 
 

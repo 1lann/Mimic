@@ -384,7 +384,7 @@ filesystem.move = function(from, to) {
 
 	if (filesystem.copy(from, to)) {
 		if (filesystem.delete(from)) {
-			//sidebar.update();
+			sidebar.update();
 			success = true;
 		} else {
 			filesystem.delete(to);
@@ -496,7 +496,7 @@ computerFilesystem.write = function(path, contents) {
 		success = false;
 	}
 
-	//sidebar.update();
+	sidebar.update();
 	return success;
 }
 
@@ -511,7 +511,7 @@ computerFilesystem.append = function(path, contents) {
 		success = false;
 	}
 
-	//sidebar.update();
+	sidebar.update();
 	return success;
 }
 
@@ -526,7 +526,7 @@ computerFilesystem.makeDir = function(path) {
 		success = false;
 	}
 
-	//sidebar.update();
+	sidebar.update();
 	return success;
 }
 
@@ -541,7 +541,7 @@ computerFilesystem.delete = function(path) {
 		success = false;
 	}
 
-	//sidebar.update();
+	sidebar.update();
 	return success;
 }
 
@@ -564,6 +564,6 @@ computerFilesystem.copy = function(from, to) {
 
 	var success = filesystem.copy(from, to);
 
-	//sidebar.update();
+	sidebar.update();
 	return success;
 }
