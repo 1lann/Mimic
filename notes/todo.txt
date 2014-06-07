@@ -16,7 +16,6 @@ To Do
 - Add popup error dialogues in place of console errors
 - Add a favicon.ico
 
-- Fix rm erroring
 - Fix file downloading all previous files multiple times
 - Fix screenshot lagging
 - Fix files destroying newlines at EOF

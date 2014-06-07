@@ -38,15 +38,22 @@ fsAPI.list = function(L) {
 
 fsAPI.listAll = function(L) {
 	var computer = core.getActiveComputer();
-	var allFiles = filesystem.listRecursively("/computers/" + computer.id, true);
+	var search = [
+		filesystem.listRecursively("/computers/" + computer.id, true),
+		filesystem.listRecursively("/rom", true),
+	];
 
 	C.lua_newtable(L);
-	for (var i in allFiles) {
-		var name = allFiles[i].toString().replace("/computers/" + computer.id, "");
+	for (var ii in search) {
+		var files = search[ii];
 
-		C.lua_pushnumber(L, parseInt(i) + 1);
-		C.lua_pushstring(L, name);
-		C.lua_rawset(L, -3);
+		for (var i in files) {
+			var name = files[i].toString().replace("/computers/" + computer.id, "");
+
+			C.lua_pushnumber(L, parseInt(i) + 1);
+			C.lua_pushstring(L, name);
+			C.lua_rawset(L, -3);
+		}
 	}
 
 	return 1;

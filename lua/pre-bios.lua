@@ -190,7 +190,8 @@ fs.listAll = nil
 function fs.find(path)
 	path = path:gsub("^/+", "")
 	path = path:gsub("/+", "/")
-	path = path:gsub("*", ".*")
+	path = path:gsub("*", "[^/]-")
+	path = "^" .. path .. "$"
 
 	local allFiles = listAllFiles()
 	local matches = {}
