@@ -170,20 +170,13 @@
   text-align: center; }
 
 #mobile-input {
-  z-index: 5;
+  z-index: -1;
   position: fixed;
   height: 350px;
-  width: 620px;
-  cursor: default;
+  width: 4px;
   background: none;
-  left: 400px;
-  top: 150px;
-  opacity: 0;
-  color: white;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none; }
+  left: -100px;
+  top: 160px; }
 
 @media (max-width: 768px) {
   #file-list {

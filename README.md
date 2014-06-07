@@ -3,12 +3,18 @@
 A fully featured emulator for the [Minecraft](http://minecraft.net) mod [ComputerCraft](http://computercraft.info) that runs straight in your browser.
 
 Mimic makes use of
-* [asm.js](http://asmjs.org/)
-* [Emscripten](https://github.com/kripken/emscripten)
-* [lua5.1.js](https://github.com/logiceditor-com/lua5.1.js/)
-* [Purl](https://github.com/allmarkedup/purl)
-* [FileSaver.js Polyfill](https://github.com/eligrey/FileSaver.js)
-* [Blob.js Polyfill](https://github.com/eligrey/Blob.js)
+* [Emscripten](https://github.com/kripken/emscripten) - allowing a direct port of Lua 5.1 into JavaScript
+* [asm.js](http://asmjs.org/) - the engine behind Emscripten
+* [lua5.1.js](https://github.com/logiceditor-com/lua5.1.js/) - a library built by Emscripten
+* [Jquery](http://jquery.com/) - a masterful DOM manipulation library
+* [Ace Editor](http://ace.c9.io/) - a pure JavaScript editor
+* [Bootstrap](http://getbootstrap.com/) - a CSS framework
+* [BrowserFS.js](https://github.com/jvilk/BrowserFS) - an emulation of the Node.JS filesystem API using LocalStorage and read-only ZIP backends
+* [Purl](https://github.com/allmarkedup/purl) - parsing of URL parameters
+* [PrefixFree](http://leaverou.github.io/prefixfree/) - removes the need for vendor prefixes in CSS
+* [xdRequest](https://code.google.com/p/xdrequest/) - allows cross site HTTP requests
+* [FileSaver.js Polyfill](https://github.com/eligrey/FileSaver.js) - library to download content to the computer
+* [Blob.js Polyfill](https://github.com/eligrey/Blob.js) - a FileSaver.js dependency
 * The default rom files that come with ComputerCraft
 
 

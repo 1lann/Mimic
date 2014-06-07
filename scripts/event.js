@@ -248,69 +248,82 @@ window.onmousemove = function(event) {
 //
 
 
-$("#mobile-input").val(">");
-$("#mobile-input").caret(-1);
-
-
 isTouchDevice = function() {
 	return !!('ontouchstart' in window);
 }
 
 
-$("#mobile-input").bind("input", function() {
-	var mobileInput = $(this);
-
+events.onMobileInput = function() {
 	if (!isTouchDevice()) {
 		return;
 	}
 
+	var input = $("#mobile-input");
 	var computer = core.getActiveComputer();
 
-	if (mobileInput.val().length < 1) {
-    	mobileInput.val(">");
-		mobileInput.caret(-1);
+	if (typeof(computer) != "undefined") {
+		if (input.val().length < 1) {
+			input.val(">");
 
-		computer.eventStack.push(["key", 14]);
-		computer.resume();
-	} else if ($(this).val() != ">") {
-		var textInput = mobileInput.val().substring(1);
-		mobileInput.val(">");
-		mobileInput.caret(-1);
+			computer.eventStack.push(["key", 14]);
+			computer.resume();
+		} else {
+			var text = input.val().substring(1);
+			input.val(">");
 
-		for (var i = 0; i < textInput.length; i++) {
-			var letter = textInput[i];
-			var keyCode = parseInt(globals.charCodes[letter]);
-			var code = globals.keyCodes[keyCode];
+			var pushedSomething = false;
+			for (var i = 0; i < text.length; i++) {
+				var letter = text[i];
+				var code = globals.keyCodes[parseInt(globals.charCodes[letter])];
 
-			if (typeof(code) != "undefined") {
-				computer.eventStack.push(["key", code]);
+				if (typeof(code) != "undefined") {
+					computer.eventStack.push(["key", code]);
+					pushedSomething = true;
+				}
+
+				if (typeof(letter) != "undefined") {
+					computer.eventStack.push(["char", letter]);
+					pushedSomething = true;
+				}
 			}
 
-			if (typeof(letter) != "undefined") {
-				computer.eventStack.push(["char", letter]);
+			if (pushedSomething) {
+				computer.resume();
 			}
 		}
-
-		computer.resume();
 	}
-});
+}
 
 
-$("#mobile-form").submit(function(event) {
+events.onMobileSubmit = function(event) {
 	event.preventDefault();
-	if (!isTouchDevice()) {
+
+	if (!isTouchDevice) {
 		return;
 	}
 
+	var input = $("#mobile-input");
+	input.val(">");
+
 	var computer = core.getActiveComputer();
-	var mobileInput = $("#mobile-input");
+	if (typeof(computer) != "undefined") {
+		computer.eventStack.push(["key", 28]);
+		computer.resume();
+	}
+}
 
-	mobileInput.val(">");
-	mobileInput.caret(-1);
 
-	computer.eventStack.push(["key", 28]);
-	computer.resume();
+$("#overlay-canvas").click(function() {
+	$("#mobile-input").focus();
 });
+
+
+var input = $("#mobile-input");
+input.val(">");
+input.bind("input", events.onMobileInput);
+
+var form = $("#mobile-form");
+form.submit(events.onMobileSubmit);
 
 
 

@@ -38,7 +38,7 @@ globals.sides = [
 globals.paths = {
 	"font": "fonts/font.png",
 	"rom": "lua/rom.zip",
-}
+};
 
 
 globals.characterWidths = [
