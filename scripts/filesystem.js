@@ -29,6 +29,7 @@ filesystem.setup = function(callback) {
 		if (!request.response) {
 			console.log("Failed to load ComputerCraft rom!");
 			console.log("Error: ", evt);
+			alert("Failed to download rom files!")
 			return;
 		}
 

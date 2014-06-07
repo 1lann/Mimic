@@ -5,6 +5,10 @@
 --  I just cleaned up the code a bit
 
 
+local startupScriptContents = startupScript
+startupScript = nil
+
+
 function os.version()
 	return "CraftOS 1.5"
 end
@@ -399,6 +403,18 @@ end
 local ok, err = pcall(function()
 	parallel.waitForAny(
 		function()
+			if startupScriptContents then
+				local fn, err = loadstring(startupScriptContents, "startup.lua")
+				if err then
+					printError(err)
+				else
+					local _, err = pcall(fn)
+					if err then
+						printError(err)
+					end
+				end
+			end
+
 			os.run({}, "rom/programs/shell")
 		end,
 		function()

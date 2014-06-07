@@ -272,6 +272,10 @@ code.bios = '\n\
 --  I just cleaned up the code a bit\n\
 \n\
 \n\
+local startupScriptContents = startupScript\n\
+startupScript = nil\n\
+\n\
+\n\
 function os.version()\n\
 	return "CraftOS 1.5"\n\
 end\n\
@@ -666,6 +670,18 @@ end\n\
 local ok, err = pcall(function()\n\
 	parallel.waitForAny(\n\
 		function()\n\
+			if startupScriptContents then\n\
+				local fn, err = loadstring(startupScriptContents)\n\
+				if err then\n\
+					printError(err)\n\
+				else\n\
+					local _, err = pcall(fn)\n\
+					if err then\n\
+						printError(err)\n\
+					end\n\
+				end\n\
+			end\n\
+\n\
 			os.run({}, "rom/programs/shell")\n\
 		end,\n\
 		function()\n\

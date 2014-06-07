@@ -25,6 +25,16 @@ var config = {
 var globals = {};
 
 
+globals.sides = [
+	"top",
+	"bottom",
+	"front",
+	"back",
+	"left",
+	"right",
+];
+
+
 globals.paths = {
 	"font": "fonts/font.png",
 	"rom": "lua/rom.zip",

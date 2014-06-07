@@ -88,14 +88,10 @@ core.loadStartupScript = function(callback) {
 		request.setURL(url);
 		request.get(function(response) {
 			if (response.status == "200") {
-				if (filesystem.exists("/computers/0/startup")) {
-					filesystem.move("/computers/0/startup", "/computers/0/startup_old");
-				}
-
-				filesystem.write("/computers/0/startup", response.html);
+				core.startupScript = response.html;
 			} else {
 				console.log("Failed to load startup script");
-				console.log("From URL: ", url);
+				console.log("Server responded with status code " + response.status);
 				alert("Failed to fetch statup script!");
 			}
 

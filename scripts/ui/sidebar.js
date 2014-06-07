@@ -148,6 +148,7 @@ sidebar.onFileClick = function(element) {
 		ui.showEditor(path);
 	} else {
 		console.log("Failed to load file! Could not detect path!");
+		alert("Failed to find clicked file!");
 	}
 }
 
@@ -160,6 +161,7 @@ sidebar.onComputerClick = function(element) {
 		ui.showComputer(id);
 	} else {
 		console.log("Failed to load computer! Could not detect ID!");
+		alert("Failed to find clicked computer!");
 	}
 }
 

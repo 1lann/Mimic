@@ -60,6 +60,14 @@ Computer.prototype.reset = function() {
 //
 
 
+Computer.prototype.installStartupScript = function(contents) {
+	if (typeof(contents) == "string") {
+		C.lua_pushstring(this.L, contents);
+		C.lua_setglobal(this.L, "startupScript");
+	}
+}
+
+
 Computer.prototype.installAPIs = function() {
 	var apis = {
 		"bit": bitAPI,
@@ -91,6 +99,10 @@ Computer.prototype.installAPIs = function() {
 			}
 			C.lua_setglobal(this.L, api);
 		}
+	}
+
+	if (typeof(core.startupScript) != "undefined") {
+		this.installStartupScript(core.startupScript);
 	}
 }
 
@@ -159,8 +171,6 @@ Computer.prototype.handleResumeResult = function(result, threadLoopID) {
 	} else if (result == 0) {
 		clearInterval(threadLoopID);
 		this.alive = false;
-
-		console.log("Program ended");
 	} else {
 		clearInterval(threadLoopID);
 		this.alive = false;
