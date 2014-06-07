@@ -314,6 +314,10 @@ events.onMobileSubmit = function(event) {
 
 
 $("#overlay-canvas").click(function() {
+	if (!isTouchDevice()) {
+		return;
+	}
+
 	$("#mobile-input").focus();
 });
 
