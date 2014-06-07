@@ -14,9 +14,9 @@ code.getAll = function() {
 }
 
 
-code.prebios = '\
+code.prebios = '\n\
 \n\
---  Some functions are taken from the ComputerCraft bios.lua, \n\
+--  Some functions are taken from the ComputerCraft bios.lua,\n\
 --  which was written by dan200\n\
 \n\
 --  I just cleaned up the code a bit\n\
@@ -36,7 +36,8 @@ load = nil\n\
 \n\
 \n\
 xpcall = function(_fn, _fnErrorHandler)\n\
-	assert(type(_fn) == "function", "bad argument #1 to xpcall (function expected, got " .. type(_fn) .. ")")\n\
+	assert(type(_fn) == "function",\n\
+		"bad argument #1 to xpcall (function expected, got " .. type(_fn) .. ")")\n\
 \n\
 	local co = coroutine.create(_fn)\n\
 	local coroutineClock = os.clock()\n\
@@ -75,13 +76,14 @@ end\n\
 \n\
 \n\
 pcall = function(_fn, ...)\n\
-	assert(type(_fn) == "function", "bad argument #1 to pcall (function expected, got " .. type(_fn) .. ")")\n\
+	assert(type(_fn) == "function",\n\
+		"bad argument #1 to pcall (function expected, got " .. type(_fn) .. ")")\n\
 \n\
 	local args = {...}\n\
 	return xpcall(\n\
 		function()\n\
 			return _fn(unpack(args))\n\
-		end, \n\
+		end,\n\
 		function(_error)\n\
 			return _error\n\
 		end\n\
@@ -98,10 +100,9 @@ fs.append = nil\n\
 local fsRead = fs.read\n\
 fs.read = nil\n\
 \n\
-\n\
 function fs.open(path, mode)\n\
 	local containingFolder = path:sub(1, path:len() - fs.getName(path):len())\n\
-	if fs.isDir(path) or not fs.isDir(containingFolder) then\n\
+	if fs.isDir(path) or not fs.isDir(containingFolder) or path:find("%s") then\n\
 		return nil\n\
 	end\n\
 \n\
@@ -200,7 +201,43 @@ function fs.open(path, mode)\n\
 end\n\
 \n\
 \n\
+local listAllFiles = fs.listAll\n\
+fs.listAll = nil\n\
+\n\
+function fs.find(path)\n\
+	path = path:gsub("^/+", "")\n\
+	path = path:gsub("/+", "/")\n\
+	path = path:gsub("*", ".*")\n\
+\n\
+	local allFiles = listAllFiles()\n\
+	local matches = {}\n\
+\n\
+	for _, file in pairs(allFiles) do\n\
+		file = file:gsub("^/+", "")\n\
+		file = file:gsub("/+$", "")\n\
+		file = file:gsub("/+", "/")\n\
+\n\
+		if file:find(path) then\n\
+			table.insert(matches, file)\n\
+		end\n\
+	end\n\
+\n\
+	return matches\n\
+end\n\
+\n\
+\n\
+function fs.getDir(path)\n\
+	path = path:gsub("^/+", "")\n\
+	path = path:gsub("/+$", "")\n\
+	path = path:gsub("/+", "/")\n\
+\n\
+	local name = fs.getName(path)\n\
+	return path:sub(1, -name:len() - 2)\n\
+end\n\
+\n\
+\n\
 local nativeYield = coroutine.yield\n\
+\n\
 function coroutine.yield(filter)\n\
 	while true do\n\
 		local response = {nativeYield(filter)}\n\
@@ -216,20 +253,19 @@ function coroutine.yield(filter)\n\
 					return "200"\n\
 				end\n\
 			}\n\
+\n\
 			return "http_success",response[2],responseData\n\
-		elseif ((response[1] == filter) or not(filter)) then\n\
+		elseif response[1] == filter or not filter then\n\
 			return unpack(response)\n\
 		end\n\
 	end\n\
 end\n\
-\n\
-\n\
 ';
 
 
 code.bios = '\n\
 \n\
---  Almost all functions are taken from the ComputerCraft bios.lua, \n\
+--  Almost all functions are taken from the ComputerCraft bios.lua,\n\
 --  which was written by dan200\n\
 \n\
 --  I just cleaned up the code a bit\n\
@@ -269,7 +305,7 @@ end\n\
 function write(sText)\n\
 	local w, h = term.getSize()\n\
 	local x, y = term.getCursorPos()\n\
-	\n\
+\n\
 	local nLinesPrinted = 0\n\
 	local function newLine()\n\
 		if y + 1 <= h then\n\
@@ -281,7 +317,7 @@ function write(sText)\n\
 		x, y = term.getCursorPos()\n\
 		nLinesPrinted = nLinesPrinted + 1\n\
 	end\n\
-	\n\
+\n\
 	while string.len(sText) > 0 do\n\
 		local whitespace = string.match(sText, "^[ \\t]+")\n\
 		if whitespace then\n\
@@ -289,13 +325,13 @@ function write(sText)\n\
 			x, y = term.getCursorPos()\n\
 			sText = string.sub(sText, string.len(whitespace) + 1)\n\
 		end\n\
-		\n\
+\n\
 		local newline = string.match(sText, "^\\n")\n\
 		if newline then\n\
 			newLine()\n\
 			sText = string.sub(sText, 2)\n\
 		end\n\
-		\n\
+\n\
 		local text = string.match(sText, "^[^ \\t\\n]+")\n\
 		if text then\n\
 			sText = string.sub(sText, string.len(text) + 1)\n\
@@ -317,7 +353,7 @@ function write(sText)\n\
 			end\n\
 		end\n\
 	end\n\
-	\n\
+\n\
 	return nLinesPrinted\n\
 end\n\
 \n\
@@ -351,16 +387,16 @@ function read(replaceCharacter, history)\n\
     if replaceCharacter then\n\
 		replaceCharacter = string.sub(replaceCharacter, 1, 1)\n\
 	end\n\
-	\n\
+\n\
 	local w, h = term.getSize()\n\
 	local sx, sy = term.getCursorPos()\n\
-	\n\
+\n\
 	local function redraw(replChar)\n\
 		local scroll = 0\n\
 		if sx + pos >= w then\n\
 			scroll = (sx + pos) - w\n\
 		end\n\
-			\n\
+\n\
 		term.setCursorPos(sx, sy)\n\
 		local replace = replChar or replaceCharacter\n\
 		if replace then\n\
@@ -370,7 +406,7 @@ function read(replaceCharacter, history)\n\
 		end\n\
 		term.setCursorPos(sx + pos - scroll, sy)\n\
 	end\n\
-	\n\
+\n\
 	while true do\n\
 		local sEvent, param = os.pullEvent()\n\
 		if sEvent == "char" then\n\
@@ -442,11 +478,11 @@ function read(replaceCharacter, history)\n\
 			end\n\
 		end\n\
 	end\n\
-	\n\
+\n\
 	term.setCursorBlink(false)\n\
 	term.setCursorPos(w + 1, sy)\n\
 	print()\n\
-	\n\
+\n\
 	return line\n\
 end\n\
 \n\
@@ -520,11 +556,11 @@ local tAPIsLoading = {}\n\
 function os.loadAPI(_sPath)\n\
 	local sName = fs.getName(_sPath)\n\
 	if tAPIsLoading[sName] == true then\n\
-		printError("API "..sName.." is already being loaded")\n\
+		printError("API " .. sName .. " is already loaded")\n\
 		return false\n\
 	end\n\
 	tAPIsLoading[sName] = true\n\
-		\n\
+\n\
 	local tEnv = {}\n\
 	setmetatable(tEnv, { __index = _G })\n\
 	local fnAPI, err = loadfile(_sPath)\n\
@@ -536,12 +572,12 @@ function os.loadAPI(_sPath)\n\
         tAPIsLoading[sName] = nil\n\
 		return false\n\
 	end\n\
-	\n\
+\n\
 	local tAPI = {}\n\
 	for k, v in pairs(tEnv) do\n\
 		tAPI[k] =  v\n\
 	end\n\
-	\n\
+\n\
 	_G[sName] = tAPI\n\
 	tAPIsLoading[sName] = nil\n\
 	return true\n\
@@ -591,7 +627,7 @@ if http then\n\
 			end\n\
 		end\n\
 	end\n\
-	\n\
+\n\
 	http.get = function(_url)\n\
 		return wrapRequest(_url, nil)\n\
 	end\n\
@@ -630,10 +666,11 @@ local ok, err = pcall(function()\n\
 	parallel.waitForAny(\n\
 		function()\n\
 			os.run({}, "rom/programs/shell")\n\
-		end, \n\
+		end,\n\
 		function()\n\
 			rednet.run()\n\
-		end)\n\
+		end\n\
+	)\n\
 end)\n\
 \n\
 \n\
@@ -645,7 +682,7 @@ end\n\
 pcall(function()\n\
 	term.setCursorBlink(false)\n\
 	print("Press any key to continue")\n\
-	os.pullEvent("key") \n\
+	os.pullEvent("key")\n\
 end)\n\
 \n\
 os.shutdown()\n\

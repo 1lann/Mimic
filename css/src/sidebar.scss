@@ -40,7 +40,7 @@ $sidebar-width: 300px;
 		color: $sidebar-text-selected;
 		cursor: default;
 
-		&.large {
+		&.computer {
 			font-size: 20px;
 		}
 
@@ -68,7 +68,7 @@ $sidebar-width: 300px;
 			float: right;
 		}
 
-		&.large .glyphicon {
+		&.computer .glyphicon {
 			font-size: 14px;
 			margin-top: 15px;
 		}

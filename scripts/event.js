@@ -170,7 +170,7 @@ window.onmousedown = function(event) {
 
 	if (typeof(computer) != "undefined") {
 		var loc = computer.getLocation();
-		var button = globals.buttons["click " + event.button] + 1;
+		var button = globals.buttons[event.button];
 		var x, y;
 		var size = computer.getActualSize();
 		var ratio = size.height / size.width;
@@ -194,6 +194,8 @@ window.onmousedown = function(event) {
 			computer.eventStack.push(["mouse_click", button, x, y]);
 			computer.resume();
 		}
+
+		event.preventDefault();
 	}
 }
 
@@ -220,7 +222,7 @@ window.onmousemove = function(event) {
 
 		var x = Math.floor(localised.x / config.cellWidth) + 1;
 		var y = Math.floor(localised.y / config.cellHeight) + 1;
-		var button = globals.buttons["click " + event.button];
+		var button = globals.buttons[event.button];
 
 		var withinBounds = (x >= 1 && y >= 1 && x <= computer.width && y <= computer.height);
 		var differentFromPrevious =

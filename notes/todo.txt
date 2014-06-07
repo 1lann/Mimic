@@ -1,27 +1,24 @@
 
 To Refactor
 - filesystem.copy
-- gui.js
-- code.js
 - core.loadStartupScript
+
+- event.js and mobile code
+- code.js
 - http.request
-- paths (ie fonts/...) into globals.js
-- "large" in sidebar.js to "computer"
-- Clicking off screen and dragging onto computer registers mouse button as 0 instead of 1
 
 
 To Do
-- Add GUI buttons for fullscreen, screenshot, etc.
+- Add grey border around computer
 - Add more ROM programs
 - Add support for http.post
 - Add simulated restone API
-- Add file deletion from Ace editor
-- Add file downloading from Ace editor
 - Add popup error dialogues in place of console errors
-- Add grey border around computer
 - Add a favicon.ico
 
-- Fix creating filenames with spaces
+- Fix rm erroring
+- Fix file downloading all previous files multiple times
+- Fix screenshot lagging
 - Fix files destroying newlines at EOF
 
 - Update to CC 1.63

@@ -54,11 +54,11 @@ sidebar.createFileElement = function(piece) {
 		element.attr("user-data", piece.userData);
 	}
 
-	if (piece.large) {
-		element.addClass("large");
+	if (piece.computer) {
+		element.addClass("computer");
 	}
 
-	if (piece.large) {
+	if (piece.computer) {
 		var glyphicon = $("<span></span>", {
 			"class": "glyphicon glyphicon-chevron-right pull-right",
 		});
@@ -71,7 +71,7 @@ sidebar.createFileElement = function(piece) {
 
 	element.click(function(event) {
 		event.stopPropagation();
-		if (piece.large) {
+		if (piece.computer) {
 			sidebar.onComputerClick(element);
 		} else {
 			sidebar.onFileClick(element);
@@ -194,7 +194,7 @@ sidebar.select = function(element) {
 sidebar.typeOfSelected = function() {
 	if (!sidebar.selected) {
 		return "none";
-	} if (sidebar.selected.hasClass("large")) {
+	} if (sidebar.selected.hasClass("computer")) {
 		return "computer";
 	} else if (sidebar.selected.attr("folder") == "true") {
 		return "folder";
@@ -256,7 +256,7 @@ sidebar.getData = function() {
 
 	files.unshift({
 		"name": "Computer 0",
-		"large": true,
+		"computer": true,
 		"folder": false,
 		"userData": "0",
 	});
@@ -279,7 +279,7 @@ sidebar.update = function() {
 			sidebar.select(newSelection);
 		}
 	} else {
-		var selection = $("li[user-data='0'][class*='large']");
+		var selection = $("li[user-data='0'][class*='computer']");
 		sidebar.select(selection);
 	}
 }

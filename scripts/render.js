@@ -39,7 +39,7 @@ render.setup = function(callback) {
 	overlayContext.mozImageSmoothingEnabled = false;
 
 	font = new Image();
-	font.src = "fonts/font.png";
+	font.src = globals.paths.font;
 	font.onload = function() {
 		callback();
 	}

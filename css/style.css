@@ -17,7 +17,7 @@
     margin: 0;
     color: #f2f3f3;
     cursor: default; }
-    .sidebar li.large {
+    .sidebar li.computer {
       font-size: 20px; }
     .sidebar li p {
       padding: 10px 25px;
@@ -34,7 +34,7 @@
       margin-right: 15px;
       font-size: 14px;
       float: right; }
-    .sidebar li.large .glyphicon {
+    .sidebar li.computer .glyphicon {
       font-size: 14px;
       margin-top: 15px; }
 
@@ -201,6 +201,9 @@
   bottom: 0;
   right: 0; }
 
+#delete-file-btn {
+  margin-right: 20px; }
+
 .editor-header {
   position: fixed;
   top: 0;
@@ -241,6 +244,21 @@
   bottom: 0;
   right: 0; }
 
+#actions-pull-down-btn {
+  margin-top: 20px;
+  margin-left: 20px;
+  display: block; }
+
+#actions-pull-down {
+  margin-left: 20px;
+  margin-top: 10px; }
+
+#actions-pull-down:first-child {
+  margin-left: 0; }
+
+#exit-fullscreen {
+  margin: 20px; }
+
 #canvas, #overlay-canvas {
   image-rendering: optimizeSpeed;
   image-rendering: -moz-crisp-edges;
@@ -255,10 +273,7 @@
 body {
   color: #444444; }
 
-.btn {
-  margin-left: 20px; }
-
-.btn:hover {
+.btn:hover, .btn:active {
   background-color: #f8f8f8; }
 
 .noscript-container {

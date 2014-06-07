@@ -36,6 +36,23 @@ fsAPI.list = function(L) {
 }
 
 
+fsAPI.listAll = function(L) {
+	var computer = core.getActiveComputer();
+	var allFiles = filesystem.listRecursively("/computers/" + computer.id, true);
+
+	C.lua_newtable(L);
+	for (var i in allFiles) {
+		var name = allFiles[i].toString().replace("/computers/" + computer.id, "");
+
+		C.lua_pushnumber(L, parseInt(i) + 1);
+		C.lua_pushstring(L, name);
+		C.lua_rawset(L, -3);
+	}
+
+	return 1;
+}
+
+
 fsAPI.exists = function(L) {
 	var path = C.luaL_checkstring(L, 1);
 	var exists = computerFilesystem.exists(path);

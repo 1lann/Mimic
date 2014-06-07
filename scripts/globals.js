@@ -25,6 +25,12 @@ var config = {
 var globals = {};
 
 
+globals.paths = {
+	"font": "fonts/font.png",
+	"rom": "lua/rom.zip",
+}
+
+
 globals.characterWidths = [
 	0, 2, 8, 10, 10, 10, 10, 4, 8, 8, 8, 10, 2, 10, 2, 10, 10, 10, 10,
 	10, 10, 10, 10, 10, 10, 10, 2, 2, 8, 10, 8, 10, 12, 10, 10, 10, 10,
@@ -36,14 +42,9 @@ globals.characterWidths = [
 
 
 globals.buttons = {
-	"click 0": 0,
-	"click 2": 1,
-	"click 1": 2,
-	"scroll down": 3,
-	"scroll up": 4,
-	"drag 0": 5,
-	"drag 2": 6,
-	"drag 1": 7,
+	"0": 1,
+	"1": 3,
+	"2": 2,
 };
 
 

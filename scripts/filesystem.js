@@ -22,7 +22,7 @@ filesystem.setup = function(callback) {
 	BrowserFS.install(window);
 
 	var request = new XMLHttpRequest();
-	request.open("GET", "lua/rom.zip", true);
+	request.open("GET", globals.paths.rom, true);
 	request.responseType = "arraybuffer";
 
 	request.onload = function(evt) {
@@ -59,9 +59,7 @@ filesystem.format = function(path) {
 		path = "/" + path;
 	}
 
-	if (path.substring(path.length - 1) == "/") {
-		path = path.substring(0, path.length - 1);
-	}
+	path = path.replace(/\/+$/, "");
 
 	if (path.length == 0) {
 		path = "/";

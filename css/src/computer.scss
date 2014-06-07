@@ -15,6 +15,29 @@
 }
 
 
+#actions-pull-down-btn {
+	margin-top: 20px;
+	margin-left: 20px;
+	display: block;
+}
+
+
+#actions-pull-down {
+	margin-left: 20px;
+	margin-top: 10px;
+}
+
+
+#actions-pull-down:first-child {
+	margin-left: 0;
+}
+
+
+#exit-fullscreen {
+	margin: 20px;
+}
+
+
 #canvas, #overlay-canvas {
 	image-rendering: optimizeSpeed;
 	image-rendering: -moz-crisp-edges;

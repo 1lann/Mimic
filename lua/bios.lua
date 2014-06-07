@@ -1,11 +1,8 @@
 
---  Almost all functions are taken from the ComputerCraft bios.lua, 
+--  Almost all functions are taken from the ComputerCraft bios.lua,
 --  which was written by dan200
 
 --  I just cleaned up the code a bit
-
-
-local jsConsolePrint = print
 
 
 function os.version()
@@ -40,9 +37,9 @@ end
 
 
 function write(sText)
-	local w, h = term.getSize()		
+	local w, h = term.getSize()
 	local x, y = term.getCursorPos()
-	
+
 	local nLinesPrinted = 0
 	local function newLine()
 		if y + 1 <= h then
@@ -54,22 +51,22 @@ function write(sText)
 		x, y = term.getCursorPos()
 		nLinesPrinted = nLinesPrinted + 1
 	end
-	
+
 	while string.len(sText) > 0 do
-		local whitespace = string.match(sText, "^[ \t]+")
+		local whitespace = string.match(sText, "^[ \\t]+")
 		if whitespace then
 			term.write(whitespace)
 			x, y = term.getCursorPos()
 			sText = string.sub(sText, string.len(whitespace) + 1)
 		end
-		
-		local newline = string.match(sText, "^\n")
+
+		local newline = string.match(sText, "^\\n")
 		if newline then
 			newLine()
 			sText = string.sub(sText, 2)
 		end
-		
-		local text = string.match(sText, "^[^ \t\n]+")
+
+		local text = string.match(sText, "^[^ \\t\\n]+")
 		if text then
 			sText = string.sub(sText, string.len(text) + 1)
 			if string.len(text) > w then
@@ -90,20 +87,18 @@ function write(sText)
 			end
 		end
 	end
-	
+
 	return nLinesPrinted
 end
 
 
-function print(...)
-	local args = {...}
-	local linesPrinted = 0
-	for k, v in pairs(args) do
-		write(tostring(k) .. ": " .. tostring(v) .. "\n")
-		linesPrinted = linesPrinted + 1
+print = function(...)
+	local nLinesPrinted = 0
+	for n, v in ipairs({...}) do
+		nLinesPrinted = nLinesPrinted + write(tostring(v))
 	end
-
-	return linesPrinted
+	nLinesPrinted = nLinesPrinted + write("\\n")
+	return nLinesPrinted
 end
 
 
@@ -126,16 +121,16 @@ function read(replaceCharacter, history)
     if replaceCharacter then
 		replaceCharacter = string.sub(replaceCharacter, 1, 1)
 	end
-	
+
 	local w, h = term.getSize()
-	local sx, sy = term.getCursorPos()	
-	
+	local sx, sy = term.getCursorPos()
+
 	local function redraw(replChar)
 		local scroll = 0
 		if sx + pos >= w then
 			scroll = (sx + pos) - w
 		end
-			
+
 		term.setCursorPos(sx, sy)
 		local replace = replChar or replaceCharacter
 		if replace then
@@ -145,9 +140,9 @@ function read(replaceCharacter, history)
 		end
 		term.setCursorPos(sx + pos - scroll, sy)
 	end
-	
+
 	while true do
-		local sEvent, param = coroutine.yield()
+		local sEvent, param = os.pullEvent()
 		if sEvent == "char" then
 			line = string.sub(line, 1, pos) .. param .. string.sub(line, pos + 1)
 			pos = pos + 1
@@ -186,7 +181,7 @@ function read(replaceCharacter, history)
 					end
 					if historyPos then
                     	line = history[historyPos]
-                    	pos = string.len(line) 
+                    	pos = string.len(line)
                     else
 						line = ""
 						pos = 0
@@ -203,7 +198,7 @@ function read(replaceCharacter, history)
 			elseif param == 199 then
 				redraw(" ")
 				pos = 0
-				redraw()		
+				redraw()
 			elseif param == 211 then
 				if pos < string.len(line) then
 					redraw(" ")
@@ -217,11 +212,11 @@ function read(replaceCharacter, history)
 			end
 		end
 	end
-	
+
 	term.setCursorBlink(false)
 	term.setCursorPos(w + 1, sy)
-	newLine()
-	
+	print()
+
 	return line
 end
 
@@ -295,11 +290,11 @@ local tAPIsLoading = {}
 function os.loadAPI(_sPath)
 	local sName = fs.getName(_sPath)
 	if tAPIsLoading[sName] == true then
-		printError("API "..sName.." is already being loaded")
+		printError("API " .. sName .. " is already loaded")
 		return false
 	end
 	tAPIsLoading[sName] = true
-		
+
 	local tEnv = {}
 	setmetatable(tEnv, { __index = _G })
 	local fnAPI, err = loadfile(_sPath)
@@ -311,13 +306,13 @@ function os.loadAPI(_sPath)
         tAPIsLoading[sName] = nil
 		return false
 	end
-	
+
 	local tAPI = {}
 	for k, v in pairs(tEnv) do
 		tAPI[k] =  v
 	end
-	
-	_G[sName] = tAPI	
+
+	_G[sName] = tAPI
 	tAPIsLoading[sName] = nil
 	return true
 end
@@ -364,9 +359,9 @@ if http then
 			elseif event == "http_failure" and param1 == _url then
 				return nil
 			end
-		end		
+		end
 	end
-	
+
 	http.get = function(_url)
 		return wrapRequest(_url, nil)
 	end
@@ -405,10 +400,11 @@ local ok, err = pcall(function()
 	parallel.waitForAny(
 		function()
 			os.run({}, "rom/programs/shell")
-		end, 
+		end,
 		function()
 			rednet.run()
-		end)
+		end
+	)
 end)
 
 
@@ -420,8 +416,7 @@ end
 pcall(function()
 	term.setCursorBlink(false)
 	print("Press any key to continue")
-	os.pullEvent("key") 
+	os.pullEvent("key")
 end)
 
 os.shutdown()
-
