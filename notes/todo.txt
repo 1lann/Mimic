@@ -1,7 +1,6 @@
 
 To Refactor
 - filesystem.copy
-- event.js and mobile code
 - http.request
 
 

@@ -296,11 +296,11 @@ events.onMobileInput = function() {
 
 
 events.onMobileSubmit = function(event) {
-	event.preventDefault();
-
-	if (!isTouchDevice) {
+	if (!isTouchDevice()) {
 		return;
 	}
+
+	event.preventDefault();
 
 	var input = $("#mobile-input");
 	input.val(">");
