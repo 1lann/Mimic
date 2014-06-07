@@ -2,7 +2,6 @@
 To Refactor
 - filesystem.copy
 - core.loadStartupScript
-
 - event.js and mobile code
 - code.js
 - http.request
@@ -20,5 +19,4 @@ To Do
 - Fix screenshot lagging
 - Fix files destroying newlines at EOF
 
-- Update to CC 1.63
 - Update forum post

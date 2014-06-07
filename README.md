@@ -7,14 +7,16 @@ Mimic makes use of
 * [Emscripten](https://github.com/kripken/emscripten)
 * [lua5.1.js](https://github.com/logiceditor-com/lua5.1.js/)
 * [Purl](https://github.com/allmarkedup/purl)
+* [FileSaver.js Polyfill](https://github.com/eligrey/FileSaver.js)
+* [Blob.js Polyfill](https://github.com/eligrey/Blob.js)
 * The default rom files that come with ComputerCraft
 
 
 ###Credits
 
-* Made by 1lann and GravityScore
+* Made by [GravityScore](https://github.com/GravityScore) and [1lann](https://github.com/1lann)
 * ComputerCraft by dan200 (Twitter: [@DanTwoHundred](https://twitter.com/dan200))
-* Alexander Gladysh for lua5.1.js
+* lua5.1.js by [Alexander Gladysh](https://github.com/agladysh)
 
 
 ###License
