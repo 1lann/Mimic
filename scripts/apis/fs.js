@@ -44,15 +44,18 @@ fsAPI.listAll = function(L) {
 	];
 
 	C.lua_newtable(L);
+
+	var fileIterator = 1
 	for (var ii in search) {
 		var files = search[ii];
 
 		for (var i in files) {
 			var name = files[i].toString().replace("/computers/" + computer.id, "");
 
-			C.lua_pushnumber(L, parseInt(i) + 1);
+			C.lua_pushnumber(L, fileIterator);
 			C.lua_pushstring(L, name);
 			C.lua_rawset(L, -3);
+			fileIterator++;
 		}
 	}
 
