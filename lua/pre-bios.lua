@@ -222,9 +222,9 @@ end
 
 local nativeYield = coroutine.yield
 
-function coroutine.yield(filter)
+function coroutine.yield(filter, ...)
 	while true do
-		local response = {nativeYield(filter)}
+		local response = {nativeYield(filter, ...)}
 		if response[1] == "http_bios_wrapper_success" then
 			local responseText = response[3]
 			local responseData = {
