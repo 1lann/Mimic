@@ -162,7 +162,7 @@ ui.showEditor = function(path) {
 	$("#editor-title").html(name);
 	$("#editor-file-path").html(displayPath);
 
-	$("#delete-file-btn").click(function() {
+	$("#delete-file-btn").off("click").click(function() {
 		ui.showComputer(computer.id);
 		sidebar.select($(".computer"));
 
@@ -170,7 +170,7 @@ ui.showEditor = function(path) {
 		sidebar.update();
 	});
 
-	$("#download-file-btn").click(function() {
+	$("#download-file-btn").off("click").click(function() {
 		var contents = ui.editor.getSession().getValue();
 		var blob = new Blob([contents], {type: "text/plain;charset=utf-8"});
 		var actualName = name;

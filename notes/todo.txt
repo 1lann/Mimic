@@ -12,9 +12,12 @@ To Do
 - Add a favicon.ico
 - Add max storage size limit
 
+- Improve dropdown action menu design
+
+- Fix action button appearing in narrow mode
+- Fix rm not working
+- Fix pasting
 - Fix startup scripts, allow use of shell API
 - Fix file downloading all previous files multiple times
 - Fix screenshot lagging
 - Fix files destroying newlines at EOF
-
-- Update forum post
