@@ -418,7 +418,7 @@ computerFilesystem.resolve = function(path, computerID) {
 	var base = "/computers/" + computerID.toString();
 	var path = filesystem.format(base + filesystem.sanitise(path));
 
-	if (path.indexOf(base + "/rom") == 0) {
+	if (path.indexOf(base + "/rom/") == 0 || path == base + "/rom") {
 		path = filesystem.format(path.substring(path.indexOf("/rom")));
 	}
 
