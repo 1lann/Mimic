@@ -114,7 +114,7 @@ window.onkeydown = function(event) {
 
 	var code = parseInt(globals.keyCodes[event.keyCode]);
 	var character = globals.characters.noshift[event.keyCode];
-	if (event.shiftKey) {
+	if (event.shiftKey || CapsLock.isOn()) {
 		character = globals.characters.shift[event.keyCode];
 	}
 
