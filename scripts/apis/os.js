@@ -64,7 +64,7 @@ osAPI.clock = function(L) {
 
 osAPI.time = function(L) {
 	var computer = core.getActiveComputer();
-	var ticks = (Date.now() - computer.startClock) * 20;
+	var ticks = (Date.now() - computer.startClock) / 50;
 	C.lua_pushnumber(L, ticks % 24000 / 1000);
 
 	return 1;
@@ -73,7 +73,7 @@ osAPI.time = function(L) {
 
 osAPI.day = function(L) {
 	var computer = core.getActiveComputer();
-	var ticks = (Date.now() - computer.startClock) * 20;
+	var ticks = (Date.now() - computer.startClock) / 50;
 	C.lua_pushnumber(L, 1 + Math.floor(ticks / 24000));
 
 	return 1;
