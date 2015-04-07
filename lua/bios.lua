@@ -10,7 +10,7 @@ startupScript = nil
 
 
 function os.version()
-	return "CraftOS 1.5"
+	return "CraftOS 1.7"
 end
 
 
@@ -414,8 +414,11 @@ local ok, err = pcall(function()
 					end
 				end
 			end
-
-			os.run({}, "rom/programs/shell")
+			if term.isColor() then
+				os.run({}, "rom/programs/advanced/multishell")
+			else
+				os.run({}, "rom/programs/shell")
+			end
 		end,
 		function()
 			rednet.run()
