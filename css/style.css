@@ -245,8 +245,10 @@
 #actions-pull-down {
   margin-left: 20px;
   margin-top: 10px;
-  .btn {
-  z-index: 1;}
+}
+
+#actions-pull-down > .btn {
+  z-index: 1;
 }
 
 #actions-pull-down:first-child {
