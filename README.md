@@ -27,32 +27,10 @@ Mimic makes use of
 
 ###License
 
-Mimic is licensed under The Q Public License Version (QPL-1.0)
-
-Link: [The Q Public License Version (QPL-1.0)](http://opensource.org/licenses/QPL-1.0)
-
-Mimic by GravityScore and 1lann - Copyright (c) 2014
-
-Summary of the license:
-
-You may modify this software and redistrubute it under the conditions:
-* You must retain the copyright and license in any redistrubutions and modifications of this software.
-* You may not charge for anything other than the data transfer costs of this software when redistrubuting.
-
-Note this license does not apply for material used in Mimic that we do not own.
-
-
-###lua5.1.js License
-
-lua5.1.js is licensed under the terms of the MIT license, reproduced below.
-This means that lua5.1.js is free software and can be used for both academic
-and commercial purposes at absolutely no cost.
-
-Link: [lua5.1.js](https://github.com/logiceditor-com/lua5.1.js/)
+Mimic is (as of October 2016, now) licensed under The MIT license
 
 ```
-lua5.1.js: Copyright (c) 2013, LogicEditor <info@logiceditor.com>
-           Copyright (c) 2013, lua5.1.js authors (see AUTHORS)
+Copyright (c) 2016 Jason Chu (1lann) and Bennett Anderson (GravityScore).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the 'Software'), to deal
@@ -73,14 +51,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
 
+Note this license does not (necessarily) apply for material used in Mimic that we do not own.
+
+
+###lua5.1.js License
+
+lua5.1.js is licensed under the MIT license, shown above.
+
+```
+lua5.1.js: Copyright (c) 2013, LogicEditor <info@logiceditor.com>
+           Copyright (c) 2013, lua5.1.js authors (see AUTHORS)
+```
+
+Link: [lua5.1.js](https://github.com/logiceditor-com/lua5.1.js/)
+
+
 ###Emscripten License
 
 Emscripten is licensed under the MIT license, shown above.
+
+```
+Copyright (c) 2010-2014 Emscripten authors, see AUTHORS file.
+```
 
 Link: [Emscripten](https://github.com/kripken/emscripten)
 
 ###Purl License
 
 Purl is licensed under the MIT license, shown above.
+
+```
+Copyright (c) 2012 Mark Perkins, http://allmarkedup.com/
+```
 
 Link: [Purl](https://github.com/allmarkedup/purl)
