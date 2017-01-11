@@ -1,5 +1,9 @@
 #Mimic
 
+###Mimic is no longer being maintained (if you haven't figured it out already).
+
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
 A fully featured emulator for the [Minecraft](http://minecraft.net) mod [ComputerCraft](http://computercraft.info) that runs straight in your browser.
 
 Mimic makes use of
