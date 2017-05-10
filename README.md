@@ -1,6 +1,6 @@
-#Mimic
+# Mimic
 
-###Mimic is no longer being maintained (if you haven't figured it out already).
+### Mimic is no longer being maintained (if you haven't figured it out already).
 
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
@@ -22,14 +22,14 @@ Mimic makes use of
 * The default rom files that come with ComputerCraft
 
 
-###Credits
+### Credits
 
 * Made by [GravityScore](https://github.com/GravityScore) and [1lann](https://github.com/1lann)
 * ComputerCraft by dan200 (Twitter: [@DanTwoHundred](https://twitter.com/dan200))
 * lua5.1.js by [Alexander Gladysh](https://github.com/agladysh)
 
 
-###License
+### License
 
 Mimic is (as of October 2016, now) licensed under The MIT license
 
@@ -58,7 +58,7 @@ THE SOFTWARE.
 Note this license does not (necessarily) apply for material used in Mimic that we do not own.
 
 
-###lua5.1.js License
+### lua5.1.js License
 
 lua5.1.js is licensed under the MIT license, shown above.
 
@@ -70,7 +70,7 @@ lua5.1.js: Copyright (c) 2013, LogicEditor <info@logiceditor.com>
 Link: [lua5.1.js](https://github.com/logiceditor-com/lua5.1.js/)
 
 
-###Emscripten License
+### Emscripten License
 
 Emscripten is licensed under the MIT license, shown above.
 
@@ -80,7 +80,7 @@ Copyright (c) 2010-2014 Emscripten authors, see AUTHORS file.
 
 Link: [Emscripten](https://github.com/kripken/emscripten)
 
-###Purl License
+### Purl License
 
 Purl is licensed under the MIT license, shown above.
 
